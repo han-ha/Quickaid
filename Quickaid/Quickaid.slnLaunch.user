@@ -1,0 +1,15 @@
+[
+  {
+    "Name": "New Profile",
+    "Projects": [
+      {
+        "Path": "Quickaid.csproj",
+        "Action": "Start"
+      },
+      {
+        "Path": "..\\QuickAidApiTests\\QuickAidApiTests.csproj",
+        "Action": "Start"
+      }
+    ]
+  }
+]

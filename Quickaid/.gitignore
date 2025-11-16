@@ -17,6 +17,5 @@ obj/
 *.pdb
 *.mdb
 
-# Reszta specyficzna dla projektu .NET (opcjonalnie)
 *.ide
 *.dotCover

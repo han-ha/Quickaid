@@ -117,14 +117,14 @@ namespace Quickaid.Controllers
             //        output.Add($"QuizQuestion → CRUD + rekord testowy");
 
             //        // USER QUIZ RESULT
-            //        var result = new UserQuizResult { UserId = persistentUser.Id, QuizId = persistentQuiz.Id, Score = 85 };
+            //        var result = new Result { UserId = persistentUser.Id, QuizId = persistentQuiz.Id, Score = 85 };
             //        _db.UserQuizResults.Add(result); _db.SaveChanges();
             //        var resultRead = _db.UserQuizResults.First(r => r.Id == result.Id);
             //        resultRead.Score = 90; _db.SaveChanges();
             //        _db.UserQuizResults.Remove(resultRead); _db.SaveChanges();
-            //        var persistentResult = new UserQuizResult { UserId = persistentUser.Id, QuizId = persistentQuiz.Id, Score = 100 };
+            //        var persistentResult = new Result { UserId = persistentUser.Id, QuizId = persistentQuiz.Id, Score = 100 };
             //        _db.UserQuizResults.Add(persistentResult); _db.SaveChanges();
-            //        output.Add($"UserQuizResult → CRUD + rekord testowy ID={persistentResult.Id}");
+            //        output.Add($"Result → CRUD + rekord testowy ID={persistentResult.Id}");
 
             //    }
             //    catch (Exception ex)

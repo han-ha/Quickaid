@@ -9,7 +9,6 @@ namespace Quickaid.Controllers
     [Route("api/[controller]")]
     public class AuthController(IAuthService authService) : ControllerBase
     {
-        // logika aplikacyjna dla autoryzacji i rejestracji
         private readonly IAuthService _authService = authService;
 
         // POST api/auth/register
@@ -17,10 +16,8 @@ namespace Quickaid.Controllers
         [HttpPost("register")]
         public async Task<IActionResult> Register([FromBody] RegisterDto dto)
         {
-            // walidacja danych wejœciowych
             if (!ModelState.IsValid) return BadRequest(ModelState);
 
-            // rejestracja nowego u¿ytkownika
             var result = await _authService.RegisterAsync(dto);
             if (!result.Success) return BadRequest(result.Message);
             return Ok(result);
@@ -31,10 +28,8 @@ namespace Quickaid.Controllers
         [HttpPost("login")]
         public async Task<IActionResult> Login([FromBody] LoginDto dto)
         {
-            // walidacja danych wejœciowych
             if (!ModelState.IsValid) return BadRequest(ModelState);
 
-            // logowanie u¿ytkownika
             var result = await _authService.LoginAsync(dto);
             if (!result.Success) return Unauthorized(result.Message);
             return Ok(result);

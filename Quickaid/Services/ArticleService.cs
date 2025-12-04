@@ -12,21 +12,18 @@ namespace Quickaid.Services
         private readonly AppDbContext _db = db;
         private readonly IArticleMapper _mapper = mapper;
 
-        // Pobranie wszystkich artyku³ów
         public async Task<IEnumerable<ArticleDto>> GetAllAsync()
         {
             var entities = await _db.Articles.ToListAsync();
             return entities.Select(a => _mapper.ToDto(a));
         }
 
-        // Pobranie artyku³u po ID
         public async Task<ArticleDto?> GetByIdAsync(int id)
         {
             var entity = await _db.Articles.FirstOrDefaultAsync(a => a.Id == id);
             return entity == null ? null : _mapper.ToDto(entity);
         }
 
-        // Dodanie nowego artyku³u
         public async Task<ArticleDto> AddAsync(ArticleDto dto)
         {
             var entity = new Article
@@ -44,7 +41,6 @@ namespace Quickaid.Services
             return _mapper.ToDto(entity);
         }
 
-        // Aktualizacja artyku³u
         public async Task<ArticleDto?> UpdateAsync(int id, ArticleDto dto)
         {
             var entity = await _db.Articles.FirstOrDefaultAsync(a => a.Id == id);
@@ -58,7 +54,6 @@ namespace Quickaid.Services
             return _mapper.ToDto(entity);
         }
 
-        // Usuniêcie artyku³u
         public async Task<bool> DeleteAsync(int id)
         {
             var entity = await _db.Articles.FirstOrDefaultAsync(a => a.Id == id);

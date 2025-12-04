@@ -1,6 +1,5 @@
 namespace Quickaid.Models.DTO
 {
-    // dane quizu
     public class QuizDto
     {
         public int Id { get; set; }

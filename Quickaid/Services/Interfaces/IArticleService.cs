@@ -2,7 +2,6 @@ using Quickaid.Models.DTO;
 
 namespace Quickaid.Services.Interfaces
 {
-    // logika artyku³ów edukacyjnych
     public interface IArticleService
     {
         Task<IEnumerable<ArticleDto>> GetAllAsync();

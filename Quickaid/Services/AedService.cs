@@ -11,21 +11,18 @@ namespace Quickaid.Services
         private readonly AppDbContext _db = db;
         private readonly IAedMapper _mapper = mapper;
 
-        // pobranie wszystkich punktów AED
         public async Task<IEnumerable<AedDto>> GetAllAsync()
         {
             var entities = await _db.AedPoints.AsNoTracking().ToListAsync();
             return entities.Select(e => _mapper.ToDto(e));
         }
 
-        // pobranie punktu AED po Id
         public async Task<AedDto?> GetByIdAsync(int id)
         {
             var entity = await _db.AedPoints.AsNoTracking().FirstOrDefaultAsync(a => a.Id == id);
             return entity == null ? null : _mapper.ToDto(entity);
         }
 
-        // dodanie nowego punktu AED
         public async Task<AedDto> AddAsync(AedDto dto)
         {
             var entity = _mapper.ToEntity(dto);
@@ -37,7 +34,6 @@ namespace Quickaid.Services
             return _mapper.ToDto(entity);
         }
 
-        // aktualizacja punktu AED
         public async Task<AedDto?> UpdateAsync(int id, AedDto dto)
         {
             var entity = await _db.AedPoints.FirstOrDefaultAsync(a => a.Id == id);
@@ -53,7 +49,6 @@ namespace Quickaid.Services
             return _mapper.ToDto(entity);
         }
 
-        // usuniêcie punktu AED
         public async Task<bool> DeleteAsync(int id)
         {
             var entity = await _db.AedPoints.FirstOrDefaultAsync(a => a.Id == id);

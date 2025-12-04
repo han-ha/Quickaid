@@ -3,7 +3,7 @@ using System.ComponentModel.DataAnnotations.Schema;
 namespace Quickaid.Models.Entities
 {
     [Table("passwords")]
-    public class Password
+    public class Password // TODO resetowanie has³a w bezpieczny sposób
     {
         [Column("id")]
         public int Id { get; set; }

@@ -98,7 +98,7 @@ namespace Quickaid.Services
                     }
                 }
 
-                // Usuń wszystkie odpowiedzi pytania
+                // Usuń wszystkie odpowiedzi pytania, jeśli nie są użyte do innego pytania
                 var answers = await _context.Answers
                     .Where(a => a.QuestionId == id)
                     .ToListAsync();

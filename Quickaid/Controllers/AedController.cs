@@ -9,7 +9,6 @@ namespace Quickaid.Controllers
     [Route("api/[controller]")]
     public class AedController(IAedService aedService) : ControllerBase
     {
-        // logika aplikacyjna dla punktów AED
         private readonly IAedService _aedService = aedService;
 
         // GET api/aed
@@ -17,7 +16,6 @@ namespace Quickaid.Controllers
         [HttpGet]
         public async Task<IActionResult> GetAllAedPoints()
         {
-            // pobranie wszystkich punktów AED
             var result = await _aedService.GetAllAsync();
             return Ok(result);
         }
@@ -27,7 +25,6 @@ namespace Quickaid.Controllers
         [HttpGet("{id}")]
         public async Task<IActionResult> GetAedById(int id)
         {
-            // pobranie punktu AED po id
             var point = await _aedService.GetByIdAsync(id);
             if (point == null) return NotFound();
             return Ok(point);
@@ -38,10 +35,8 @@ namespace Quickaid.Controllers
         [HttpPost]
         public async Task<IActionResult> AddAed([FromBody] AedDto dto)
         {
-            // walidacja danych wejœciowych
             if (!ModelState.IsValid) return BadRequest(ModelState);
 
-            // dodanie nowego punktu AED
             var created = await _aedService.AddAsync(dto);
             return CreatedAtAction(nameof(GetAedById), new { id = created.Id }, created);
         }
@@ -51,10 +46,8 @@ namespace Quickaid.Controllers
         [HttpPut("{id}")]
         public async Task<IActionResult> UpdateAed(int id, [FromBody] AedDto dto)
         {
-            // walidacja danych wejœciowych
             if (!ModelState.IsValid) return BadRequest(ModelState);
 
-            // aktualizacja punktu AED
             var updated = await _aedService.UpdateAsync(id, dto);
             if (updated == null) return NotFound();
             return Ok(updated);
@@ -65,7 +58,6 @@ namespace Quickaid.Controllers
         [HttpDelete("{id}")]
         public async Task<IActionResult> DeleteAed(int id)
         {
-            // usuniêcie punktu AED
             var deleted = await _aedService.DeleteAsync(id);
             if (!deleted) return NotFound();
             return NoContent();

@@ -1,6 +1,7 @@
 using Microsoft.AspNetCore.Authentication.JwtBearer;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.IdentityModel.Tokens;
+using Microsoft.OpenApi.Models;
 using Quickaid.Data;
 using Quickaid.Services;
 using Quickaid.Services.Interfaces;
@@ -16,7 +17,7 @@ namespace Quickaid
         {
             var builder = WebApplication.CreateBuilder(args);
 
-            // baza danych z retry na transient errors TODO daæ limit na retry?
+            // baza danych
             builder.Services.AddDbContext<AppDbContext>(options =>
                 options.UseSqlServer(
                     builder.Configuration.GetConnectionString("DefaultConnection"),
@@ -27,11 +28,11 @@ namespace Quickaid
             builder.Services.AddControllers();
             builder.Services.AddRouting(options => options.LowercaseUrls = true);
 
-            // swagger (testy)
+            // Swagger (testy)
             builder.Services.AddEndpointsApiExplorer();
             builder.Services.AddSwaggerGen();
 
-            // CORS (opcjonalnie, dla testów w Swaggerze)
+            // CORS (dla testów w Swaggerze)
             builder.Services.AddCors(options =>
             {
                 options.AddPolicy("AllowAll", policy =>
@@ -42,8 +43,8 @@ namespace Quickaid
                 });
             });
 
-            // klucz JWT z konfiguracji TODO zrobiæ coœ sensownego
-            var key = Encoding.ASCII.GetBytes(builder.Configuration["Jwt:Secret"] ?? "super_secret_dev_key");
+            // klucz JWT z konfiguracji TODO daæ lepszy default
+            var key = Encoding.ASCII.GetBytes(builder.Configuration["Jwt:Key"] ?? "super_secret_dev_key");
 
             // konfiguracja uwierzytelniania JWT
             builder.Services.AddAuthentication(options =>
@@ -65,6 +66,37 @@ namespace Quickaid
                 };
             });
 
+            builder.Services.AddSwaggerGen(c =>
+            {
+                c.SwaggerDoc("v1", new Microsoft.OpenApi.Models.OpenApiInfo { Title = "Quickaid API", Version = "v1" });
+
+                var securityScheme = new Microsoft.OpenApi.Models.OpenApiSecurityScheme
+                {
+                    Name = "Authorization",
+                    Description = "Enter JWT Bearer token **_only_**",
+                    In = Microsoft.OpenApi.Models.ParameterLocation.Header,
+                    Type = Microsoft.OpenApi.Models.SecuritySchemeType.Http,
+                    Scheme = "bearer",
+                    BearerFormat = "JWT",
+                    Reference = new Microsoft.OpenApi.Models.OpenApiReference
+                    {
+                        Id = JwtBearerDefaults.AuthenticationScheme,
+                        Type = Microsoft.OpenApi.Models.ReferenceType.SecurityScheme
+                    }
+                };
+
+                c.AddSecurityDefinition(securityScheme.Reference.Id, securityScheme);
+
+                c.AddSecurityRequirement(new Microsoft.OpenApi.Models.OpenApiSecurityRequirement
+                {
+                    {
+                        securityScheme,
+                        Array.Empty<string>()
+                    }
+                });
+            });
+
+
             // konfiguracja autoryzacji
             builder.Services.AddAuthorization();
 
@@ -82,7 +114,7 @@ namespace Quickaid
             builder.Services.AddScoped<IUserMapper, UserMapper>();
             builder.Services.AddScoped<IArticleMapper, ArticleMapper>();
             builder.Services.AddScoped<IQuizMapper, QuizMapper>();
-            builder.Services.AddScoped<IUserQuizResultMapper, UserQuizResultMapper>();
+            builder.Services.AddScoped<IResultMapper, ResultMapper>();
             builder.Services.AddScoped<IAedMapper, AedMapper>();
             builder.Services.AddScoped<IQuestionMapper, QuestionMapper>();
             builder.Services.AddScoped<IAnswerMapper, AnswerMapper>();
@@ -90,7 +122,7 @@ namespace Quickaid
 
             var app = builder.Build();
 
-            // swagger UI (testy)
+            // Swagger UI (testy)
             if (app.Environment.IsDevelopment())
             {
                 app.UseSwagger();

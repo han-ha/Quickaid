@@ -7,6 +7,7 @@ namespace Quickaid.Controllers
 {
     [ApiController]
     [Route("api/[controller]")]
+    [Authorize]
     public class QuestionsController(IQuestionService questionService) : ControllerBase
     {
         private readonly IQuestionService _questionService = questionService;

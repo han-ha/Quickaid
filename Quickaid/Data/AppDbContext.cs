@@ -12,7 +12,7 @@ namespace Quickaid.Data
         public DbSet<Question> Questions { get; set; }
         public DbSet<Answer> Answers { get; set; }
         public DbSet<QuizQuestion> QuizQuestions { get; set; }
-        public DbSet<UserQuizResult> UserQuizResults { get; set; }
+        public DbSet<Result> UserQuizResults { get; set; }
         public DbSet<Article> Articles { get; set; }
 
         protected override void OnModelCreating(ModelBuilder modelBuilder)
@@ -30,12 +30,12 @@ namespace Quickaid.Data
                 .WithMany()
                 .HasForeignKey(a => a.QuestionId);
 
-            modelBuilder.Entity<UserQuizResult>()
+            modelBuilder.Entity<Result>()
                 .HasOne<User>()
                 .WithMany()
                 .HasForeignKey(r => r.UserId);
 
-            modelBuilder.Entity<UserQuizResult>()
+            modelBuilder.Entity<Result>()
                 .HasOne<Quiz>()
                 .WithMany()
                 .HasForeignKey(r => r.QuizId);

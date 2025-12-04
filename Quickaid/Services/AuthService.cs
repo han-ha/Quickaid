@@ -17,15 +17,22 @@ namespace Quickaid.Services
         private readonly AppDbContext _db = db;
         private readonly IConfiguration _config = config;
 
-        public async Task<AuthResult> RegisterAsync(RegisterDto dto)
+        public async Task<AuthResultDto> RegisterAsync(RegisterDto dto)
         {
-            // sprawdzenie czy u¿ytkownik ju¿ istnieje
+	        if (string.IsNullOrWhiteSpace(dto.Password) || dto.Password.Length < 8)
+    	    {
+       	        return new AuthResultDto
+                {
+                    Success = false,
+                    Message = "Has³o musi mieæ co najmniej 8 znaków."
+                };
+            }
+
             var existingUser = await _db.Users.FirstOrDefaultAsync(u => u.Username == dto.Username || u.Email == dto.Email);
             if (existingUser != null)
-                return new AuthResult { Success = false, Message = "U¿ytkownik ju¿ istnieje" };
+                return new AuthResultDto { Success = false, Message = "U¿ytkownik ju¿ istnieje" };
 
-            // utworzenie nowego u¿ytkownika
-            var user = new Models.Entities.User
+            var user = new User
             {
                 Username = dto.Username,
                 Email = dto.Email,
@@ -35,7 +42,6 @@ namespace Quickaid.Services
             _db.Users.Add(user);
             await _db.SaveChangesAsync();
 
-            // zapisanie has³a
             var salt = GenerateSalt();
             var hashed = HashPassword(dto.Password, salt);
 
@@ -49,10 +55,9 @@ namespace Quickaid.Services
             _db.Passwords.Add(passwordEntity);
             await _db.SaveChangesAsync();
 
-            // utwórz token JWT
             var token = GenerateJwtToken(user);
 
-            return new AuthResult
+            return new AuthResultDto
             {
                 Success = true,
                 Message = "Rejestracja zakoñczona sukcesem",
@@ -60,23 +65,23 @@ namespace Quickaid.Services
             };
         }
 
-        public async Task<AuthResult> LoginAsync(LoginDto dto)
+        public async Task<AuthResultDto> LoginAsync(LoginDto dto)
         {
             var user = await _db.Users.FirstOrDefaultAsync(u => u.Username == dto.Username);
             if (user == null)
-                return new AuthResult { Success = false, Message = "Nieprawid³owa nazwa u¿ytkownika lub has³o" };
+                return new AuthResultDto { Success = false, Message = "Nieprawid³owa nazwa u¿ytkownika lub has³o" };
 
             var password = await _db.Passwords.FirstOrDefaultAsync(p => p.UserId == user.Id);
             if (password == null)
-                return new AuthResult { Success = false, Message = "Nieprawid³owa nazwa u¿ytkownika lub has³o" };
+                return new AuthResultDto { Success = false, Message = "Nieprawid³owa nazwa u¿ytkownika lub has³o" };
 
             var hashedInput = HashPassword(dto.Password, password.Salt ?? "");
             if (hashedInput != password.HashedPassword)
-                return new AuthResult { Success = false, Message = "Nieprawid³owa nazwa u¿ytkownika lub has³o" };
+                return new AuthResultDto { Success = false, Message = "Nieprawid³owa nazwa u¿ytkownika lub has³o" };
 
             var token = GenerateJwtToken(user);
 
-            return new AuthResult
+            return new AuthResultDto
             {
                 Success = true,
                 Message = "Logowanie zakoñczone sukcesem",
@@ -99,7 +104,7 @@ namespace Quickaid.Services
             return Convert.ToBase64String(hash);
         }
 
-        private string GenerateJwtToken(Models.Entities.User user)
+        private string GenerateJwtToken(User user)
         {
             var key = _config["Jwt:Key"] ?? throw new Exception("Brak klucza JWT w konfiguracji");
             var issuer = _config["Jwt:Issuer"];

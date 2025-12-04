@@ -2,7 +2,7 @@ using Microsoft.AspNetCore.Mvc;
 using Quickaid.Services.Interfaces;
 using Quickaid.Models.DTO;
 using Microsoft.AspNetCore.Authorization;
-using System.Security.Claims;
+using Quickaid.Utils;
 
 namespace Quickaid.Controllers
 {
@@ -15,7 +15,7 @@ namespace Quickaid.Controllers
 
         // GET api/users
         [HttpGet]
-        [Authorize(Roles = "admin")] // tylko admin widzi wszystkich
+        [Authorize(Roles = "admin")]
         public async Task<IActionResult> GetAll()
         {
             var users = await _userService.GetAllAsync();
@@ -24,11 +24,11 @@ namespace Quickaid.Controllers
 
         // GET api/users/{id}
         [HttpGet("{id}")]
-        [Authorize(Roles = "admin")] // tylko admin widzi dowolnego
+        [Authorize(Roles = "admin")]
         public async Task<IActionResult> GetById(int id)
         {
             var user = await _userService.GetByIdAsync(id);
-            if (user == null) return NotFound();
+            if (user == null) return NotFound("Nie znaleziono u¿ytkownika.");
             return Ok(user);
         }
 
@@ -36,13 +36,18 @@ namespace Quickaid.Controllers
         [HttpGet("me")]
         public async Task<IActionResult> GetMe()
         {
-            var userIdClaim = User.FindFirstValue(ClaimTypes.NameIdentifier);
-            if (!int.TryParse(userIdClaim, out var userId))
+            int userId;
+            try
+            {
+                userId = UserUtils.GetUserId(User);
+            }
+            catch
+            {
                 return Unauthorized(new { Message = "Nieprawid³owy token lub brak uprawnieñ." });
+            }
 
             var user = await _userService.GetByIdAsync(userId);
-            if (user == null) return NotFound();
-
+            if (user == null) return NotFound("Nie znaleziono u¿ytkownika.");
             return Ok(user);
         }
 
@@ -50,24 +55,28 @@ namespace Quickaid.Controllers
         [HttpPut("me")]
         public async Task<IActionResult> UpdateMe([FromBody] UserDto dto)
         {
-            var userIdClaim = User.FindFirstValue(ClaimTypes.NameIdentifier);
-            if (!int.TryParse(userIdClaim, out var userId))
+            int userId;
+            try
+            {
+                userId = UserUtils.GetUserId(User);
+            }
+            catch
+            {
                 return Unauthorized(new { Message = "Nieprawid³owy token lub brak uprawnieñ." });
+            }
 
             var updated = await _userService.UpdateAsync(userId, dto);
-            if (updated == null) return NotFound();
-
+            if (updated == null) return NotFound("Nie znaleziono u¿ytkownika.");
             return Ok(updated);
         }
 
-        // PUT api/users/{id} (admin aktualizuje dowolnego u¿ytkownika)
+        // PUT api/users/{id}
         [HttpPut("{id}")]
         [Authorize(Roles = "admin")]
         public async Task<IActionResult> UpdateUser(int id, [FromBody] UserDto dto)
         {
             var updated = await _userService.UpdateAsync(id, dto);
-            if (updated == null) return NotFound();
-
+            if (updated == null) return NotFound("Nie znaleziono u¿ytkownika.");
             return Ok(updated);
         }
 
@@ -75,24 +84,45 @@ namespace Quickaid.Controllers
         [HttpDelete("me")]
         public async Task<IActionResult> DeleteMe()
         {
-            var userIdClaim = User.FindFirstValue(ClaimTypes.NameIdentifier);
-            if (!int.TryParse(userIdClaim, out var userId))
+            int userId;
+            try
+            {
+                userId = UserUtils.GetUserId(User);
+            }
+            catch
+            {
                 return Unauthorized(new { Message = "Nieprawid³owy token lub brak uprawnieñ." });
+            }
 
             var deleted = await _userService.DeleteAsync(userId);
-            if (!deleted) return NotFound();
-
+            if (!deleted) return NotFound("Nie znaleziono u¿ytkownika.");
             return NoContent();
         }
 
-        // DELETE api/users/{id} (admin usuwa dowolnego)
+        // DELETE api/users/{id}
         [HttpDelete("{id}")]
         [Authorize(Roles = "admin")]
         public async Task<IActionResult> Delete(int id)
         {
             var deleted = await _userService.DeleteAsync(id);
-            if (!deleted) return NotFound();
+            if (!deleted) return NotFound("Nie znaleziono u¿ytkownika.");
+            return NoContent();
+        }
 
+        // PUT api/users/{id}/role
+        [HttpPut("{id}/role")]
+        [Authorize(Roles = "admin")]
+        public async Task<IActionResult> ChangeUserRole(int id, [FromQuery] string role)
+        {
+            if (string.IsNullOrWhiteSpace(role))
+                return BadRequest("Rola nie mo¿e byæ pusta.");
+
+            var allowedRoles = new[] { "user", "admin" };
+            if (!allowedRoles.Contains(role.ToLower()))
+                return BadRequest("Nieprawid³owa rola. Dozwolone: user, admin.");
+
+            var updated = await _userService.ChangeUserRoleAsync(id, role.ToLower());
+            if (!updated) return NotFound("Nie znaleziono u¿ytkownika.");
             return NoContent();
         }
     }

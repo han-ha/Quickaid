@@ -1,6 +1,5 @@
 namespace Quickaid.Models.DTO
 {
-    // dane punktu AED
     public class AedDto
     {
         public int Id { get; set; }

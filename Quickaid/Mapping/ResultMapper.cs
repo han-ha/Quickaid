@@ -4,9 +4,9 @@ using Quickaid.Mapping.Interfaces;
 
 namespace Quickaid.Mapping
 {
-    public class UserQuizResultMapper : IUserQuizResultMapper
+    public class ResultMapper : IResultMapper
     {
-        public ResultDto ToDto(UserQuizResult entity)
+        public ResultDto ToDto(Result entity)
         {
             return new ResultDto
             {
@@ -17,9 +17,9 @@ namespace Quickaid.Mapping
             };
         }
 
-        public UserQuizResult ToEntity(ResultDto dto)
+        public Result ToEntity(ResultDto dto)
         {
-            return new UserQuizResult
+            return new Result
             {
                 QuizId = dto.QuizId,
                 Score = dto.Score,

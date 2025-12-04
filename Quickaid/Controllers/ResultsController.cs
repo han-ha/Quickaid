@@ -2,19 +2,20 @@ using Microsoft.AspNetCore.Mvc;
 using Quickaid.Services.Interfaces;
 using Quickaid.Models.DTO;
 using Microsoft.AspNetCore.Authorization;
-using System.Security.Claims;
+using Quickaid.Utils;
+
 
 namespace Quickaid.Controllers
 {
     [ApiController]
     [Route("api/[controller]")]
-    [Authorize] // dostêp tylko dla zalogowanych
+    [Authorize]
     public class ResultsController(IResultService resultService) : ControllerBase
     {
         private readonly IResultService _resultService = resultService;
 
         // GET api/results
-        [Authorize(Roles = "admin")] // tylko admin widzi wszystkie wyniki
+        [Authorize(Roles = "admin")]
         [HttpGet]
         public async Task<IActionResult> GetAll()
         {
@@ -26,11 +27,21 @@ namespace Quickaid.Controllers
         [HttpGet("{id}")]
         public async Task<IActionResult> GetById(int id)
         {
+            int userId;
+            try
+            {
+                userId = UserUtils.GetUserId(User);
+            }
+            catch
+            {
+                return Unauthorized("Nieprawid³owy token u¿ytkownika.");
+            }
+
             var result = await _resultService.GetByIdAsync(id);
             if (result == null) return NotFound();
 
-            if (!User.IsInRole("admin") && result.UserId != GetCurrentUserId())
-                return Forbid(); // zwyk³y user nie mo¿e widzieæ cudzych wyników
+            if (!User.IsInRole("admin") && result.UserId != userId)
+                return Forbid();
 
             return Ok(result);
         }
@@ -39,8 +50,18 @@ namespace Quickaid.Controllers
         [HttpGet("user/{userId}")]
         public async Task<IActionResult> GetUserResults(int userId)
         {
-            if (!User.IsInRole("admin") && userId != GetCurrentUserId())
-                return Forbid(); // zwyk³y user mo¿e widzieæ tylko swoje wyniki
+            int currentUserId;
+            try
+            {
+                currentUserId = UserUtils.GetUserId(User);
+            }
+            catch
+            {
+                return Unauthorized("Nieprawid³owy token u¿ytkownika.");
+            }
+
+            if (!User.IsInRole("admin") && userId != currentUserId)
+                return Forbid();
 
             var results = await _resultService.GetByUserAsync(userId);
             return Ok(results);
@@ -52,9 +73,20 @@ namespace Quickaid.Controllers
         {
             if (!ModelState.IsValid) return BadRequest(ModelState);
 
-            // user mo¿e dodawaæ tylko swoje wyniki
             if (!User.IsInRole("admin"))
-                dto.UserId = GetCurrentUserId();
+            {
+                int userId;
+                try
+                {
+                    userId = UserUtils.GetUserId(User);
+                }
+                catch
+                {
+                    return Unauthorized("Nieprawid³owy token u¿ytkownika.");
+                }
+
+                dto.UserId = userId;
+            }
 
             try
             {
@@ -73,9 +105,21 @@ namespace Quickaid.Controllers
         {
             if (!ModelState.IsValid) return BadRequest(ModelState);
 
-            // zwyk³y user mo¿e aktualizowaæ tylko swoje wyniki
-            if (!User.IsInRole("admin") && dto.UserId != GetCurrentUserId())
-                return Forbid();
+            if (!User.IsInRole("admin"))
+            {
+                int userId;
+                try
+                {
+                    userId = UserUtils.GetUserId(User);
+                }
+                catch
+                {
+                    return Unauthorized("Nieprawid³owy token u¿ytkownika.");
+                }
+
+                if (dto.UserId != userId)
+                    return Forbid();
+            }
 
             try
             {
@@ -93,11 +137,21 @@ namespace Quickaid.Controllers
         [HttpDelete("{id}")]
         public async Task<IActionResult> Delete(int id)
         {
+            int userId;
+            try
+            {
+                userId = UserUtils.GetUserId(User);
+            }
+            catch
+            {
+                return Unauthorized("Nieprawid³owy token u¿ytkownika.");
+            }
+
             var result = await _resultService.GetByIdAsync(id);
             if (result == null) return NotFound();
 
-            if (!User.IsInRole("admin") && result.UserId != GetCurrentUserId())
-                return Forbid(); // zwyk³y user nie mo¿e usuwaæ cudzych wyników
+            if (!User.IsInRole("admin") && result.UserId != userId)
+                return Forbid();
 
             try
             {
@@ -109,12 +163,6 @@ namespace Quickaid.Controllers
             {
                 return StatusCode(500, ex.ToString());
             }
-        }
-
-        // pomocnicza metoda do pobrania ID aktualnie zalogowanego u¿ytkownika z JWT
-        private int GetCurrentUserId()
-        {
-            return int.Parse(User.FindFirstValue(ClaimTypes.NameIdentifier)!);
         }
     }
 }

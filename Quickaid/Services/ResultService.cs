@@ -41,7 +41,7 @@ namespace Quickaid.Services
 
         public async Task<ResultDto> AddAsync(ResultDto dto)
         {
-            var entity = new UserQuizResult
+            var entity = new Result
             {
                 UserId = dto.UserId,
                 QuizId = dto.QuizId,

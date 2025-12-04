@@ -2,7 +2,6 @@ using Quickaid.Models.DTO;
 
 namespace Quickaid.Services.Interfaces
 {
-    // logika dla punktów AED
     public interface IAedService
     {
         Task<IEnumerable<AedDto>> GetAllAsync();

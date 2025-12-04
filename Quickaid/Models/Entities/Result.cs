@@ -3,7 +3,7 @@ using System.ComponentModel.DataAnnotations.Schema;
 namespace Quickaid.Models.Entities
 {
     [Table("user_quiz_results")]
-    public class UserQuizResult // TODO ujednoliciæ nazwy kolumn na Result?
+    public class Result
     {
         [Column("id")]
         public int Id { get; set; }

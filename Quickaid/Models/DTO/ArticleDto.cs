@@ -1,6 +1,5 @@
 namespace Quickaid.Models.DTO
 {
-    // dane artyku³u edukacyjnego
     public class ArticleDto
     {
         public int Id { get; set; }

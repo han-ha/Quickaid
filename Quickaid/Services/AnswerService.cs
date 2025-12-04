@@ -12,21 +12,18 @@ namespace Quickaid.Services
         private readonly AppDbContext _db = db;
         private readonly IAnswerMapper _mapper = mapper;
 
-        // Pobranie wszystkich odpowiedzi
         public async Task<IEnumerable<AnswerDto>> GetAllAsync()
         {
             var entities = await _db.Answers.ToListAsync();
             return entities.Select(a => _mapper.ToDto(a));
         }
 
-        // Pobranie odpowiedzi po ID
         public async Task<AnswerDto?> GetByIdAsync(int id)
         {
             var entity = await _db.Answers.FirstOrDefaultAsync(a => a.Id == id);
             return entity == null ? null : _mapper.ToDto(entity);
         }
 
-        // Dodanie nowej odpowiedzi
         public async Task<AnswerDto> AddAsync(AnswerDto dto, int questionId)
         {
             var entity = new Answer
@@ -42,7 +39,6 @@ namespace Quickaid.Services
             return _mapper.ToDto(entity);
         }
 
-        // Aktualizacja odpowiedzi
         public async Task<AnswerDto?> UpdateAsync(int id, AnswerDto dto)
         {
             var entity = await _db.Answers.FirstOrDefaultAsync(a => a.Id == id);
@@ -54,7 +50,6 @@ namespace Quickaid.Services
             return _mapper.ToDto(entity);
         }
 
-        // Usunięcie odpowiedzi
         public async Task<bool> DeleteAsync(int id)
         {
             using var transaction = await _db.Database.BeginTransactionAsync();

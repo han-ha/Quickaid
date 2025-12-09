@@ -74,48 +74,38 @@ namespace Quickaid.Services
 
         public async Task<bool> DeleteAsync(int id)
         {
-            using var transaction = await _context.Database.BeginTransactionAsync();
-            try
+            var question = await _context.Questions.FindAsync(id);
+            if (question == null) return false;
+
+            // Pobierz wszystkie quizy powiązane z tym pytaniem
+            var quizLinks = await _context.QuizQuestions
+                .Where(qq => qq.QuestionId == id)
+                .ToListAsync();
+
+            // Usuń powiązania w QuizQuestions
+            _context.QuizQuestions.RemoveRange(quizLinks);
+
+            // Aktualizacja liczników w quizach
+            foreach (var link in quizLinks)
             {
-                var question = await _context.Questions.FindAsync(id);
-                if (question == null) return false;
-
-                // Pobierz wszystkie quizy powiązane z tym pytaniem
-                var quizLinks = await _context.QuizQuestions
-                    .Where(qq => qq.QuestionId == id)
-                    .ToListAsync();
-
-                // Usuń powiązania w QuizQuestions
-                _context.QuizQuestions.RemoveRange(quizLinks);
-
-                // Aktualizacja liczników w quizach
-                foreach (var link in quizLinks)
+                var quiz = await _context.Quizzes.FindAsync(link.QuizId);
+                if (quiz != null && quiz.NumberOfQuestions.HasValue)
                 {
-                    var quiz = await _context.Quizzes.FindAsync(link.QuizId);
-                    if (quiz != null && quiz.NumberOfQuestions.HasValue)
-                    {
-                        quiz.NumberOfQuestions = Math.Max(0, quiz.NumberOfQuestions.Value - 1);
-                    }
+                    quiz.NumberOfQuestions = Math.Max(0, quiz.NumberOfQuestions.Value - 1);
                 }
-
-                // Usuń wszystkie odpowiedzi pytania, jeśli nie są użyte do innego pytania
-                var answers = await _context.Answers
-                    .Where(a => a.QuestionId == id)
-                    .ToListAsync();
-                _context.Answers.RemoveRange(answers);
-
-                // Usuń pytanie
-                _context.Questions.Remove(question);
-
-                await _context.SaveChangesAsync();
-                await transaction.CommitAsync();
-                return true;
             }
-            catch
-            {
-                await transaction.RollbackAsync();
-                throw;
-            }
+
+            // Usuń wszystkie odpowiedzi pytania, jeśli nie są użyte do innego pytania
+            var answers = await _context.Answers
+                .Where(a => a.QuestionId == id)
+                .ToListAsync();
+            _context.Answers.RemoveRange(answers);
+
+            // Usuń pytanie
+            _context.Questions.Remove(question);
+
+            await _context.SaveChangesAsync();
+            return true;
         }
 
     }

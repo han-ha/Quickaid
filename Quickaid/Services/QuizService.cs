@@ -50,44 +50,35 @@ namespace Quickaid.Services
 
         public async Task<bool> DeleteAsync(int id)
         {
-            using var transaction = await _db.Database.BeginTransactionAsync();
-            try
-            {
-                var quiz = await _db.Quizzes.FindAsync(id);
-                if (quiz == null) return false;
+            var quiz = await _db.Quizzes.FindAsync(id);
+            if (quiz == null) return false;
 
-                // Pobierz pytania przypisane do tego quizu
-                var questionIds = await _db.QuizQuestions
-                    .Where(qq => qq.QuizId == id)
-                    .Select(qq => qq.QuestionId)
-                    .ToListAsync();
+            // Pobierz pytania przypisane do tego quizu
+            var questionIds = await _db.QuizQuestions
+                .Where(qq => qq.QuizId == id)
+                .Select(qq => qq.QuestionId)
+                .ToListAsync();
 
-                // Pobierz pytania u¿ywane w innych quizach
-                var usedElsewhere = await _db.QuizQuestions
-                    .Where(qq => qq.QuizId != id && questionIds.Contains(qq.QuestionId))
-                    .Select(qq => qq.QuestionId)
-                    .Distinct()
-                    .ToListAsync();
+            // Pobierz pytania u¿ywane w innych quizach
+            var usedElsewhere = await _db.QuizQuestions
+                .Where(qq => qq.QuizId != id && questionIds.Contains(qq.QuestionId))
+                .Select(qq => qq.QuestionId)
+                .Distinct()
+                .ToListAsync();
 
-                // Wybierz pytania do usuniêcia
-                var toDelete = questionIds.Except(usedElsewhere).ToList();
+            // Wybierz pytania do usuniêcia
+            var toDelete = questionIds.Except(usedElsewhere).ToList();
 
-                // Usuñ powi¹zania w QuizQuestions
-                _db.QuizQuestions.RemoveRange(_db.QuizQuestions.Where(qq => qq.QuizId == id));
+            // Usuñ powi¹zania w QuizQuestions
+            _db.QuizQuestions.RemoveRange(_db.QuizQuestions.Where(qq => qq.QuizId == id));
 
-                // Usuñ sam quiz
-                _db.Quizzes.Remove(quiz);
+            // Usuñ sam quiz
+            _db.Quizzes.Remove(quiz);
 
-                await _db.SaveChangesAsync();
-                await transaction.CommitAsync();
-                return true;
-            }
-            catch
-            {
-                await transaction.RollbackAsync();
-                throw;
-            }
+            await _db.SaveChangesAsync();
+            return true;
         }
+
 
         public async Task<List<int>> GetQuestionsIdsAsync(int quizId)
         {

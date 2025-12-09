@@ -2,18 +2,14 @@
 using Quickaid.Data;
 using Quickaid.Models.DTO;
 using Quickaid.Models.Entities;
+using Quickaid.Services.Interfaces;
 
 namespace Quickaid.Services
 {
-    public interface IQuizSolverService
-    {
-        Task<ResultDto> SubmitQuizAsync(int userId, int quizId, Dictionary<int, int> userAnswers);
-        Task<int> CalculateScoreAsync(int quizId, Dictionary<int, int> userAnswers);
-    }
-
-    public class QuizSolverService(AppDbContext db) : IQuizSolverService
+    public class QuizSolverService(AppDbContext db, IResultService resultService) : IQuizSolverService
     {
         private readonly AppDbContext _db = db;
+        private readonly IResultService _resultService = resultService;
 
         public async Task<int> CalculateScoreAsync(int quizId, Dictionary<int, int> userAnswers)
         {
@@ -34,7 +30,6 @@ namespace Quickaid.Services
                     continue;
 
                 var answer = answers.FirstOrDefault(a => a.Id == selectedAnswerId);
-
                 if (answer != null && answer.IsCorrect)
                     score++;
             }
@@ -46,7 +41,7 @@ namespace Quickaid.Services
         {
             int score = await CalculateScoreAsync(quizId, userAnswers);
 
-            var result = new Result
+            var dto = new ResultDto
             {
                 UserId = userId,
                 QuizId = quizId,
@@ -54,17 +49,7 @@ namespace Quickaid.Services
                 CompletedAt = DateTime.UtcNow
             };
 
-            _db.UserQuizResults.Add(result);
-            await _db.SaveChangesAsync();
-
-            return new ResultDto
-            {
-                Id = result.Id,
-                UserId = result.UserId,
-                QuizId = result.QuizId,
-                Score = result.Score ?? 0,
-                CompletedAt = result.CompletedAt
-            };
+            return await _resultService.AddAsync(dto);
         }
 
         public async Task<ResultDto?> GetLastResultAsync(int userId, int quizId)
@@ -85,6 +70,5 @@ namespace Quickaid.Services
                 CompletedAt = result.CompletedAt
             };
         }
-
     }
 }

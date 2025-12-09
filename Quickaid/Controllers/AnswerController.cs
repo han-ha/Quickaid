@@ -14,6 +14,7 @@ namespace Quickaid.Controllers
 
         // GET api/answers
         [HttpGet]
+        [Authorize(Roles = "admin")]
         public async Task<IActionResult> GetAll()
         {
             var answers = await _answerService.GetAllAsync();

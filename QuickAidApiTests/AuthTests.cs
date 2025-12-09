@@ -22,7 +22,7 @@ public static class AuthTests
         var registerResponse = await client.PostAsJsonAsync("api/auth/register", newUser);
         if (registerResponse.IsSuccessStatusCode)
         {
-            var authResult = await registerResponse.Content.ReadFromJsonAsync<AuthResult>();
+            var authResult = await registerResponse.Content.ReadFromJsonAsync<AuthResultDto>();
             Console.WriteLine($"POST /api/auth/register -> OK, token={authResult?.Token}");
         }
         else
@@ -41,7 +41,7 @@ public static class AuthTests
         var loginResponse = await client.PostAsJsonAsync("api/auth/login", loginDto);
         if (loginResponse.IsSuccessStatusCode)
         {
-            var loginResult = await loginResponse.Content.ReadFromJsonAsync<AuthResult>();
+            var loginResult = await loginResponse.Content.ReadFromJsonAsync<AuthResultDto>();
             Console.WriteLine($"POST /api/auth/login -> OK, token={loginResult?.Token}");
         }
         else

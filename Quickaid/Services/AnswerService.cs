@@ -52,34 +52,23 @@ namespace Quickaid.Services
 
         public async Task<bool> DeleteAsync(int id)
         {
-            using var transaction = await _db.Database.BeginTransactionAsync();
-            try
+            var answer = await _db.Answers.FirstOrDefaultAsync(a => a.Id == id);
+            if (answer == null) return false;
+
+            // Pobierz powiązane pytanie
+            var question = await _db.Questions.FindAsync(answer.QuestionId);
+
+            // Usuń odpowiedź
+            _db.Answers.Remove(answer);
+
+            // Aktualizacja liczników w pytaniu
+            if (question != null && question.NumberOfAnswers.HasValue)
             {
-                var answer = await _db.Answers.FirstOrDefaultAsync(a => a.Id == id);
-                if (answer == null) return false;
-
-                // Pobierz powiązane pytanie
-                var question = await _db.Questions.FindAsync(answer.QuestionId);
-
-                // Usuń odpowiedź
-                _db.Answers.Remove(answer);
-
-                // Aktualizacja liczników w pytaniu
-                if (question != null && question.NumberOfAnswers.HasValue)
-                {
-                    question.NumberOfAnswers = Math.Max(0, question.NumberOfAnswers.Value - 1);
-                }
-
-                await _db.SaveChangesAsync();
-                await transaction.CommitAsync();
-                return true;
+                question.NumberOfAnswers = Math.Max(0, question.NumberOfAnswers.Value - 1);
             }
-            catch
-            {
-                await transaction.RollbackAsync();
-                throw;
-            }
+
+            await _db.SaveChangesAsync();
+            return true;
         }
-
     }
 }

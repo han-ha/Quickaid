@@ -94,8 +94,16 @@ namespace Quickaid.Controllers
                 return Unauthorized(new { Message = "Nieprawid³owy token lub brak uprawnieñ." });
             }
 
+            var user = await _userService.GetByIdAsync(userId);
+            if (user == null) return NotFound("Nie znaleziono u¿ytkownika.");
+
+            if (user.Role.ToLower() == "admin")
+            {
+                return BadRequest(new { Message = "Nie mo¿esz usun¹æ swojego konta, poniewa¿ jesteœ administratorem." });
+            }
+
             var deleted = await _userService.DeleteAsync(userId);
-            if (!deleted) return NotFound("Nie znaleziono u¿ytkownika.");
+            if (!deleted) return NotFound("Nie uda³o siê usun¹æ u¿ytkownika.");
             return NoContent();
         }
 
@@ -104,8 +112,31 @@ namespace Quickaid.Controllers
         [Authorize(Roles = "admin")]
         public async Task<IActionResult> Delete(int id)
         {
+            int currentUserId;
+            try
+            {
+                currentUserId = UserUtils.GetUserId(User);
+            }
+            catch
+            {
+                return Unauthorized(new { Message = "Nieprawid³owy token lub brak uprawnieñ." });
+            }
+
+            if (id == currentUserId)
+            {
+                return BadRequest(new { Message = "Nie mo¿esz usun¹æ swojego konta, poniewa¿ jesteœ administratorem." });
+            }
+
+            var user = await _userService.GetByIdAsync(id);
+            if (user == null) return NotFound("Nie znaleziono u¿ytkownika.");
+
+            if (user.Role.ToLower() == "admin")
+            {
+                return BadRequest(new { Message = "Nie mo¿esz usun¹æ konta innego administratora." });
+            }
+
             var deleted = await _userService.DeleteAsync(id);
-            if (!deleted) return NotFound("Nie znaleziono u¿ytkownika.");
+            if (!deleted) return NotFound("Nie uda³o siê usun¹æ u¿ytkownika.");
             return NoContent();
         }
 

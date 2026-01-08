@@ -100,5 +100,24 @@ namespace Quickaid.Services
             await _db.SaveChangesAsync();
             return true;
         }
+
+        public async Task<ResultDto?> GetBestResultForUserAsync(int userId, int quizId)
+        {
+            var best = await _db.UserQuizResults
+                .Where(r => r.UserId == userId && r.QuizId == quizId)
+                .OrderByDescending(r => r.Score)
+                .FirstOrDefaultAsync();
+
+            if (best == null) return null;
+
+            return new ResultDto
+            {
+                Id = best.Id,
+                UserId = best.UserId,
+                QuizId = best.QuizId,
+                Score = best.Score ?? 0,
+                CompletedAt = best.CompletedAt
+            };
+        }
     }
 }

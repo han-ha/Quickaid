@@ -10,5 +10,6 @@ namespace Quickaid.Services.Interfaces
         Task<ResultDto?> GetByIdAsync(int id);
         Task<ResultDto?> UpdateAsync(int id, ResultDto dto);
         Task<bool> DeleteAsync(int id);
+        Task<ResultDto?> GetBestResultForUserAsync(int userId, int quizId);
     }
 }

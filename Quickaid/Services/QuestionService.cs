@@ -108,5 +108,24 @@ namespace Quickaid.Services
             return true;
         }
 
+        public async Task<List<QuestionDto>> GetByQuizIdAsync(int quizId)
+        {
+            var quizQuestions = await _context.QuizQuestions
+                .Where(qq => qq.QuizId == quizId)
+                .ToListAsync();
+
+            var result = new List<QuestionDto>();
+
+            foreach (var qq in quizQuestions)
+            {
+                var question = await GetByIdAsync(qq.QuestionId);
+                if (question != null)
+                    result.Add(question);
+            }
+
+            return result;
+        }
+
+
     }
 }

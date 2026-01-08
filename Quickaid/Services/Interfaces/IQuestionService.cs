@@ -9,5 +9,7 @@ namespace Quickaid.Services.Interfaces
         Task<QuestionDto> AddAsync(QuestionDto dto);
         Task<QuestionDto?> UpdateAsync(int id, QuestionDto dto);
         Task<bool> DeleteAsync(int id);
+        Task<List<QuestionDto>> GetByQuizIdAsync(int quizId);
+
     }
 }

@@ -1,4 +1,17 @@
 USE QuickAid;
+
+IF NOT EXISTS (SELECT * FROM sys.server_principals WHERE name = 'qa_user')
+BEGIN
+    CREATE LOGIN qa_user WITH PASSWORD = 'qa';
+END
+GO
+
+IF NOT EXISTS (SELECT * FROM sys.database_principals WHERE name = 'qa_user')
+BEGIN
+    CREATE USER qa_user FOR LOGIN qa_user;
+END
+GO
+
 ALTER USER qa_user WITH LOGIN = qa_user;
 
 USE QuickAid;

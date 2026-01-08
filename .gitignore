@@ -1,0 +1,24 @@
+czesc pisemna/
+frontend/
+
+# Visual Studio
+.vs/
+*.user
+*.suo
+*.sln.docstates
+
+# Bin i Obj
+bin/
+obj/
+
+# Pliki tymczasowe i logi
+*.log
+*.tmp
+*.userosscache
+*.suo
+*.cache
+*.pdb
+*.mdb
+
+*.ide
+*.dotCover

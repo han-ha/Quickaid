@@ -123,6 +123,13 @@ namespace Quickaid
 
             var app = builder.Build();
 
+            // db warmup
+            using (var scope = app.Services.CreateScope())
+            {
+                var db = scope.ServiceProvider.GetRequiredService<AppDbContext>();
+                db.Database.CanConnect();
+            }
+
             // Swagger UI (testy)
             if (app.Environment.IsDevelopment())
             {

@@ -22,7 +22,17 @@ namespace Quickaid.Services
         {
             var quiz = await _db.Quizzes.FindAsync(id);
             if (quiz == null) return null;
-            return _mapper.ToDto(quiz);
+
+            var questions = await _questionService.GetByQuizIdAsync(id);
+
+            return new QuizDto
+            {
+                Id = quiz.Id,
+                Title = quiz.Title,
+                Description = quiz.Description ?? "",
+                NumberOfQuestions = questions.Count,
+                Questions = questions
+            };
         }
 
         public async Task<QuizDto> AddAsync(QuizDto dto)
@@ -53,32 +63,25 @@ namespace Quickaid.Services
             var quiz = await _db.Quizzes.FindAsync(id);
             if (quiz == null) return false;
 
-            // Pobierz pytania przypisane do tego quizu
             var questionIds = await _db.QuizQuestions
                 .Where(qq => qq.QuizId == id)
                 .Select(qq => qq.QuestionId)
                 .ToListAsync();
 
-            // Pobierz pytania u¿ywane w innych quizach
             var usedElsewhere = await _db.QuizQuestions
                 .Where(qq => qq.QuizId != id && questionIds.Contains(qq.QuestionId))
                 .Select(qq => qq.QuestionId)
                 .Distinct()
                 .ToListAsync();
 
-            // Wybierz pytania do usuniêcia
             var toDelete = questionIds.Except(usedElsewhere).ToList();
 
-            // Usuñ powi¹zania w QuizQuestions
             _db.QuizQuestions.RemoveRange(_db.QuizQuestions.Where(qq => qq.QuizId == id));
-
-            // Usuñ sam quiz
             _db.Quizzes.Remove(quiz);
 
             await _db.SaveChangesAsync();
             return true;
         }
-
 
         public async Task<List<int>> GetQuestionsIdsAsync(int quizId)
         {
@@ -87,6 +90,5 @@ namespace Quickaid.Services
                 .Select(qq => qq.QuestionId)
                 .ToListAsync();
         }
-
     }
 }

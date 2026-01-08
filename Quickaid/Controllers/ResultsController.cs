@@ -164,5 +164,26 @@ namespace Quickaid.Controllers
                 return StatusCode(500, ex.ToString());
             }
         }
+
+        // GET api/results/best/{quizId}
+        [HttpGet("best/{quizId}")]
+        public async Task<IActionResult> GetBestForQuiz(int quizId)
+        {
+            int userId;
+            try
+            {
+                userId = UserUtils.GetUserId(User);
+            }
+            catch
+            {
+                return Unauthorized("Nieprawid³owy token u¿ytkownika.");
+            }
+
+            var bestResult = await _resultService.GetBestResultForUserAsync(userId, quizId);
+            if (bestResult == null) return NotFound();
+
+            return Ok(bestResult);
+        }
+
     }
 }

@@ -11,7 +11,8 @@ namespace Quickaid.Mapping
             return new AnswerDto
             {
                 Id = entity.Id,
-                AnswerText = entity.AnswerText ?? ""
+                AnswerText = entity.AnswerText ?? "",
+                IsCorrect = entity.IsCorrect
             };
         }
 
@@ -19,7 +20,8 @@ namespace Quickaid.Mapping
         {
             return new Answer
             {
-                AnswerText = dto.AnswerText
+                AnswerText = dto.AnswerText,
+                IsCorrect = dto.IsCorrect
             };
         }
     }

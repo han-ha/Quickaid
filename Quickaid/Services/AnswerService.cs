@@ -30,7 +30,7 @@ namespace Quickaid.Services
             {
                 QuestionId = questionId,
                 AnswerText = dto.AnswerText,
-                IsCorrect = false
+                IsCorrect = dto.IsCorrect
             };
 
             _db.Answers.Add(entity);
@@ -45,6 +45,7 @@ namespace Quickaid.Services
             if (entity == null) return null;
 
             entity.AnswerText = dto.AnswerText;
+            entity.IsCorrect = dto.IsCorrect;
             await _db.SaveChangesAsync();
 
             return _mapper.ToDto(entity);

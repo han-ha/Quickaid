@@ -1,6 +1,7 @@
 package com.quickaid.app.data.api
 
 import com.quickaid.app.data.models.QuestionDto
+import retrofit2.Response
 import retrofit2.http.Body
 import retrofit2.http.DELETE
 import retrofit2.http.GET
@@ -22,5 +23,5 @@ interface QuestionApi {
     ): QuestionDto
 
     @DELETE("questions/{id}")
-    suspend fun deleteQuestion(@Path("id") id: Int)
+    suspend fun deleteQuestion(@Path("id") id: Int): Response<Unit>
 }

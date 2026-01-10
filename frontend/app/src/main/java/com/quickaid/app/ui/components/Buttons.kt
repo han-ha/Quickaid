@@ -13,13 +13,15 @@ fun LargeButton(
     onClick: () -> Unit,
     modifier: Modifier = Modifier,
     content: String,
-    buttonColor: Color = MaterialTheme.colorScheme.primary
+    buttonColor: Color = MaterialTheme.colorScheme.primary,
+    enabled: Boolean = true
 ) {
     Button(
         onClick = onClick,
         modifier = modifier,
         shape = MaterialTheme.shapes.large,
-        colors = ButtonDefaults.buttonColors(containerColor = buttonColor)
+        colors = ButtonDefaults.buttonColors(containerColor = buttonColor),
+        enabled = enabled
     ) {
         Text(
             text = content,
@@ -33,13 +35,15 @@ fun SmallButton(
     onClick: () -> Unit,
     modifier: Modifier = Modifier,
     content: String,
-    buttonColor: Color = MaterialTheme.colorScheme.primary
+    buttonColor: Color = MaterialTheme.colorScheme.primary,
+    enabled: Boolean = true
 ) {
     Button(
         onClick = onClick,
         modifier = modifier,
         shape = MaterialTheme.shapes.small,
-        colors = ButtonDefaults.buttonColors(containerColor = buttonColor)
+        colors = ButtonDefaults.buttonColors(containerColor = buttonColor),
+        enabled = enabled
     ) {
         Text(
             text = content,

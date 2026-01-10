@@ -22,12 +22,14 @@ fun AdminActions(
         modifier = modifier,
         horizontalArrangement = Arrangement.spacedBy(AppSpacing.small)
     ) {
-        Button(onClick = onEdit) { Text("Edytuj") }
-        Button(
+        SmallButton(
+            onClick = onEdit,
+            content = "Edytuj"
+        )
+        SmallButton(
             onClick = onDelete,
-            colors = ButtonDefaults.buttonColors(MaterialTheme.colorScheme.error)
-        ) {
-            Text("Usuń")
-        }
+            content = "Usuń",
+            buttonColor = MaterialTheme.colorScheme.error
+        )
     }
 }

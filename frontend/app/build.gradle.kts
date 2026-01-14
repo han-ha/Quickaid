@@ -3,6 +3,7 @@ plugins {
     alias(libs.plugins.kotlinAndroid)
     alias(libs.plugins.ksp)
     alias(libs.plugins.hilt.android)
+    kotlin("kapt")
 }
 
 android {
@@ -63,7 +64,7 @@ dependencies {
 
     // Hilt
     implementation(libs.hiltAndroid)
-    ksp(libs.hiltCompiler)
+    kapt(libs.hiltCompiler)
     implementation(libs.hiltNavigationCompose)
 
     // Tests
@@ -78,5 +79,8 @@ dependencies {
 
     implementation("androidx.datastore:datastore-preferences:1.1.1")
     implementation("androidx.datastore:datastore-core:1.1.1")
+}
 
+kapt {
+    correctErrorTypes = true
 }

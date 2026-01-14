@@ -14,5 +14,12 @@ class QuestionRepository @Inject constructor(private val api: QuestionApi) {
     suspend fun updateQuestion(id: Int, question: QuestionDto): QuestionDto =
         api.updateQuestion(id, question)
 
-    suspend fun deleteQuestion(id: Int): Response<Unit> = api.deleteQuestion(id)
+    suspend fun deleteQuestion(questionId: Int, quizId: Int): Response<Unit> {
+        return api.deleteQuestion(questionId, quizId)
+    }
+
+    suspend fun addQuestionToQuiz(quizId: Int, dto: QuestionDto): QuestionDto {
+        return api.addQuestionToQuiz(quizId, dto)
+    }
+
 }

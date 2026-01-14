@@ -22,6 +22,17 @@ interface QuestionApi {
         @Body question: QuestionDto
     ): QuestionDto
 
-    @DELETE("questions/{id}")
-    suspend fun deleteQuestion(@Path("id") id: Int): Response<Unit>
+    @DELETE("questions/{questionId}/quiz/{quizId}")
+    suspend fun deleteQuestion(
+        @Path("questionId") questionId: Int,
+        @Path("quizId") quizId: Int
+    ): Response<Unit>
+
+
+    @POST("quizzes/{quizId}/questions")
+    suspend fun addQuestionToQuiz(
+        @Path("quizId") quizId: Int,
+        @Body dto: QuestionDto
+    ): QuestionDto
+
 }

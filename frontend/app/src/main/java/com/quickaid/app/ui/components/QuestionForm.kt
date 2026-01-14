@@ -9,7 +9,6 @@ import androidx.compose.material3.*
 import androidx.compose.runtime.*
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
-import androidx.navigation.NavController
 import com.quickaid.app.data.models.AnswerDto
 import com.quickaid.app.data.models.QuestionDto
 import com.quickaid.app.ui.theme.AppSpacing
@@ -17,38 +16,31 @@ import com.quickaid.app.viewmodel.QuestionViewModel
 
 @Composable
 fun QuestionForm(
-    navController: NavController,
-    viewModel: QuestionViewModel,
+        viewModel: QuestionViewModel,
     questionId: Int?,
     quizId: Int?,
     onSave: ((QuestionDto) -> Unit)? = null
 ) {
     val scrollState = rememberScrollState()
-
-    var questionText by remember { mutableStateOf("") }
-    val answers = remember { mutableStateListOf<AnswerDto>() }
-    var answerToDeleteIndex by remember { mutableStateOf<Int?>(null) }
-
+    val question by viewModel.question.collectAsState()
     val error by viewModel.error.collectAsState()
-    val saveSuccess by viewModel.saveSuccess.collectAsState()
 
-    LaunchedEffect(questionId) {
-        if (questionId != null) {
-            val q = viewModel.getQuestionById(questionId)
-            questionText = q.questionText
-            answers.clear()
-            answers.addAll(q.answers)
-        } else {
-            if (answers.isEmpty()) {
-                answers.add(AnswerDto(id = 0, answerText = "", isCorrect = false))
-                answers.add(AnswerDto(id = 0, answerText = "", isCorrect = false))
-            }
-        }
+    val localAnswers = remember(question) {
+        question?.answers?.toMutableStateList() ?: mutableStateListOf(
+            AnswerDto(id = 0, answerText = "", isCorrect = false),
+            AnswerDto(id = 0, answerText = "", isCorrect = false)
+        )
     }
 
-    LaunchedEffect(saveSuccess) {
-        if (saveSuccess) navController.popBackStack()
+    var localQuestionText by remember(question) {
+        mutableStateOf(question?.questionText ?: "")
     }
+
+    var localCorrectAnswerIndex by remember(question) {
+        mutableStateOf(question?.answers?.indexOfFirst { it.isCorrect }?.takeIf { it >= 0 })
+    }
+
+    var answerToDeleteIndex by remember { mutableStateOf<Int?>(null) }
 
     Column(
         modifier = Modifier
@@ -61,85 +53,66 @@ fun QuestionForm(
             text = if (questionId == null) "Dodaj pytanie" else "Edytuj pytanie",
             style = MaterialTheme.typography.headlineMedium
         )
-
         Spacer(Modifier.height(AppSpacing.medium))
-
         OutlinedTextField(
-            value = questionText,
-            onValueChange = { questionText = it },
+            value = localQuestionText,
+            onValueChange = { localQuestionText = it },
             label = { Text("Treść pytania") },
             modifier = Modifier.fillMaxWidth()
         )
-
         Spacer(Modifier.height(AppSpacing.medium))
-
-        answers.forEachIndexed { index, answer ->
+        localAnswers.forEachIndexed { index, answer ->
             Column(
                 modifier = Modifier.fillMaxWidth(),
                 verticalArrangement = Arrangement.spacedBy(AppSpacing.small)
             ) {
-                Row(
-                    verticalAlignment = Alignment.CenterVertically,
-                    modifier = Modifier.fillMaxWidth()
-                ) {
+                Row(verticalAlignment = Alignment.CenterVertically, modifier = Modifier.fillMaxWidth()) {
                     OutlinedTextField(
                         value = answer.answerText,
-                        onValueChange = { answers[index] = answer.copy(answerText = it) },
+                        onValueChange = { localAnswers[index] = answer.copy(answerText = it) },
                         label = { Text("Odpowiedź ${index + 1}") },
                         modifier = Modifier.weight(1f)
                     )
-
                     Spacer(Modifier.width(AppSpacing.small))
-
                     IconButton(onClick = { answerToDeleteIndex = index }) {
                         Icon(Icons.Default.Delete, contentDescription = "Usuń odpowiedź")
                     }
                 }
-
                 Row(verticalAlignment = Alignment.CenterVertically) {
-                    Checkbox(
-                        checked = answer.isCorrect,
-                        onCheckedChange = { answers[index] = answer.copy(isCorrect = it) }
+                    RadioButton(
+                        selected = localCorrectAnswerIndex == index,
+                        onClick = { localCorrectAnswerIndex = index }
                     )
                     Text("Poprawna odpowiedź")
                 }
             }
-
             Spacer(Modifier.height(AppSpacing.small))
         }
-
         Button(
-            onClick = { answers.add(AnswerDto(id = 0, answerText = "", isCorrect = false)) },
+            onClick = { localAnswers.add(AnswerDto(id = 0, answerText = "", isCorrect = false)) },
             modifier = Modifier.fillMaxWidth()
         ) {
             Text("Dodaj odpowiedź")
         }
-
         Spacer(Modifier.height(AppSpacing.medium))
-
         if (!error.isNullOrBlank()) {
-            Text(
-                text = "Błąd: $error",
-                color = MaterialTheme.colorScheme.error
-            )
+            Text(text = "Błąd: $error", color = MaterialTheme.colorScheme.error)
         }
-
         Button(
             onClick = {
-                if (quizId == null && questionId == null) error("quizId nie może być null przy dodawaniu pytania")
                 val q = QuestionDto(
                     id = questionId ?: 0,
                     quizId = quizId ?: 0,
-                    questionText = questionText,
-                    answers = answers.toList()
+                    questionText = localQuestionText,
+                    answers = localAnswers.mapIndexed { i, ans -> ans.copy(isCorrect = i == localCorrectAnswerIndex) }
                 )
                 if (questionId == null) viewModel.addQuestion(q) else viewModel.updateQuestion(questionId, q)
                 onSave?.invoke(q)
             },
-            enabled = questionText.isNotBlank()
-                    && answers.size >= 2
-                    && answers.all { it.answerText.isNotBlank() }
-                    && answers.count { it.isCorrect } >= 1,
+            enabled = localQuestionText.isNotBlank()
+                    && localAnswers.size >= 2
+                    && localAnswers.all { it.answerText.isNotBlank() }
+                    && localCorrectAnswerIndex != null,
             modifier = Modifier.fillMaxWidth()
         ) {
             Text("Zapisz")
@@ -154,7 +127,10 @@ fun QuestionForm(
             confirmButton = {
                 Button(
                     onClick = {
-                        answers.removeAt(answerToDeleteIndex!!)
+                        localAnswers.removeAt(answerToDeleteIndex!!)
+                        if (localCorrectAnswerIndex == answerToDeleteIndex) localCorrectAnswerIndex = null
+                        else if (localCorrectAnswerIndex != null && localCorrectAnswerIndex!! > answerToDeleteIndex!!)
+                            localCorrectAnswerIndex = localCorrectAnswerIndex!! - 1
                         answerToDeleteIndex = null
                     },
                     colors = ButtonDefaults.buttonColors(containerColor = MaterialTheme.colorScheme.error)

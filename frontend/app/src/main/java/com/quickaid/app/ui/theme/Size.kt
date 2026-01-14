@@ -13,5 +13,6 @@ object AppSpacing {
 
 object AppSizes {
     val logoSizeLarge = 360.dp
-    val outlinedTextFieldHeight = 240.dp
+    val outlinedTextFieldHeightLarge = 240.dp
+    val outlinedTextFieldHeightMedium = 120.dp
 }

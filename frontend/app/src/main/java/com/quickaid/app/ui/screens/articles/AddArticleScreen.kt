@@ -63,7 +63,7 @@ fun AddArticleScreen(
             label = { Text("Treść") },
             modifier = Modifier
                 .fillMaxWidth()
-                .height(AppSizes.outlinedTextFieldHeight)
+                .height(AppSizes.outlinedTextFieldHeightLarge)
         )
 
         Spacer(Modifier.height(AppSpacing.medium))

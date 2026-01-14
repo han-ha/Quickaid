@@ -6,7 +6,6 @@ import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
-import androidx.compose.material3.Button
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.OutlinedTextField
 import androidx.compose.material3.Text
@@ -21,6 +20,7 @@ import androidx.compose.ui.Modifier
 import androidx.hilt.navigation.compose.hiltViewModel
 import androidx.navigation.NavController
 import com.quickaid.app.data.models.QuizDto
+import com.quickaid.app.ui.components.LargeButton
 import com.quickaid.app.ui.theme.AppSizes
 import com.quickaid.app.ui.theme.AppSpacing
 import com.quickaid.app.viewmodel.QuizViewModel
@@ -75,7 +75,7 @@ fun AddQuizScreen(
 
         if (error != null) Text(text = "Błąd: $error", color = MaterialTheme.colorScheme.error)
 
-        Button(
+        LargeButton(
             onClick = {
                 viewModel.addQuizAndReturnId(
                     QuizDto(
@@ -90,7 +90,8 @@ fun AddQuizScreen(
                 }
             },
             modifier = Modifier.fillMaxWidth(),
+            content = "Dodaj i edytuj",
             enabled = !isLoading && title.isNotBlank() && description.isNotBlank()
-        ) { Text("Dodaj i edytuj") }
+        )
     }
 }

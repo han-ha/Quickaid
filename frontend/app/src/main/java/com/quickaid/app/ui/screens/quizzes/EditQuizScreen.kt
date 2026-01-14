@@ -13,6 +13,7 @@ import com.quickaid.app.data.models.QuestionDto
 import com.quickaid.app.data.models.QuizDto
 import com.quickaid.app.enums.UserRole
 import com.quickaid.app.ui.components.AdminActions
+import com.quickaid.app.ui.components.LargeButton
 import com.quickaid.app.ui.components.SmallButton
 import com.quickaid.app.ui.theme.AppSizes
 import com.quickaid.app.ui.theme.AppSpacing
@@ -134,12 +135,11 @@ fun EditQuizScreen(
 
         Spacer(Modifier.height(AppSpacing.medium))
 
-        Button(
+        LargeButton(
             onClick = { navController.navigate("addQuestion/$quizId") },
-            modifier = Modifier.fillMaxWidth()
-        ) {
-            Text("Dodaj pytanie")
-        }
+            modifier = Modifier.fillMaxWidth(),
+            content = "Dodaj pytanie"
+        )
 
         Spacer(Modifier.height(AppSpacing.medium))
 
@@ -148,7 +148,7 @@ fun EditQuizScreen(
             Spacer(Modifier.height(AppSpacing.medium))
         }
 
-        Button(
+        LargeButton(
             onClick = {
                 quizViewModel.updateQuiz(
                     quizId,
@@ -165,10 +165,10 @@ fun EditQuizScreen(
                 }
             },
             modifier = Modifier.fillMaxWidth(),
+            content = "Zapisz quiz",
             enabled = !isLoading && title.isNotBlank() && description.isNotBlank() && questions.count() > 1
-        ) {
-            Text("Zapisz quiz")
-        }
+        )
+
     }
 
     if (questionToDelete != null) {

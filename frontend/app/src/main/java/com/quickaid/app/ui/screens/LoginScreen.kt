@@ -9,24 +9,21 @@ import androidx.compose.ui.text.input.PasswordVisualTransformation
 import androidx.hilt.navigation.compose.hiltViewModel
 import com.quickaid.app.ui.components.LargeButton
 import com.quickaid.app.ui.theme.AppSpacing
-import com.quickaid.app.viewmodel.AuthState
 import com.quickaid.app.viewmodel.AuthViewModel
-import com.quickaid.app.viewmodel.SessionViewModel
 
 @Composable
 fun LoginScreen(
     viewModel: AuthViewModel = hiltViewModel(),
-    sessionViewModel: SessionViewModel = hiltViewModel(),
     onSuccess: () -> Unit
 ) {
-    val authState by viewModel.authState.collectAsState()
+    val authState by viewModel.authStateDto.collectAsState()
 
     var username by remember { mutableStateOf("") }
     var password by remember { mutableStateOf("") }
     var handledSuccess by remember { mutableStateOf(false) }
 
     LaunchedEffect(authState) {
-        if (authState is AuthState.Success && !handledSuccess) {
+        if (authState is AuthStateDto.Success && !handledSuccess) {
             handledSuccess = true
             onSuccess()
         }
@@ -78,7 +75,7 @@ fun LoginScreen(
         Spacer(Modifier.height(AppSpacing.medium))
 
         when (authState) {
-            is AuthState.Loading -> {
+            is AuthStateDto.Loading -> {
                 Box(
                     modifier = Modifier
                         .fillMaxWidth()
@@ -88,8 +85,8 @@ fun LoginScreen(
                     CircularProgressIndicator()
                 }
             }
-            is AuthState.Error -> {
-                val message = (authState as? AuthState.Error)?.message ?: "Nieznany błąd"
+            is AuthStateDto.Error -> {
+                val message = (authState as? AuthStateDto.Error)?.message ?: "Nieznany błąd"
                 Text(
                     text = "Błąd: $message",
                     color = MaterialTheme.colorScheme.error,

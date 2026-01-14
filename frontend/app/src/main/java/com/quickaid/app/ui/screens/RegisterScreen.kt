@@ -10,7 +10,6 @@ import androidx.hilt.navigation.compose.hiltViewModel
 import com.quickaid.app.ui.components.LargeButton
 import com.quickaid.app.ui.components.SmallButton
 import com.quickaid.app.ui.theme.AppSpacing
-import com.quickaid.app.viewmodel.AuthState
 import com.quickaid.app.viewmodel.AuthViewModel
 
 @Composable
@@ -18,7 +17,7 @@ fun RegisterScreen(
     viewModel: AuthViewModel = hiltViewModel(),
     onSuccess: () -> Unit
 ) {
-    val authState by viewModel.authState.collectAsState()
+    val authState by viewModel.authStateDto.collectAsState()
 
     var username by remember { mutableStateOf("") }
     var email by remember { mutableStateOf("") }
@@ -31,7 +30,7 @@ fun RegisterScreen(
 
     LaunchedEffect(authState) {
         when (authState) {
-            is AuthState.Success -> {
+            is AuthStateDto.Success -> {
                 if (!handledSuccess) {
                     handledSuccess = true
                     dialogMessage = "Konto zostało utworzone pomyślnie!"
@@ -39,8 +38,8 @@ fun RegisterScreen(
                     onSuccess()
                 }
             }
-            is AuthState.Error -> {
-                dialogMessage = (authState as AuthState.Error).message
+            is AuthStateDto.Error -> {
+                dialogMessage = (authState as AuthStateDto.Error).message
                 showDialog = true
             }
             else -> {}
@@ -116,7 +115,7 @@ fun RegisterScreen(
         Spacer(Modifier.height(AppSpacing.medium))
 
         when (authState) {
-            is AuthState.Loading -> {
+            is AuthStateDto.Loading -> {
                 Box(
                     modifier = Modifier
                         .fillMaxWidth()
@@ -133,7 +132,7 @@ fun RegisterScreen(
     if (showDialog) {
         AlertDialog(
             onDismissRequest = { showDialog = false },
-            title = { Text(if (authState is AuthState.Success) "Sukces" else "Błąd") },
+            title = { Text(if (authState is AuthStateDto.Success) "Sukces" else "Błąd") },
             text = { Text(dialogMessage) },
             confirmButton = {
                 SmallButton(

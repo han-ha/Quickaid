@@ -105,6 +105,7 @@ namespace Quickaid.Services
         {
             var best = await _db.UserQuizResults
                 .Where(r => r.UserId == userId && r.QuizId == quizId)
+                .OrderBy(r => r.CompletedAt)
                 .OrderByDescending(r => r.Score)
                 .FirstOrDefaultAsync();
 

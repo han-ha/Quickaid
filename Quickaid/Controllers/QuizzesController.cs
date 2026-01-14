@@ -3,16 +3,21 @@ using Quickaid.Services.Interfaces;
 using Quickaid.Models.DTO;
 using Microsoft.AspNetCore.Authorization;
 using Quickaid.Utils;
+using Quickaid.Services;
 
 namespace Quickaid.Controllers
 {
     [ApiController]
     [Route("api/[controller]")]
     [Authorize]
-    public class QuizzesController(IQuizService quizService, IQuizSolverService quizSolverService) : ControllerBase
+    public class QuizzesController(
+        IQuizService quizService,
+        IQuizSolverService quizSolverService,
+        IQuestionService questionService) : ControllerBase
     {
         private readonly IQuizService _quizService = quizService;
         private readonly IQuizSolverService _quizSolverService = quizSolverService;
+        private readonly IQuestionService _questionService = questionService;
 
         // GET api/quizzes
         [HttpGet]
@@ -117,6 +122,18 @@ namespace Quickaid.Controllers
             return Ok(lastResult);
         }
 
+        [Authorize(Roles = "admin")]
+        [HttpPost("{quizId}/questions")]
+        public async Task<IActionResult> AddQuestionToQuiz(int quizId, [FromBody] QuestionDto dto)
+        {
+            var created = await _questionService.AddToQuizAsync(quizId, dto);
+            return CreatedAtAction(
+                nameof(QuestionsController.GetById),
+                "Questions",
+                new { id = created.Id },
+                created
+            );
+        }
 
     }
 }

@@ -50,14 +50,42 @@ namespace Quickaid.Controllers
             return Ok(updated);
         }
 
-        // DELETE api/questions/{id}
+        // DELETE api/questions/{questionId}/quiz/{quizId}
         [Authorize(Roles = "admin")]
-        [HttpDelete("{id}")]
-        public async Task<IActionResult> Delete(int id)
+        [HttpDelete("{questionId}/quiz/{quizId}")]
+        public async Task<IActionResult> Delete(int questionId, int quizId)
         {
-            var deleted = await _questionService.DeleteAsync(id);
-            if (!deleted) return NotFound();
-            return NoContent();
+            try
+            {
+                var deleted = await _questionService.DeleteAsync(questionId, quizId);
+                if (!deleted)
+                    return NotFound("Nie znaleziono pytania lub powiązania z quizem.");
+                return NoContent();
+            }
+            catch (Exception e)
+            {
+                return BadRequest(e.Message);
+            }
         }
+
+
+        // POST api/questions/quiz/{quizId}
+        [Authorize(Roles = "admin")]
+        [HttpPost("quiz/{quizId}")]
+        public async Task<IActionResult> AddQuestionToQuiz(int quizId, [FromBody] QuestionDto dto)
+        {
+            if (dto == null) return BadRequest("Pytanie nie może być puste.");
+
+            try
+            {
+                var created = await _questionService.AddToQuizAsync(quizId, dto);
+                return CreatedAtAction(nameof(GetById), new { id = created.Id }, created);
+            }
+            catch (Exception e)
+            {
+                return BadRequest(e.Message);
+            }
+        }
+
     }
 }

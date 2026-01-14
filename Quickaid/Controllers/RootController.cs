@@ -15,6 +15,8 @@ namespace Quickaid.Controllers
         [HttpGet]
         public IActionResult Get()
         {
+
+            return Ok("Hello World, backend here!");
             //    var output = new List<string>();
 
             //    try
@@ -136,7 +138,7 @@ namespace Quickaid.Controllers
 
             //    return Ok(output);
 
-            return Ok();
+            
         }
 }
 }

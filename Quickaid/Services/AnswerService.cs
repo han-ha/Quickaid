@@ -65,7 +65,7 @@ namespace Quickaid.Services
             // Aktualizacja liczników w pytaniu
             if (question != null && question.NumberOfAnswers.HasValue)
             {
-                question.NumberOfAnswers = Math.Max(0, question.NumberOfAnswers.Value - 1);
+                question.NumberOfAnswers = Math.Max(0, (question.NumberOfAnswers ?? 0) - 1);
             }
 
             await _db.SaveChangesAsync();

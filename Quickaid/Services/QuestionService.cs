@@ -3,6 +3,7 @@ using Quickaid.Data;
 using Quickaid.Models.DTO;
 using Quickaid.Services.Interfaces;
 using Quickaid.Mapping.Interfaces;
+using Quickaid.Models.Entities;
 
 namespace Quickaid.Services
 {
@@ -68,42 +69,62 @@ namespace Quickaid.Services
             question.QuestionText = dto.QuestionText;
             question.NumberOfAnswers = dto.Answers?.Count ?? 0;
 
+            var currentAnswers = await _context.Answers
+                .Where(a => a.QuestionId == id)
+                .ToListAsync();
+            if (currentAnswers.Count != 0)
+                _context.Answers.RemoveRange(currentAnswers);
+
+            var newAnswers = (dto.Answers ?? new List<AnswerDto>()).Select(a => new Answer
+            {
+                QuestionId = id,
+                AnswerText = a.AnswerText,
+                IsCorrect = a.IsCorrect
+            }).ToList();
+            if (newAnswers.Any())
+                _context.Answers.AddRange(newAnswers);
+
             await _context.SaveChangesAsync();
             return _mapper.ToDto(question);
         }
 
-        public async Task<bool> DeleteAsync(int id)
+        public async Task<bool> DeleteAsync(int questionId, int quizId)
         {
-            var question = await _context.Questions.FindAsync(id);
+            var question = await _context.Questions.FindAsync(questionId);
             if (question == null) return false;
 
-            // Pobierz wszystkie quizy powiązane z tym pytaniem
-            var quizLinks = await _context.QuizQuestions
-                .Where(qq => qq.QuestionId == id)
-                .ToListAsync();
+            // Pobierz powiązanie pytania z tym konkretnym quizem
+            var quizLink = await _context.QuizQuestions
+                .FirstOrDefaultAsync(qq => qq.QuestionId == questionId && qq.QuizId == quizId);
 
-            // Usuń powiązania w QuizQuestions
-            _context.QuizQuestions.RemoveRange(quizLinks);
-
-            // Aktualizacja liczników w quizach
-            foreach (var link in quizLinks)
+            if (quizLink != null) // Jeśli istnieje powiązanie
             {
-                var quiz = await _context.Quizzes.FindAsync(link.QuizId);
-                if (quiz != null && quiz.NumberOfQuestions.HasValue)
+                // To je usuń
+                _context.QuizQuestions.Remove(quizLink);
+
+                // I zmniejsz licznik pytań w tym quizie i max score
+                var quiz = await _context.Quizzes.FindAsync(quizId);
+                if (quiz != null)
                 {
-                    quiz.NumberOfQuestions = Math.Max(0, quiz.NumberOfQuestions.Value - 1);
+                    quiz.NumberOfQuestions = Math.Max(0, (quiz.NumberOfQuestions ?? 0) - 1);
+                    // Każde pytanie jest warte 1 pkt, obecnie ta kolumna nie jest przekazywana w DTO,
+                    // ale dla łatwiejszego rozszerzenia modułu quizów jest aktualizowana
+                    quiz.MaxScore = Math.Max(0, (quiz.MaxScore ?? 0) - 1);
                 }
             }
 
-            // Usuń wszystkie odpowiedzi pytania, jeśli nie są użyte do innego pytania
-            var answers = await _context.Answers
-                .Where(a => a.QuestionId == id)
-                .ToListAsync();
-            _context.Answers.RemoveRange(answers);
+            // Sprawdź, czy pytanie jest używane w jakimkolwiek innym quizie
+            var stillUsed = await _context.QuizQuestions
+                .AnyAsync(qq => qq.QuestionId == questionId);
 
-            // Usuń pytanie
-            _context.Questions.Remove(question);
+            if (!stillUsed)
+            {
+                // Jeśli pytanie nie jest nigdzie więcej używane, to usuwamy je z bazy
+                // Odpowiedzi zostaną usunięte kaskadowo
+                _context.Questions.Remove(question);
+            }
 
+            // Zapisz wszystkie zmiany w jednym kroku
             await _context.SaveChangesAsync();
             return true;
         }
@@ -126,6 +147,53 @@ namespace Quickaid.Services
             return result;
         }
 
+        public async Task<QuestionDto> AddToQuizAsync(int quizId, QuestionDto dto)
+        {
+            var question = new Question
+            {
+                QuestionText = dto.QuestionText,
+                CreatedAt = DateTime.UtcNow,
+                NumberOfAnswers = dto.Answers?.Count ?? 0
+            };
+
+            _context.Questions.Add(question);
+            await _context.SaveChangesAsync();
+
+            // Tworzenie powiązania z quizem
+            _context.QuizQuestions.Add(new QuizQuestion
+            {
+                QuizId = quizId,
+                QuestionId = question.Id
+            });
+
+            // Dodawanie odpowiedzi
+            if (dto.Answers != null && dto.Answers.Count != 0)
+            {
+                var answers = dto.Answers.Select(a => new Answer
+                {
+                    QuestionId = question.Id,
+                    AnswerText = a.AnswerText,
+                    IsCorrect = a.IsCorrect
+                }).ToList();
+
+                _context.Answers.AddRange(answers);
+            }
+
+            // Zmiana liczby pytań w quizie i max score
+            var quiz = await _context.Quizzes.FindAsync(quizId);
+            if (quiz != null)
+            {
+                quiz.NumberOfQuestions = (quiz.NumberOfQuestions ?? 0) + 1;
+                // Każde pytanie jest warte 1 pkt, obecnie ta kolumna nie jest przekazywana w DTO,
+                // ale dla łatwiejszego rozszerzenia modułu quizów jest aktualizowana
+                quiz.MaxScore = (quiz.MaxScore ?? 0) + 1;
+            }
+
+            await _context.SaveChangesAsync();
+
+            var questionWithAnswers = await GetByIdAsync(question.Id);
+            return questionWithAnswers!;
+        }
 
     }
 }

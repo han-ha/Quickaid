@@ -17,7 +17,7 @@ import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.text.withStyle
 import androidx.core.net.toUri
 import com.quickaid.app.R
-import com.quickaid.app.ui.theme.AppSpacing
+import com.quickaid.app.ui.theme.AppSizes
 
 @Composable
 fun ContactScreen() {
@@ -28,7 +28,7 @@ fun ContactScreen() {
     Column(
         modifier = Modifier
             .fillMaxSize()
-            .padding(horizontal = AppSpacing.large, vertical = AppSpacing.medium),
+            .padding(horizontal = AppSizes.large, vertical = AppSizes.medium),
         verticalArrangement = Arrangement.Top,
         horizontalAlignment = Alignment.CenterHorizontally
     ) {
@@ -40,7 +40,7 @@ fun ContactScreen() {
             modifier = Modifier.fillMaxWidth()
         )
 
-        Spacer(Modifier.height(AppSpacing.large))
+        Spacer(Modifier.height(AppSizes.large))
 
         val annotatedText = buildAnnotatedString {
             append("$description\n\n")

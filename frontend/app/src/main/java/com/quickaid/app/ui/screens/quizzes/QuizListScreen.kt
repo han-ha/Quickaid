@@ -12,8 +12,6 @@ import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.items
 import androidx.compose.material3.AlertDialog
-import androidx.compose.material3.Button
-import androidx.compose.material3.ButtonDefaults
 import androidx.compose.material3.Card
 import androidx.compose.material3.CircularProgressIndicator
 import androidx.compose.material3.MaterialTheme
@@ -33,7 +31,7 @@ import com.quickaid.app.enums.UserRole
 import com.quickaid.app.ui.components.AdminActions
 import com.quickaid.app.ui.components.LargeButton
 import com.quickaid.app.ui.components.SmallButton
-import com.quickaid.app.ui.theme.AppSpacing
+import com.quickaid.app.ui.theme.AppSizes
 import com.quickaid.app.viewmodel.QuizViewModel
 import com.quickaid.app.viewmodel.SessionViewModel
 import java.net.URLEncoder
@@ -93,11 +91,11 @@ fun QuizListScreen(
     Column(
         modifier = Modifier
             .fillMaxSize()
-            .padding(AppSpacing.medium),
+            .padding(AppSizes.medium),
         horizontalAlignment = Alignment.CenterHorizontally
     ) {
         Text("Quizy", style = MaterialTheme.typography.headlineMedium)
-        Spacer(Modifier.height(AppSpacing.large))
+        Spacer(Modifier.height(AppSizes.large))
 
         when {
             isLoading -> Box(modifier = Modifier.fillMaxSize(), contentAlignment = Alignment.Center) {
@@ -110,7 +108,7 @@ fun QuizListScreen(
 
                 LazyColumn(
                     modifier = Modifier.weight(1f),
-                    verticalArrangement = Arrangement.spacedBy(AppSpacing.small)
+                    verticalArrangement = Arrangement.spacedBy(AppSizes.small)
                 ) {
                     items(visibleQuizzes, key = { it.id }) { quiz ->
                         Card(
@@ -121,11 +119,11 @@ fun QuizListScreen(
                                     navController.navigate("quizOverview/${quiz.id}/$encodedTitle/${quiz.numberOfQuestions}")
                                 }
                         ) {
-                            Column(modifier = Modifier.padding(AppSpacing.medium)) {
+                            Column(modifier = Modifier.padding(AppSizes.medium)) {
                                 Text(quiz.title, style = MaterialTheme.typography.headlineSmall)
 
                                 if (role == UserRole.ADMIN) {
-                                    Spacer(Modifier.height(AppSpacing.small))
+                                    Spacer(Modifier.height(AppSizes.small))
                                     AdminActions(
                                         onEdit = { navController.navigate("editQuiz/${quiz.id}") },
                                         onDelete = {
@@ -142,7 +140,7 @@ fun QuizListScreen(
         }
 
         if (role == UserRole.ADMIN) {
-            Spacer(Modifier.height(AppSpacing.medium))
+            Spacer(Modifier.height(AppSizes.medium))
             LargeButton(
                 onClick = { navController.navigate("addQuiz") },
                 modifier = Modifier.fillMaxWidth(),

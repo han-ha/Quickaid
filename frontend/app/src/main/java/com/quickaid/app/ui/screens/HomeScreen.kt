@@ -10,7 +10,7 @@ import androidx.hilt.navigation.compose.hiltViewModel
 import androidx.navigation.NavController
 import com.quickaid.app.enums.UserRole
 import com.quickaid.app.ui.components.SmallButton
-import com.quickaid.app.ui.theme.AppSpacing
+import com.quickaid.app.ui.theme.AppSizes
 import com.quickaid.app.viewmodel.SessionViewModel
 
 @Composable
@@ -24,7 +24,7 @@ fun HomeScreen(
     Column(
         modifier = Modifier
             .fillMaxSize()
-            .padding(AppSpacing.medium),
+            .padding(AppSizes.medium),
         verticalArrangement = Arrangement.Top,
         horizontalAlignment = Alignment.CenterHorizontally
     ) {
@@ -38,7 +38,7 @@ fun HomeScreen(
             style = MaterialTheme.typography.headlineMedium
         )
 
-        Spacer(Modifier.height(AppSpacing.large))
+        Spacer(Modifier.height(AppSizes.large))
 
         SmallButton(
             onClick = { navController.navigate("emergency") },
@@ -46,7 +46,7 @@ fun HomeScreen(
             content = "Tryb awaryjny"
         )
 
-        Spacer(Modifier.height(AppSpacing.small))
+        Spacer(Modifier.height(AppSizes.small))
 
         SmallButton(
             onClick = { },
@@ -54,7 +54,7 @@ fun HomeScreen(
             content = "Mapa AED"
         )
 
-        Spacer(Modifier.height(AppSpacing.small))
+        Spacer(Modifier.height(AppSizes.small))
 
         SmallButton(
             onClick = { navController.navigate("articles") },
@@ -62,7 +62,7 @@ fun HomeScreen(
             content = "Materiały edukacyjne"
         )
 
-        Spacer(Modifier.height(AppSpacing.small))
+        Spacer(Modifier.height(AppSizes.small))
 
         when (role) {
 
@@ -73,7 +73,7 @@ fun HomeScreen(
                     content = "Kontakt"
                 )
 
-                Spacer(Modifier.height(AppSpacing.small))
+                Spacer(Modifier.height(AppSizes.small))
 
                 SmallButton(
                     onClick = { navController.navigate("login") },
@@ -81,7 +81,7 @@ fun HomeScreen(
                     content = "Zaloguj się"
                 )
 
-                Spacer(Modifier.height(AppSpacing.small))
+                Spacer(Modifier.height(AppSizes.small))
 
                 SmallButton(
                     onClick = { navController.navigate("register") },
@@ -98,7 +98,7 @@ fun HomeScreen(
                     content = "Quizy edukacyjne"
                 )
 
-                Spacer(Modifier.height(AppSpacing.small))
+                Spacer(Modifier.height(AppSizes.small))
 
                 SmallButton(
                     onClick = { navController.navigate("settings") },
@@ -107,7 +107,7 @@ fun HomeScreen(
                 )
 
                 if (role == UserRole.USER) {
-                    Spacer(Modifier.height(AppSpacing.small))
+                    Spacer(Modifier.height(AppSizes.small))
 
                     SmallButton(
                         onClick = { navController.navigate("contact") },
@@ -116,7 +116,7 @@ fun HomeScreen(
                     )
                 }
 
-                Spacer(Modifier.height(AppSpacing.small))
+                Spacer(Modifier.height(AppSizes.small))
 
                 SmallButton(
                     onClick = {

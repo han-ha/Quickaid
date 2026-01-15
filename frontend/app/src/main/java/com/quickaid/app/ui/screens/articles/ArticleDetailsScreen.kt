@@ -10,7 +10,7 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.text.style.TextAlign
 import androidx.hilt.navigation.compose.hiltViewModel
 import androidx.navigation.NavBackStackEntry
-import com.quickaid.app.ui.theme.AppSpacing
+import com.quickaid.app.ui.theme.AppSizes
 import com.quickaid.app.viewmodel.ArticleDetailsViewModel
 
 @Composable
@@ -25,7 +25,7 @@ fun ArticleDetailsScreen(
     Column(
         modifier = Modifier
             .fillMaxSize()
-            .padding(AppSpacing.medium),
+            .padding(AppSizes.medium),
         horizontalAlignment = Alignment.CenterHorizontally
     ) {
         Text(
@@ -34,7 +34,7 @@ fun ArticleDetailsScreen(
             textAlign = TextAlign.Center
         )
 
-        Spacer(Modifier.height(AppSpacing.large))
+        Spacer(Modifier.height(AppSizes.large))
 
         when {
             isLoading -> CircularProgressIndicator()
@@ -47,7 +47,7 @@ fun ArticleDetailsScreen(
                 Column(
                     modifier = Modifier
                         .fillMaxWidth()
-                        .padding(horizontal = AppSpacing.medium)
+                        .padding(horizontal = AppSizes.medium)
                 ) {
                     Text(
                         text = article!!.content,

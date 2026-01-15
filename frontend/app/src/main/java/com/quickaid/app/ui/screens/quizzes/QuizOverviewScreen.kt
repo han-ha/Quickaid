@@ -67,7 +67,7 @@ fun QuizOverviewScreen(
     Column(
         modifier = Modifier
             .fillMaxSize()
-            .padding(AppSpacing.medium),
+            .padding(AppSizes.medium),
         horizontalAlignment = Alignment.CenterHorizontally,
         verticalArrangement = Arrangement.Top
     ) {
@@ -76,7 +76,7 @@ fun QuizOverviewScreen(
             style = AppTypography.headlineMedium
         )
 
-        Spacer(Modifier.height(AppSpacing.large))
+        Spacer(Modifier.height(AppSizes.large))
 
         when {
             error != null -> {
@@ -97,14 +97,14 @@ fun QuizOverviewScreen(
                     text = "${bestResult!!.score}/$quizMaxScore",
                     style = AppTypography.headlineMedium,
                     color = GreenPrimary,
-                    modifier = Modifier.padding(top = AppSpacing.small)
+                    modifier = Modifier.padding(top = AppSizes.small)
                 )
 
                 formattedDate?.let {
                     Text(
                         text = "Osiągnięto po raz pierwszy: $it",
                         style = AppTypography.bodyMedium,
-                        modifier = Modifier.padding(top = AppSpacing.small)
+                        modifier = Modifier.padding(top = AppSizes.small)
                     )
                 }
             }
@@ -118,7 +118,7 @@ fun QuizOverviewScreen(
 
             }
         }
-        Spacer(Modifier.height(AppSpacing.large))
+        Spacer(Modifier.height(AppSizes.large))
 
         LargeButton(
             onClick = { navController.navigate("quizDetails/$quizId") },

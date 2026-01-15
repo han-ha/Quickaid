@@ -4,11 +4,10 @@ import androidx.compose.foundation.layout.*
 import androidx.compose.material3.*
 import androidx.compose.runtime.*
 import androidx.compose.ui.Modifier
-import androidx.compose.ui.unit.dp
 import androidx.navigation.NavController
 import com.quickaid.app.data.models.UserDto
 import com.quickaid.app.viewmodel.AdminViewModel
-import com.quickaid.app.ui.theme.AppSpacing
+import com.quickaid.app.ui.theme.AppSizes
 
 @Composable
 fun UserItem(
@@ -48,7 +47,7 @@ fun UserItem(
     Card(
         modifier = Modifier
             .fillMaxWidth()
-            .padding(vertical = AppSpacing.extraSmall),
+            .padding(vertical = AppSizes.extraSmall),
         shape = MaterialTheme.shapes.small,
         colors = CardDefaults.cardColors(
             containerColor = MaterialTheme.colorScheme.surfaceVariant
@@ -57,10 +56,10 @@ fun UserItem(
         Column(
             modifier = Modifier
                 .fillMaxWidth()
-                .padding(AppSpacing.medium)
+                .padding(AppSizes.medium)
         ) {
             Text(user.username, style = MaterialTheme.typography.titleMedium)
-            Spacer(Modifier.height(AppSpacing.extraSmall))
+            Spacer(Modifier.height(AppSizes.extraSmall))
 
             val isAdmin = user.role == "admin"
             val isCurrentUser = user.id == currentUserId

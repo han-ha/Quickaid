@@ -11,12 +11,11 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.text.style.TextAlign
 import androidx.hilt.navigation.compose.hiltViewModel
 import androidx.navigation.NavController
-import com.quickaid.app.data.models.ArticleDto
 import com.quickaid.app.enums.UserRole
 import com.quickaid.app.ui.components.AdminActions
 import com.quickaid.app.ui.components.LargeButton
 import com.quickaid.app.ui.components.SmallButton
-import com.quickaid.app.ui.theme.AppSpacing
+import com.quickaid.app.ui.theme.AppSizes
 import com.quickaid.app.viewmodel.ArticleViewModel
 import com.quickaid.app.viewmodel.SessionViewModel
 
@@ -78,7 +77,7 @@ fun ArticleListScreen(
     Column(
         modifier = Modifier
             .fillMaxSize()
-            .padding(AppSpacing.medium),
+            .padding(AppSizes.medium),
         horizontalAlignment = Alignment.CenterHorizontally
     ) {
         Text(
@@ -87,7 +86,7 @@ fun ArticleListScreen(
             textAlign = TextAlign.Center
         )
 
-        Spacer(Modifier.height(AppSpacing.large))
+        Spacer(Modifier.height(AppSizes.large))
 
         when {
             isLoading -> CircularProgressIndicator()
@@ -98,7 +97,7 @@ fun ArticleListScreen(
             )
             else -> LazyColumn(
                 modifier = Modifier.weight(1f),
-                verticalArrangement = Arrangement.spacedBy(AppSpacing.small)
+                verticalArrangement = Arrangement.spacedBy(AppSizes.small)
             ) {
                 items(items = articles, key = { it.id }) { article ->
                     Card(
@@ -108,14 +107,14 @@ fun ArticleListScreen(
                                 navController.navigate("articleDetails/${article.id}")
                             }
                     ) {
-                        Column(modifier = Modifier.padding(AppSpacing.medium)) {
+                        Column(modifier = Modifier.padding(AppSizes.medium)) {
                             Text(
                                 text = article.title,
                                 style = MaterialTheme.typography.headlineSmall
                             )
 
                             if (role == UserRole.ADMIN) {
-                                Spacer(Modifier.height(AppSpacing.small))
+                                Spacer(Modifier.height(AppSizes.small))
                                 AdminActions(
                                     onEdit = {
                                         navController.navigate("editArticle/${article.id}")
@@ -133,7 +132,7 @@ fun ArticleListScreen(
         }
 
         if (role == UserRole.ADMIN) {
-            Spacer(Modifier.height(AppSpacing.medium))
+            Spacer(Modifier.height(AppSizes.medium))
             LargeButton(
                 onClick = { navController.navigate("addArticle") },
                 modifier = Modifier.fillMaxWidth(),

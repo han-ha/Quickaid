@@ -16,7 +16,6 @@ import com.quickaid.app.ui.components.AdminActions
 import com.quickaid.app.ui.components.LargeButton
 import com.quickaid.app.ui.components.SmallButton
 import com.quickaid.app.ui.theme.AppSizes
-import com.quickaid.app.ui.theme.AppSpacing
 import com.quickaid.app.viewmodel.QuestionViewModel
 import com.quickaid.app.viewmodel.QuizViewModel
 import com.quickaid.app.viewmodel.SessionViewModel
@@ -77,10 +76,10 @@ fun EditQuizScreen(
     Column(
         modifier = Modifier
             .fillMaxSize()
-            .padding(AppSpacing.medium)
+            .padding(AppSizes.medium)
     ) {
         Text("Edytuj quiz", style = MaterialTheme.typography.headlineMedium)
-        Spacer(Modifier.height(AppSpacing.medium))
+        Spacer(Modifier.height(AppSizes.medium))
 
         OutlinedTextField(
             value = title,
@@ -90,7 +89,7 @@ fun EditQuizScreen(
             singleLine = true
         )
 
-        Spacer(Modifier.height(AppSpacing.small))
+        Spacer(Modifier.height(AppSizes.small))
 
         OutlinedTextField(
             value = description,
@@ -101,26 +100,26 @@ fun EditQuizScreen(
                 .height(AppSizes.outlinedTextFieldHeightMedium)
         )
 
-        Spacer(Modifier.height(AppSpacing.medium))
+        Spacer(Modifier.height(AppSizes.medium))
 
         Text("Pytania:", style = MaterialTheme.typography.headlineSmall)
-        Spacer(Modifier.height(AppSpacing.small))
+        Spacer(Modifier.height(AppSizes.small))
 
         LazyColumn(
             modifier = Modifier.weight(1f),
-            verticalArrangement = Arrangement.spacedBy(AppSpacing.small)
+            verticalArrangement = Arrangement.spacedBy(AppSizes.small)
         ) {
             items(questions, key = { it.id }) { question ->
                 Card(modifier = Modifier.fillMaxWidth()) {
-                    Column(modifier = Modifier.padding(AppSpacing.medium)) {
+                    Column(modifier = Modifier.padding(AppSizes.medium)) {
                         Text(question.questionText)
-                        Spacer(Modifier.height(AppSpacing.extraSmall))
+                        Spacer(Modifier.height(AppSizes.extraSmall))
                         Text(
                             "${question.answers.size} odpowiedzi",
                             style = MaterialTheme.typography.bodySmall
                         )
                         if (role == UserRole.ADMIN) {
-                            Spacer(Modifier.height(AppSpacing.small))
+                            Spacer(Modifier.height(AppSizes.small))
                             AdminActions(
                                 onEdit = {
                                     navController.navigate("editQuestion/${question.id}/$quizId")
@@ -133,7 +132,7 @@ fun EditQuizScreen(
             }
         }
 
-        Spacer(Modifier.height(AppSpacing.medium))
+        Spacer(Modifier.height(AppSizes.medium))
 
         LargeButton(
             onClick = { navController.navigate("addQuestion/$quizId") },
@@ -141,11 +140,11 @@ fun EditQuizScreen(
             content = "Dodaj pytanie"
         )
 
-        Spacer(Modifier.height(AppSpacing.medium))
+        Spacer(Modifier.height(AppSizes.medium))
 
         if (!error.isNullOrBlank()) {
             Text("Błąd: $error", color = MaterialTheme.colorScheme.error)
-            Spacer(Modifier.height(AppSpacing.medium))
+            Spacer(Modifier.height(AppSizes.medium))
         }
 
         LargeButton(

@@ -11,7 +11,7 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import com.quickaid.app.data.models.AnswerDto
 import com.quickaid.app.data.models.QuestionDto
-import com.quickaid.app.ui.theme.AppSpacing
+import com.quickaid.app.ui.theme.AppSizes
 import com.quickaid.app.viewmodel.QuestionViewModel
 
 @Composable
@@ -46,25 +46,25 @@ fun QuestionForm(
         modifier = Modifier
             .fillMaxSize()
             .verticalScroll(scrollState)
-            .padding(AppSpacing.medium),
+            .padding(AppSizes.medium),
         horizontalAlignment = Alignment.CenterHorizontally
     ) {
         Text(
             text = if (questionId == null) "Dodaj pytanie" else "Edytuj pytanie",
             style = MaterialTheme.typography.headlineMedium
         )
-        Spacer(Modifier.height(AppSpacing.medium))
+        Spacer(Modifier.height(AppSizes.medium))
         OutlinedTextField(
             value = localQuestionText,
             onValueChange = { localQuestionText = it },
             label = { Text("Treść pytania") },
             modifier = Modifier.fillMaxWidth()
         )
-        Spacer(Modifier.height(AppSpacing.medium))
+        Spacer(Modifier.height(AppSizes.medium))
         localAnswers.forEachIndexed { index, answer ->
             Column(
                 modifier = Modifier.fillMaxWidth(),
-                verticalArrangement = Arrangement.spacedBy(AppSpacing.small)
+                verticalArrangement = Arrangement.spacedBy(AppSizes.small)
             ) {
                 Row(verticalAlignment = Alignment.CenterVertically, modifier = Modifier.fillMaxWidth()) {
                     OutlinedTextField(
@@ -73,7 +73,7 @@ fun QuestionForm(
                         label = { Text("Odpowiedź ${index + 1}") },
                         modifier = Modifier.weight(1f)
                     )
-                    Spacer(Modifier.width(AppSpacing.small))
+                    Spacer(Modifier.width(AppSizes.small))
                     IconButton(onClick = { answerToDeleteIndex = index }) {
                         Icon(Icons.Default.Delete, contentDescription = "Usuń odpowiedź")
                     }
@@ -86,7 +86,7 @@ fun QuestionForm(
                     Text("Poprawna odpowiedź")
                 }
             }
-            Spacer(Modifier.height(AppSpacing.small))
+            Spacer(Modifier.height(AppSizes.small))
         }
         Button(
             onClick = { localAnswers.add(AnswerDto(id = 0, answerText = "", isCorrect = false)) },
@@ -94,7 +94,7 @@ fun QuestionForm(
         ) {
             Text("Dodaj odpowiedź")
         }
-        Spacer(Modifier.height(AppSpacing.medium))
+        Spacer(Modifier.height(AppSizes.medium))
         if (!error.isNullOrBlank()) {
             Text(text = "Błąd: $error", color = MaterialTheme.colorScheme.error)
         }

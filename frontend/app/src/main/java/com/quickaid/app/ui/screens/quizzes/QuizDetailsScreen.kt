@@ -37,7 +37,7 @@ fun QuizDetailsScreen(
     Column(
         modifier = Modifier
             .fillMaxSize()
-            .padding(AppSpacing.medium)
+            .padding(AppSizes.medium)
     ) {
         Box(
             modifier = Modifier
@@ -50,7 +50,7 @@ fun QuizDetailsScreen(
             )
         }
 
-        Spacer(Modifier.height(AppSpacing.medium))
+        Spacer(Modifier.height(AppSizes.medium))
 
         when {
             isLoading -> Box(
@@ -90,40 +90,40 @@ fun QuizDetailsScreen(
                                 modifier = Modifier
                                     .fillMaxWidth()
                                     .background(questionColor)
-                                    .padding(vertical = AppSpacing.small)
+                                    .padding(vertical = AppSizes.small)
                             ) {
                                 Text(
                                     text = "${index + 1}. ${question.questionText}",
                                     style = MaterialTheme.typography.titleMedium
                                 )
 
-                                Spacer(Modifier.height(AppSpacing.extraSmall))
+                                Spacer(Modifier.height(AppSizes.extraSmall))
 
                                 question.answers.forEach { answer ->
                                     val selected = userAnswerId == answer.id
                                     Row(
                                         modifier = Modifier
                                             .fillMaxWidth()
-                                            .padding(vertical = AppSpacing.extraSmall),
+                                            .padding(vertical = AppSizes.extraSmall),
                                         verticalAlignment = Alignment.CenterVertically
                                     ) {
                                         RadioButton(
                                             selected = selected,
                                             onClick = null
                                         )
-                                        Spacer(Modifier.width(AppSpacing.small))
+                                        Spacer(Modifier.width(AppSizes.small))
                                         Text(answer.answerText)
                                     }
                                 }
 
-                                Spacer(Modifier.height(AppSpacing.small))
+                                Spacer(Modifier.height(AppSizes.small))
                             }
 
-                            Spacer(Modifier.height(AppSpacing.medium))
+                            Spacer(Modifier.height(AppSizes.medium))
                         }
                     }
 
-                    Spacer(Modifier.height(AppSpacing.medium))
+                    Spacer(Modifier.height(AppSizes.medium))
                     Box(
                         modifier = Modifier.fillMaxWidth(),
                         contentAlignment = Alignment.Center
@@ -159,7 +159,7 @@ fun QuizDetailsScreen(
                                 style = MaterialTheme.typography.titleMedium
                             )
 
-                            Spacer(Modifier.height(AppSpacing.extraSmall))
+                            Spacer(Modifier.height(AppSizes.extraSmall))
 
                             question.answers.forEach { answer ->
                                 val selected = selectedAnswers[question.id] == answer.id
@@ -169,25 +169,25 @@ fun QuizDetailsScreen(
                                         .clickable {
                                             selectedAnswers[question.id] = answer.id
                                         }
-                                        .padding(vertical = AppSpacing.extraSmall),
+                                        .padding(vertical = AppSizes.extraSmall),
                                     verticalAlignment = Alignment.CenterVertically
                                 ) {
                                     RadioButton(
                                         selected = selected,
                                         onClick = { selectedAnswers[question.id] = answer.id }
                                     )
-                                    Spacer(Modifier.width(AppSpacing.small))
+                                    Spacer(Modifier.width(AppSizes.small))
                                     Text(answer.answerText)
                                 }
                             }
 
-                            Spacer(Modifier.height(AppSpacing.medium))
+                            Spacer(Modifier.height(AppSizes.medium))
                         }
                     }
 
                     // komunikat błędu submitu
                     submitError?.let {
-                        Spacer(Modifier.height(AppSpacing.small))
+                        Spacer(Modifier.height(AppSizes.small))
                         Text(it, color = MaterialTheme.colorScheme.error)
                     }
 

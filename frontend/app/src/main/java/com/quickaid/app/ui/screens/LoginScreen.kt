@@ -8,7 +8,7 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.text.input.PasswordVisualTransformation
 import androidx.hilt.navigation.compose.hiltViewModel
 import com.quickaid.app.ui.components.LargeButton
-import com.quickaid.app.ui.theme.AppSpacing
+import com.quickaid.app.ui.theme.AppSizes
 import com.quickaid.app.viewmodel.AuthViewModel
 
 @Composable
@@ -32,7 +32,7 @@ fun LoginScreen(
     Column(
         modifier = Modifier
             .fillMaxSize()
-            .padding(AppSpacing.medium),
+            .padding(AppSizes.medium),
         verticalArrangement = Arrangement.Center,
         horizontalAlignment = Alignment.CenterHorizontally
     ) {
@@ -40,7 +40,7 @@ fun LoginScreen(
         Text(
             text = "Zaloguj się",
             style = MaterialTheme.typography.headlineMedium,
-            modifier = Modifier.padding(bottom = AppSpacing.large)
+            modifier = Modifier.padding(bottom = AppSizes.large)
         )
 
         TextField(
@@ -52,7 +52,7 @@ fun LoginScreen(
             shape = MaterialTheme.shapes.small
         )
 
-        Spacer(Modifier.height(AppSpacing.small))
+        Spacer(Modifier.height(AppSizes.small))
 
         TextField(
             value = password,
@@ -64,7 +64,7 @@ fun LoginScreen(
             visualTransformation = PasswordVisualTransformation()
         )
 
-        Spacer(Modifier.height(AppSpacing.medium))
+        Spacer(Modifier.height(AppSizes.medium))
 
         LargeButton(
             onClick = { viewModel.login(username, password) },
@@ -72,14 +72,14 @@ fun LoginScreen(
             content = "Zaloguj"
         )
 
-        Spacer(Modifier.height(AppSpacing.medium))
+        Spacer(Modifier.height(AppSizes.medium))
 
         when (authState) {
             is AuthStateDto.Loading -> {
                 Box(
                     modifier = Modifier
                         .fillMaxWidth()
-                        .height(AppSpacing.extraLarge),
+                        .height(AppSizes.extraLarge),
                     contentAlignment = Alignment.Center
                 ) {
                     CircularProgressIndicator()

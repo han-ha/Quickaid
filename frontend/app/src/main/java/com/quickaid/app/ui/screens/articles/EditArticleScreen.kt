@@ -11,7 +11,6 @@ import androidx.navigation.NavController
 import com.quickaid.app.data.models.ArticleDto
 import com.quickaid.app.ui.components.LargeButton
 import com.quickaid.app.ui.theme.AppSizes
-import com.quickaid.app.ui.theme.AppSpacing
 import com.quickaid.app.util.JwtUtils
 import com.quickaid.app.viewmodel.ArticleViewModel
 import com.quickaid.app.viewmodel.SessionViewModel
@@ -58,7 +57,7 @@ fun EditArticleScreen(
     Column(
         modifier = Modifier
             .fillMaxSize()
-            .padding(AppSpacing.medium),
+            .padding(AppSizes.medium),
         horizontalAlignment = Alignment.CenterHorizontally
     ) {
         Text(
@@ -66,7 +65,7 @@ fun EditArticleScreen(
             style = MaterialTheme.typography.headlineMedium,
             textAlign = TextAlign.Center
         )
-        Spacer(Modifier.height(AppSpacing.medium))
+        Spacer(Modifier.height(AppSizes.medium))
 
         OutlinedTextField(
             value = title,
@@ -76,7 +75,7 @@ fun EditArticleScreen(
             singleLine = true
         )
 
-        Spacer(Modifier.height(AppSpacing.small))
+        Spacer(Modifier.height(AppSizes.small))
 
         OutlinedTextField(
             value = content,
@@ -87,7 +86,7 @@ fun EditArticleScreen(
                 .height(AppSizes.outlinedTextFieldHeightLarge)
         )
 
-        Spacer(Modifier.height(AppSpacing.medium))
+        Spacer(Modifier.height(AppSizes.medium))
 
         if (error != null) {
             Text(text = "Błąd: $error", color = MaterialTheme.colorScheme.error)

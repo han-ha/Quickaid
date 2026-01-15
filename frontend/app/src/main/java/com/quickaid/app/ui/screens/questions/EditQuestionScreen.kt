@@ -10,7 +10,7 @@ import androidx.compose.ui.Modifier
 import androidx.hilt.navigation.compose.hiltViewModel
 import androidx.navigation.NavController
 import com.quickaid.app.ui.components.QuestionForm
-import com.quickaid.app.ui.theme.AppSpacing
+import com.quickaid.app.ui.theme.AppSizes
 import com.quickaid.app.viewmodel.QuestionViewModel
 
 @Composable
@@ -53,7 +53,7 @@ fun EditQuestionScreen(
         }
 
         if (isLoading) {
-            Spacer(modifier = Modifier.height(AppSpacing.medium))
+            Spacer(modifier = Modifier.height(AppSizes.medium))
             CircularProgressIndicator()
         }
     }

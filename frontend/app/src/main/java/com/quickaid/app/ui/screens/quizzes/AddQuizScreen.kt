@@ -22,7 +22,6 @@ import androidx.navigation.NavController
 import com.quickaid.app.data.models.QuizDto
 import com.quickaid.app.ui.components.LargeButton
 import com.quickaid.app.ui.theme.AppSizes
-import com.quickaid.app.ui.theme.AppSpacing
 import com.quickaid.app.viewmodel.QuizViewModel
 
 @Composable
@@ -49,10 +48,10 @@ fun AddQuizScreen(
     }
 
     Column(
-        modifier = Modifier.fillMaxSize().padding(AppSpacing.medium)
+        modifier = Modifier.fillMaxSize().padding(AppSizes.medium)
     ) {
         Text("Dodaj quiz", style = MaterialTheme.typography.headlineMedium)
-        Spacer(Modifier.height(AppSpacing.medium))
+        Spacer(Modifier.height(AppSizes.medium))
 
         OutlinedTextField(
             value = title,
@@ -62,7 +61,7 @@ fun AddQuizScreen(
             singleLine = true
         )
 
-        Spacer(Modifier.height(AppSpacing.small))
+        Spacer(Modifier.height(AppSizes.small))
 
         OutlinedTextField(
             value = description,
@@ -71,7 +70,7 @@ fun AddQuizScreen(
             modifier = Modifier.fillMaxWidth().height(AppSizes.outlinedTextFieldHeightLarge)
         )
 
-        Spacer(Modifier.height(AppSpacing.medium))
+        Spacer(Modifier.height(AppSizes.medium))
 
         if (error != null) Text(text = "Błąd: $error", color = MaterialTheme.colorScheme.error)
 

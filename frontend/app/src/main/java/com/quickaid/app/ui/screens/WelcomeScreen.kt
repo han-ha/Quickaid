@@ -20,7 +20,6 @@ import com.quickaid.app.R
 import com.quickaid.app.enums.UserRole
 import com.quickaid.app.ui.components.LargeButton
 import com.quickaid.app.ui.theme.AppSizes
-import com.quickaid.app.ui.theme.AppSpacing
 import com.quickaid.app.viewmodel.SessionViewModel
 
 @Composable
@@ -31,7 +30,7 @@ fun WelcomeScreen(
     Column(
         modifier = Modifier
             .fillMaxSize()
-            .padding(AppSpacing.medium),
+            .padding(AppSizes.medium),
         verticalArrangement = Arrangement.Center,
         horizontalAlignment = Alignment.CenterHorizontally
     ) {
@@ -41,7 +40,7 @@ fun WelcomeScreen(
             modifier = Modifier.size(AppSizes.logoSizeLarge)
         )
 
-        Spacer(modifier = Modifier.height(AppSpacing.large))
+        Spacer(modifier = Modifier.height(AppSizes.large))
 
         LargeButton(
             onClick = { navController.navigate("login") },
@@ -50,7 +49,7 @@ fun WelcomeScreen(
             buttonColor = MaterialTheme.colorScheme.primary
         )
 
-        Spacer(modifier = Modifier.height(AppSpacing.small))
+        Spacer(modifier = Modifier.height(AppSizes.small))
 
         LargeButton(
             onClick = { navController.navigate("register") },
@@ -59,7 +58,7 @@ fun WelcomeScreen(
             buttonColor = MaterialTheme.colorScheme.primary
         )
 
-        Spacer(modifier = Modifier.height(AppSpacing.small))
+        Spacer(modifier = Modifier.height(AppSizes.small))
 
         LargeButton(
             onClick = {

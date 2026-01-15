@@ -12,8 +12,7 @@ namespace Quickaid.Mapping
             {
                 Id = entity.Id,
                 Title = entity.Title,
-                Content = entity.Content ?? "",
-                CreatedBy = entity.CreatedBy ?? 0
+                Content = entity.Content ?? ""
             };
         }
 
@@ -22,8 +21,7 @@ namespace Quickaid.Mapping
             return new Article
             {
                 Title = dto.Title,
-                Content = dto.Content,
-                CreatedBy = dto.CreatedBy
+                Content = dto.Content
             };
         }
     }

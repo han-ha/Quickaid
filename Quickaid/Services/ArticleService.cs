@@ -24,13 +24,13 @@ namespace Quickaid.Services
             return entity == null ? null : _mapper.ToDto(entity);
         }
 
-        public async Task<ArticleDto> AddAsync(ArticleDto dto)
+        public async Task<ArticleDto> AddAsync(ArticleDto dto, int userId)
         {
             var entity = new Article
             {
                 Title = dto.Title,
                 Content = dto.Content,
-                CreatedBy = dto.CreatedBy,
+                CreatedBy = userId,
                 CreatedAt = DateTime.UtcNow,
                 UpdatedAt = DateTime.UtcNow
             };

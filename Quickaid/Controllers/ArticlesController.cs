@@ -2,6 +2,7 @@ using Microsoft.AspNetCore.Mvc;
 using Quickaid.Services.Interfaces;
 using Quickaid.Models.DTO;
 using Microsoft.AspNetCore.Authorization;
+using System.Security.Claims;
 
 namespace Quickaid.Controllers
 {
@@ -37,7 +38,12 @@ namespace Quickaid.Controllers
         {
             if (!ModelState.IsValid) return BadRequest(ModelState);
 
-            var created = await _articleService.AddAsync(dto);
+            var userIdClaim = User.FindFirst("id")?.Value;
+            if (userIdClaim == null) return Unauthorized();
+
+            int userId = int.Parse(userIdClaim);
+            var created = await _articleService.AddAsync(dto, userId);
+
             return CreatedAtAction(nameof(GetById), new { id = created.Id }, created);
         }
 

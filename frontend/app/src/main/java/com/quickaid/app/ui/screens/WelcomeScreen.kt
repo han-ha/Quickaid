@@ -11,9 +11,6 @@ import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.runtime.Composable
-import androidx.compose.runtime.LaunchedEffect
-import androidx.compose.runtime.collectAsState
-import androidx.compose.runtime.getValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.res.painterResource
@@ -31,16 +28,6 @@ fun WelcomeScreen(
     navController: NavController,
     sessionViewModel: SessionViewModel = hiltViewModel()
 ) {
-    val role by sessionViewModel.role.collectAsState()
-
-    LaunchedEffect(role) {
-        if (role != UserRole.ANON) {
-            navController.navigate("home") {
-                popUpTo("welcome") { inclusive = true }
-            }
-        }
-    }
-
     Column(
         modifier = Modifier
             .fillMaxSize()
@@ -77,7 +64,9 @@ fun WelcomeScreen(
         LargeButton(
             onClick = {
                 sessionViewModel.setRole(UserRole.ANON)
-                navController.navigate("home")
+                navController.navigate("start") {
+                    popUpTo(0) { inclusive = true }
+                }
             },
             modifier = Modifier.fillMaxWidth(),
             content = "Kontynuuj jako gość",

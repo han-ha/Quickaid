@@ -8,6 +8,7 @@ import androidx.compose.ui.unit.dp
 import androidx.navigation.NavController
 import com.quickaid.app.data.models.UserDto
 import com.quickaid.app.viewmodel.AdminViewModel
+import com.quickaid.app.ui.theme.AppSpacing
 
 @Composable
 fun UserItem(
@@ -26,19 +27,20 @@ fun UserItem(
                 Text("Czy na pewno chcesz usunąć użytkownika ${user.username}? Ta operacja jest nieodwracalna.")
             },
             confirmButton = {
-                TextButton(
+                SmallButton(
                     onClick = {
                         viewModel.deleteUser(user)
+                        navController.currentBackStackEntry
+                            ?.savedStateHandle
+                            ?.set("usersUpdated", true)
                         showDeleteDialog = false
-                    }
-                ) {
-                    Text("Usuń", color = MaterialTheme.colorScheme.error)
-                }
+                    },
+                    content = "Usuń",
+                    buttonColor = MaterialTheme.colorScheme.error
+                )
             },
             dismissButton = {
-                TextButton(onClick = { showDeleteDialog = false }) {
-                    Text("Anuluj")
-                }
+                SmallButton(onClick = { showDeleteDialog = false }, content = "Anuluj")
             }
         )
     }
@@ -46,35 +48,33 @@ fun UserItem(
     Card(
         modifier = Modifier
             .fillMaxWidth()
-            .padding(vertical = 4.dp),
+            .padding(vertical = AppSpacing.extraSmall),
         shape = MaterialTheme.shapes.small,
         colors = CardDefaults.cardColors(
             containerColor = MaterialTheme.colorScheme.surfaceVariant
         ),
-        elevation = CardDefaults.cardElevation(defaultElevation = 2.dp)
     ) {
         Column(
             modifier = Modifier
                 .fillMaxWidth()
-                .padding(12.dp)
+                .padding(AppSpacing.medium)
         ) {
             Text(user.username, style = MaterialTheme.typography.titleMedium)
-            Spacer(Modifier.height(4.dp))
+            Spacer(Modifier.height(AppSpacing.extraSmall))
 
-            Row(horizontalArrangement = Arrangement.spacedBy(8.dp)) {
+            val isAdmin = user.role == "admin"
+            val isCurrentUser = user.id == currentUserId
+
+            if (!isAdmin && !isCurrentUser) {
+                AdminActions(
+                    onEdit = { navController.navigate("editUser/${user.id}") },
+                    onDelete = { showDeleteDialog = true }
+                )
+            } else {
                 SmallButton(
                     onClick = { navController.navigate("editUser/${user.id}") },
                     content = "Edytuj"
                 )
-
-                val isAdmin = user.role == "admin"
-                val isCurrentUser = user.id == currentUserId
-                if (!isAdmin && !isCurrentUser) {
-                    SmallButton(
-                        onClick = { showDeleteDialog = true },
-                        content = "Usuń"
-                    )
-                }
             }
         }
     }

@@ -7,6 +7,7 @@ import androidx.compose.foundation.verticalScroll
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
+import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.stringResource
@@ -14,7 +15,7 @@ import androidx.compose.ui.text.style.TextAlign
 import androidx.core.net.toUri
 import com.quickaid.app.R
 import com.quickaid.app.ui.components.LargeButton
-import com.quickaid.app.ui.theme.AppSpacing
+import com.quickaid.app.ui.theme.AppSizes
 
 @Composable
 fun EmergencyScreen() {
@@ -25,8 +26,8 @@ fun EmergencyScreen() {
         modifier = Modifier
             .fillMaxSize()
             .padding(
-                horizontal = AppSpacing.large,
-                vertical = AppSpacing.medium
+                horizontal = AppSizes.large,
+                vertical = AppSizes.medium
             )
     ) {
         Text(
@@ -37,23 +38,29 @@ fun EmergencyScreen() {
             color = MaterialTheme.colorScheme.onBackground
         )
 
-        Spacer(Modifier.height(AppSpacing.large))
+        Spacer(Modifier.height(AppSizes.large))
 
         Column(
             modifier = Modifier
                 .weight(1f)
                 .verticalScroll(rememberScrollState())
+                .fillMaxWidth(),
+            horizontalAlignment = Alignment.CenterHorizontally
         ) {
             Text(
-                text = instructions,
+                text = instructions.trimIndent(),
                 style = MaterialTheme.typography.bodyMedium.copy(
-                    textAlign = TextAlign.Justify
+                    lineHeight = MaterialTheme.typography.bodyMedium.fontSize * 1.5
                 ),
+                textAlign = TextAlign.Start,
+                modifier = Modifier
+                    .widthIn(max = AppSizes.emergencyInstructionsWidth)
+                    .padding(horizontal = AppSizes.small),
                 color = MaterialTheme.colorScheme.onBackground
             )
         }
 
-        Spacer(Modifier.height(AppSpacing.large))
+        Spacer(Modifier.height(AppSizes.large))
 
         LargeButton(
             onClick = {

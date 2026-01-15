@@ -5,6 +5,7 @@ import androidx.compose.material3.*
 import androidx.compose.runtime.*
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.text.style.TextAlign
 import androidx.hilt.navigation.compose.hiltViewModel
 import androidx.navigation.NavController
 import com.quickaid.app.data.models.ArticleDto
@@ -57,9 +58,14 @@ fun EditArticleScreen(
     Column(
         modifier = Modifier
             .fillMaxSize()
-            .padding(AppSpacing.medium)
+            .padding(AppSpacing.medium),
+        horizontalAlignment = Alignment.CenterHorizontally
     ) {
-        Text("Edytuj artykuł", style = MaterialTheme.typography.headlineMedium)
+        Text(
+            "Edytuj artykuł",
+            style = MaterialTheme.typography.headlineMedium,
+            textAlign = TextAlign.Center
+        )
         Spacer(Modifier.height(AppSpacing.medium))
 
         OutlinedTextField(
@@ -94,8 +100,7 @@ fun EditArticleScreen(
                     ArticleDto(
                         id = articleId,
                         title = title,
-                        content = content,
-                        createdBy = userId
+                        content = content
                     )
                 )
                 navController.previousBackStackEntry

@@ -8,6 +8,7 @@ import androidx.compose.material3.*
 import androidx.compose.runtime.*
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.text.style.TextAlign
 import androidx.hilt.navigation.compose.hiltViewModel
 import androidx.navigation.NavController
 import com.quickaid.app.data.models.ArticleDto
@@ -82,7 +83,8 @@ fun ArticleListScreen(
     ) {
         Text(
             text = "Materiały edukacyjne",
-            style = MaterialTheme.typography.headlineMedium
+            style = MaterialTheme.typography.headlineMedium,
+            textAlign = TextAlign.Center
         )
 
         Spacer(Modifier.height(AppSpacing.large))

@@ -3,7 +3,9 @@ package com.quickaid.app.ui.screens.articles
 import androidx.compose.foundation.layout.*
 import androidx.compose.material3.*
 import androidx.compose.runtime.*
+import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.text.style.TextAlign
 import androidx.hilt.navigation.compose.hiltViewModel
 import androidx.navigation.NavController
 import com.quickaid.app.data.models.ArticleDto
@@ -42,9 +44,13 @@ fun AddArticleScreen(
     Column(
         modifier = Modifier
             .fillMaxSize()
-            .padding(AppSpacing.medium)
+            .padding(AppSpacing.medium),
+        horizontalAlignment = Alignment.CenterHorizontally
     ) {
-        Text("Dodaj artykuł", style = MaterialTheme.typography.headlineMedium)
+        Text(
+            "Dodaj artykuł",
+            style = MaterialTheme.typography.headlineMedium,
+            textAlign = TextAlign.Center)
         Spacer(Modifier.height(AppSpacing.medium))
 
         OutlinedTextField(
@@ -78,8 +84,7 @@ fun AddArticleScreen(
                     ArticleDto(
                         id = 0,
                         title = title,
-                        content = content,
-                        createdBy = userId
+                        content = content
                     )
                 )
             },

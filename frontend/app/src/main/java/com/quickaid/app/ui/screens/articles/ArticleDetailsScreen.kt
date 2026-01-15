@@ -7,6 +7,7 @@ import androidx.compose.material3.Text
 import androidx.compose.runtime.*
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.text.style.TextAlign
 import androidx.hilt.navigation.compose.hiltViewModel
 import androidx.navigation.NavBackStackEntry
 import com.quickaid.app.ui.theme.AppSpacing
@@ -29,7 +30,8 @@ fun ArticleDetailsScreen(
     ) {
         Text(
             text = article?.title ?: "Szczegóły artykułu",
-            style = MaterialTheme.typography.headlineMedium
+            style = MaterialTheme.typography.headlineMedium,
+            textAlign = TextAlign.Center
         )
 
         Spacer(Modifier.height(AppSpacing.large))

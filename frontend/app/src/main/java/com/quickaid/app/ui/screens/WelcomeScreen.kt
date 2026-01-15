@@ -64,7 +64,7 @@ fun WelcomeScreen(
         LargeButton(
             onClick = {
                 sessionViewModel.setRole(UserRole.ANON)
-                navController.navigate("start") {
+                navController.navigate("home") {
                     popUpTo(0) { inclusive = true }
                 }
             },

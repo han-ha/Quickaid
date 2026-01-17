@@ -40,6 +40,9 @@ CREATE TABLE [aed_points] (
 );
 GO
 
+ALTER TABLE aed_points
+ADD external_id BIGINT NULL;
+
 CREATE TABLE [quizzes] (
     [id] int PRIMARY KEY IDENTITY(1, 1),
     [title] varchar(150) NOT NULL,

@@ -4,11 +4,11 @@ using Quickaid.Mapping.Interfaces;
 
 namespace Quickaid.Mapping
 {
-    public class AedMapper : IAedMapper
+    public class InternalAedMapper : IInternalAedMapper
     {
-        public AedDto ToDto(AedPoint entity)
+        public InternalAedDto ToDto(AedPoint entity)
         {
-            return new AedDto
+            return new InternalAedDto
             {
                 Id = entity.Id,
                 Latitude = entity.Latitude,
@@ -18,7 +18,7 @@ namespace Quickaid.Mapping
             };
         }
 
-        public AedPoint ToEntity(AedDto dto)
+        public AedPoint ToEntity(InternalAedDto dto)
         {
             return new AedPoint
             {

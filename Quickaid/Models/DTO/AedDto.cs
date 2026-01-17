@@ -1,8 +1,9 @@
-namespace Quickaid.Models.DTO
+﻿namespace Quickaid.Models.DTO
 {
     public class AedDto
     {
-        public int Id { get; set; }
+        public int? Id { get; set; } // Id w bazie (nullable, bo punkty z API mogą go nie mieć)
+        public long? ExternalId { get; set; } // Id z API (nullable, bo punkty dodane przez usera go nie mają)
         public decimal Latitude { get; set; }
         public decimal Longitude { get; set; }
         public string? Description { get; set; }

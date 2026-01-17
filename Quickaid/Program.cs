@@ -8,6 +8,7 @@ using Quickaid.Services.Interfaces;
 using Quickaid.Mapping;
 using Quickaid.Mapping.Interfaces;
 using System.Text;
+using Quickaid.Utils;
 
 namespace Quickaid
 {
@@ -116,10 +117,14 @@ namespace Quickaid
             builder.Services.AddScoped<IArticleMapper, ArticleMapper>();
             builder.Services.AddScoped<IQuizMapper, QuizMapper>();
             builder.Services.AddScoped<IResultMapper, ResultMapper>();
-            builder.Services.AddScoped<IAedMapper, AedMapper>();
+            builder.Services.AddScoped<IInternalAedMapper, InternalAedMapper>();
+            builder.Services.AddScoped<IExternalAedMapper, ExternalAedMapper>();
+            builder.Services.AddScoped<IAedMergeMapper, AedMergeMapper>();
             builder.Services.AddScoped<IQuestionMapper, QuestionMapper>();
             builder.Services.AddScoped<IAnswerMapper, AnswerMapper>();
             builder.Services.AddScoped<IPasswordMapper, PasswordMapper>();
+
+            builder.Services.AddScoped<AedGeoJsonUtils>();
 
             var app = builder.Build();
 

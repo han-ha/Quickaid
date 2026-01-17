@@ -4,10 +4,12 @@ namespace Quickaid.Services.Interfaces
 {
     public interface IAedService
     {
-        Task<IEnumerable<AedDto>> GetAllAsync();
-        Task<AedDto?> GetByIdAsync(int id);
-        Task<AedDto> AddAsync(AedDto dto);
-        Task<AedDto?> UpdateAsync(int id, AedDto dto);
+        Task<IEnumerable<InternalAedDto>> GetInternalAedsAsync();
+        Task<InternalAedDto?> GetByIdAsync(int id);
+        Task<InternalAedDto> AddAsync(InternalAedDto dto);
+        Task<InternalAedDto?> UpdateAsync(int id, InternalAedDto dto);
         Task<bool> DeleteAsync(int id);
+        Task<IEnumerable<AedDto>> GetMergedAedsAsync();
+
     }
 }

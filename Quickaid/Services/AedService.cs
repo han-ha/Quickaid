@@ -3,38 +3,45 @@ using Quickaid.Data;
 using Quickaid.Models.DTO;
 using Quickaid.Services.Interfaces;
 using Quickaid.Mapping.Interfaces;
+using Quickaid.Utils;
 
 namespace Quickaid.Services
 {
-    public class AedService(AppDbContext db, IAedMapper mapper) : IAedService
+    public class AedService(
+        AppDbContext db,
+        IInternalAedMapper internalMapper,
+        IExternalAedMapper externalMapper,
+        IAedMergeMapper mergeMapper) : IAedService
     {
         private readonly AppDbContext _db = db;
-        private readonly IAedMapper _mapper = mapper;
+        private readonly IInternalAedMapper _internalMapper = internalMapper;
+        private readonly IAedMergeMapper _mergeMapper = mergeMapper;
+        private readonly IExternalAedMapper _externalMapper = externalMapper;
 
-        public async Task<IEnumerable<AedDto>> GetAllAsync()
+        public async Task<IEnumerable<InternalAedDto>> GetInternalAedsAsync()
         {
             var entities = await _db.AedPoints.AsNoTracking().ToListAsync();
-            return entities.Select(e => _mapper.ToDto(e));
+            return entities.Select(e => _internalMapper.ToDto(e));
         }
 
-        public async Task<AedDto?> GetByIdAsync(int id)
+        public async Task<InternalAedDto?> GetByIdAsync(int id)
         {
             var entity = await _db.AedPoints.AsNoTracking().FirstOrDefaultAsync(a => a.Id == id);
-            return entity == null ? null : _mapper.ToDto(entity);
+            return entity == null ? null : _internalMapper.ToDto(entity);
         }
 
-        public async Task<AedDto> AddAsync(AedDto dto)
+        public async Task<InternalAedDto> AddAsync(InternalAedDto dto)
         {
-            var entity = _mapper.ToEntity(dto);
+            var entity = _internalMapper.ToEntity(dto);
             entity.UpdatedAt = DateTime.UtcNow;
 
             _db.AedPoints.Add(entity);
             await _db.SaveChangesAsync();
 
-            return _mapper.ToDto(entity);
+            return _internalMapper.ToDto(entity);
         }
 
-        public async Task<AedDto?> UpdateAsync(int id, AedDto dto)
+        public async Task<InternalAedDto?> UpdateAsync(int id, InternalAedDto dto)
         {
             var entity = await _db.AedPoints.FirstOrDefaultAsync(a => a.Id == id);
             if (entity == null) return null;
@@ -46,7 +53,7 @@ namespace Quickaid.Services
             entity.UpdatedAt = DateTime.UtcNow;
 
             await _db.SaveChangesAsync();
-            return _mapper.ToDto(entity);
+            return _internalMapper.ToDto(entity);
         }
 
         public async Task<bool> DeleteAsync(int id)
@@ -57,6 +64,51 @@ namespace Quickaid.Services
             _db.AedPoints.Remove(entity);
             await _db.SaveChangesAsync();
             return true;
+        }
+
+        public async Task<IEnumerable<AedDto>> GetMergedAedsAsync()
+        {
+            // Pobierz AED z API
+            var externalAeds = await new AedGeoJsonUtils().FetchExternalAedsAsync();
+
+            // Pobierz z bazy tylko potrzebne wiersze
+            var editedAedPoints = await _db.AedPoints
+                .Where(a => a.ExternalId.HasValue)
+                .AsNoTracking()
+                .ToListAsync();
+
+            var addedAedPoints = await _db.AedPoints
+                .Where(a => !a.ExternalId.HasValue)
+                .AsNoTracking()
+                .ToListAsync();
+
+            // S³ownik edytowanych AED po ExternalId
+            var editedByExternalId = editedAedPoints.ToDictionary(a => a.ExternalId!.Value, a => a);
+
+            var merged = new List<AedDto>();
+
+            // Po³¹cz API z editedAedPoints
+            foreach (var extAed in externalAeds)
+            {
+                if (editedByExternalId.TryGetValue(extAed.ExternalId, out var dbEntity))
+                {
+                    // Punkt z API istnieje w bazie i zosta³ nadpisany przez usera
+                    merged.Add(_mergeMapper.ToDto(_internalMapper.ToDto(dbEntity)));
+                }
+                else
+                {
+                    // Nowy punkt z API, Verified = true (wierzymy, ¿e OpenAEDMap dostarcza sprawdzone dane)
+                    merged.Add(_mergeMapper.ToDto(extAed));
+                }
+            }
+
+            // Dodaj AED dodane przez u¿ytkowników (bez ExternalId)
+            foreach (var added in addedAedPoints)
+            {
+                merged.Add(_mergeMapper.ToDto(_internalMapper.ToDto(added)));
+            }
+
+            return merged;
         }
     }
 }

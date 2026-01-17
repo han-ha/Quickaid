@@ -25,5 +25,9 @@ namespace Quickaid.Models.Entities
 
         [Column("updated_at")]
         public DateTime UpdatedAt { get; set; } = DateTime.UtcNow;
+
+        [Column("external_id")]
+        public long? ExternalId { get; set; }
+
     }
 }

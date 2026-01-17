@@ -49,7 +49,7 @@ fun HomeScreen(
         Spacer(Modifier.height(AppSizes.small))
 
         SmallButton(
-            onClick = { },
+            onClick = { navController.navigate("aeds") },
             modifier = Modifier.fillMaxWidth(),
             content = "Mapa AED"
         )

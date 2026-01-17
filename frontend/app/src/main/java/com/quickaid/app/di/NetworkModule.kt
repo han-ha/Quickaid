@@ -155,4 +155,15 @@ object NetworkModule {
     fun provideQuestionRepository(api: QuestionApi) =
         com.quickaid.app.data.repository.QuestionRepository(api)
 
+    @Provides
+    @Singleton
+    fun provideAedApi(retrofit: Retrofit): com.quickaid.app.data.api.AedApi =
+        retrofit.create(com.quickaid.app.data.api.AedApi::class.java)
+
+    @Provides
+    @Singleton
+    fun provideAedRepository(api: com.quickaid.app.data.api.AedApi): com.quickaid.app.data.repository.AedRepository =
+        com.quickaid.app.data.repository.AedRepository(api)
+
+
 }

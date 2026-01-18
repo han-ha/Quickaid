@@ -20,7 +20,6 @@
 
   <ItemGroup>
     <Folder Include="Models\Entities\" />
-    <Folder Include="Mapping\" />
   </ItemGroup>
 
 </Project>

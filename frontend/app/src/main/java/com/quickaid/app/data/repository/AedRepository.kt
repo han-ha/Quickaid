@@ -8,4 +8,8 @@ class AedRepository @Inject constructor(
     private val api: AedApi
 ) {
     suspend fun getAllAeds(): List<AedDto> = api.getAllAeds()
+
+    suspend fun saveAed(aed: AedDto): AedDto {
+        return api.saveAed(aed)
+    }
 }

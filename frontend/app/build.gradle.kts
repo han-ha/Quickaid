@@ -79,6 +79,8 @@ dependencies {
 
     implementation("androidx.datastore:datastore-preferences:1.1.1")
     implementation("androidx.datastore:datastore-core:1.1.1")
+
+    implementation("org.osmdroid:osmdroid-android:6.1.18")
 }
 
 kapt {

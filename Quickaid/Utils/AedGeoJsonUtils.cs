@@ -12,31 +12,57 @@ namespace Quickaid.Utils
             PropertyNameCaseInsensitive = true
         };
 
+        private static List<ExternalAedDto>? _cachedAeds;
+        private static DateTime _cacheTimestamp;
+        private static readonly TimeSpan CacheTtl = TimeSpan.FromHours(2);
+        private static readonly SemaphoreSlim _lock = new(1, 1);
+
         public async Task<List<ExternalAedDto>> FetchExternalAedsAsync()
         {
-            using var client = new HttpClient();
-            var response = await client.GetStringAsync(_url);
+            if (_cachedAeds != null && DateTime.UtcNow - _cacheTimestamp < CacheTtl)
+                return _cachedAeds;
 
-            var geoJson = JsonSerializer.Deserialize<GeoJsonRoot>(response, _jsonOptions);
-
-            var list = new List<ExternalAedDto>();
-
-            if (geoJson?.Features != null)
+            // Lock, żeby tylko jeden request naraz mógł pobierać dane z API
+            await _lock.WaitAsync();
+            try
             {
-                foreach (var feature in geoJson.Features)
-                {
-                    var coords = feature.Geometry.Coordinates;
-                    list.Add(new ExternalAedDto
-                    {
-                        ExternalId = feature.Properties.OsmId,
-                        Longitude = (decimal)coords[0],
-                        Latitude = (decimal)coords[1],
-                        Description = feature.Properties.Location ?? feature.Properties.Name ?? feature.Properties.Description
-                    });
-                }
-            }
+                // Drugi check po locku
+                // Jeśli inny request już odświeżył cache, nie robimy tego ponownie
+                if (_cachedAeds != null && DateTime.UtcNow - _cacheTimestamp < CacheTtl)
+                    return _cachedAeds;
 
-            return list;
+                using var client = new HttpClient();
+                var response = await client.GetStringAsync(_url);
+
+                var geoJson = JsonSerializer.Deserialize<GeoJsonRoot>(response, _jsonOptions);
+
+                var list = new List<ExternalAedDto>();
+
+                if (geoJson?.Features != null)
+                {
+                    foreach (var feature in geoJson.Features)
+                    {
+                        var coords = feature.Geometry.Coordinates;
+                        list.Add(new ExternalAedDto
+                        {
+                            ExternalId = feature.Properties.OsmId,
+                            Longitude = (decimal)coords[0],
+                            Latitude = (decimal)coords[1],
+                            Description = feature.Properties.Location
+                                ?? feature.Properties.Name
+                                ?? feature.Properties.Description
+                        });
+                    }
+                }
+
+                _cachedAeds = list;
+                _cacheTimestamp = DateTime.UtcNow;
+                return list;
+            }
+            finally
+            {
+                _lock.Release();
+            }
         }
 
         private class GeoJsonRoot
@@ -49,7 +75,6 @@ namespace Quickaid.Utils
         {
             public Geometry Geometry { get; set; } = new Geometry();
             public Properties Properties { get; set; } = new Properties();
-
         }
 
         private class Geometry

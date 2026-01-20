@@ -76,7 +76,7 @@ fun AddQuizScreen(
 
         LargeButton(
             onClick = {
-                viewModel.addQuizAndReturnId(
+                viewModel.addQuiz(
                     QuizDto(
                         id = 0,
                         title = title,

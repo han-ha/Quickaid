@@ -123,6 +123,7 @@ fun QuizOverviewScreen(
         LargeButton(
             onClick = { navController.navigate("quizDetails/$quizId") },
             modifier = Modifier.fillMaxWidth(),
+//            enabled = quiz.numberOfQuestions > 0, // todo: dodać quiz do tego ekranu, pobierać liczbę pytań
             content = "Rozwiąż quiz"
         )
 

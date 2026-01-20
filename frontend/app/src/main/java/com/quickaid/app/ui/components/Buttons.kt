@@ -1,12 +1,17 @@
 package com.quickaid.app.ui.components
 
+import androidx.compose.foundation.layout.size
 import androidx.compose.material3.Button
 import androidx.compose.material3.ButtonDefaults
+import androidx.compose.material3.Icon
+import androidx.compose.material3.IconButton
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.graphics.vector.ImageVector
+import com.quickaid.app.ui.theme.AppSizes
 
 @Composable
 fun LargeButton(
@@ -76,6 +81,26 @@ fun RoleButton(
         Text(
             text = text,
             style = MaterialTheme.typography.labelMedium
+        )
+    }
+}
+
+@Composable
+fun CustomIconButton(
+    onClick: () -> Unit,
+    modifier: Modifier = Modifier,
+    icon: ImageVector,
+    contentDescription: String
+) {
+    IconButton(
+        onClick = onClick,
+        modifier = modifier
+    ) {
+        Icon(
+            imageVector = icon,
+            contentDescription = contentDescription,
+            tint = MaterialTheme.colorScheme.primary,
+            modifier = Modifier.size(AppSizes.extraLarge)
         )
     }
 }

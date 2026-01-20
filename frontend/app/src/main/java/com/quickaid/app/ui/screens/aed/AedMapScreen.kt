@@ -21,15 +21,12 @@ import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
+import androidx.compose.material.icons.Icons
+import androidx.compose.material.icons.filled.Add
+import androidx.compose.material.icons.filled.Home
 import androidx.compose.material3.AlertDialog
 import androidx.compose.material3.Text
-import androidx.compose.runtime.Composable
-import androidx.compose.runtime.LaunchedEffect
-import androidx.compose.runtime.collectAsState
-import androidx.compose.runtime.getValue
-import androidx.compose.runtime.mutableStateOf
-import androidx.compose.runtime.remember
-import androidx.compose.runtime.setValue
+import androidx.compose.runtime.*
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.platform.LocalContext
@@ -37,12 +34,17 @@ import androidx.compose.ui.viewinterop.AndroidView
 import androidx.core.app.ActivityCompat
 import androidx.hilt.navigation.compose.hiltViewModel
 import androidx.navigation.NavController
+import com.quickaid.app.data.models.AedDto
 import com.quickaid.app.enums.UserRole
-import com.quickaid.app.ui.components.HomeButton
+import com.quickaid.app.ui.components.CustomIconButton
 import com.quickaid.app.ui.theme.AppSizes
 import com.quickaid.app.viewmodel.AedViewModel
 import com.quickaid.app.viewmodel.SessionViewModel
 import org.osmdroid.config.Configuration
+import org.osmdroid.events.MapListener
+import org.osmdroid.events.ScrollEvent
+import org.osmdroid.events.ZoomEvent
+import org.osmdroid.util.BoundingBox
 import org.osmdroid.util.GeoPoint
 import org.osmdroid.views.MapView
 import org.osmdroid.views.overlay.Marker
@@ -108,12 +110,91 @@ fun AedMapScreen(
         MapView(context).apply {
             setMultiTouchControls(true)
             controller.setZoom(15.0)
-            controller.setCenter(GeoPoint(52.2297, 21.0122)) // fallback Warsaw
+            controller.setCenter(GeoPoint(52.2297, 21.0122)) // Warszawa domyślnie
             setOnTouchListener { _, _ ->
                 lastOpenInfoWindow?.close()
                 false
             }
         }
+    }
+
+    fun createInfoWindow(aed: AedDto): CardView {
+        val card = CardView(context).apply {
+            radius = TypedValue.applyDimension(
+                TypedValue.COMPLEX_UNIT_DIP,
+                8f,
+                context.resources.displayMetrics
+            )
+            setCardBackgroundColor(Color.WHITE)
+            setContentPadding(16, 16, 16, 16)
+            layoutParams = LinearLayout.LayoutParams(
+                LinearLayout.LayoutParams.WRAP_CONTENT,
+                LinearLayout.LayoutParams.WRAP_CONTENT
+            )
+            addView(LinearLayout(context).apply {
+                orientation = LinearLayout.VERTICAL
+                val titleView = TextView(context).apply {
+                    text = aed.description ?: "AED"
+                    setTextColor(Color.BLACK)
+                    setTextSize(TypedValue.COMPLEX_UNIT_SP, 16f)
+                }
+                val descView = TextView(context).apply {
+                    text = if (aed.verified) "Zweryfikowany" else "Niezweryfikowany"
+                    setTextColor(Color.DKGRAY)
+                    setTextSize(TypedValue.COMPLEX_UNIT_SP, 14f)
+                }
+                addView(titleView)
+                addView(descView)
+                if (userRole != UserRole.ANON) {
+                    val editBtn = Button(context).apply {
+                        text = "Edytuj"
+                        setOnClickListener { onEditAed(aed.id, aed.externalId) }
+                    }
+                    addView(editBtn)
+                }
+            })
+        }
+        return card
+    }
+
+    fun updateMarkers(map: MapView, aeds: List<AedDto>) {
+        val bounds: BoundingBox = map.boundingBox
+        map.overlays.removeAll { it is Marker }
+
+        aeds.forEach { aed ->
+            val point = GeoPoint(aed.latitude, aed.longitude)
+            if (point.latitude in bounds.latSouth..bounds.latNorth &&
+                point.longitude in bounds.lonWest..bounds.lonEast
+            ) { // wyświetlanie tylko markerów wewnątrz widocznego obszaru mapy
+                val marker = Marker(map).apply {
+                    position = point
+                    title = aed.description ?: "AED"
+                    subDescription = if (aed.verified) "Zweryfikowany" else "Niezweryfikowany"
+                    setAnchor(Marker.ANCHOR_CENTER, Marker.ANCHOR_BOTTOM)
+
+                    setOnMarkerClickListener { m, _ ->
+                        lastOpenInfoWindow?.close()
+
+                        val card = createInfoWindow(aed)
+                        val info = object : InfoWindow(card, map) {
+                            override fun onOpen(item: Any?) {
+                                lastOpenInfoWindow = this
+                            }
+
+                            override fun onClose() {
+                                if (lastOpenInfoWindow == this) lastOpenInfoWindow = null
+                            }
+                        }
+
+                        info.open(m, m.position, 0, -m.icon.intrinsicHeight)
+                        true
+                    }
+                }
+                map.overlays.add(marker)
+            }
+        }
+
+        map.invalidate()
     }
 
     Box(modifier = Modifier.fillMaxSize()) {
@@ -161,82 +242,44 @@ fun AedMapScreen(
                     }
                 }
 
-                val existingMarkers = map.overlays.filterIsInstance<Marker>()
-                val existingPositions = existingMarkers.map { it.position to it.title }.toSet()
+                updateMarkers(map, aeds)
 
-                aeds.forEach { aed ->
-                    val point = GeoPoint(aed.latitude, aed.longitude)
-                    if ((point to (aed.description ?: "AED")) !in existingPositions) {
-                        val marker = Marker(map).apply {
-                            position = point
-                            title = aed.description ?: "AED"
-                            subDescription = if (aed.verified) "Zweryfikowany" else "Niezweryfikowany"
-                            setAnchor(Marker.ANCHOR_CENTER, Marker.ANCHOR_BOTTOM)
-
-                            val card = CardView(context).apply {
-                                radius = TypedValue.applyDimension(
-                                    TypedValue.COMPLEX_UNIT_DIP,
-                                    8f,
-                                    context.resources.displayMetrics
-                                )
-                                setCardBackgroundColor(Color.WHITE)
-                                setContentPadding(16, 16, 16, 16)
-                                layoutParams = LinearLayout.LayoutParams(
-                                    LinearLayout.LayoutParams.WRAP_CONTENT,
-                                    LinearLayout.LayoutParams.WRAP_CONTENT
-                                )
-                                addView(LinearLayout(context).apply {
-                                    orientation = LinearLayout.VERTICAL
-                                    val titleView = TextView(context).apply {
-                                        text = title
-                                        setTextColor(Color.BLACK)
-                                        setTextSize(TypedValue.COMPLEX_UNIT_SP, 16f)
-                                    }
-                                    val descView = TextView(context).apply {
-                                        text = subDescription
-                                        setTextColor(Color.DKGRAY)
-                                        setTextSize(TypedValue.COMPLEX_UNIT_SP, 14f)
-                                    }
-                                    addView(titleView)
-                                    addView(descView)
-                                    if (userRole != UserRole.ANON) {
-                                        val editBtn = Button(context).apply {
-                                            text = "Edytuj"
-                                            setOnClickListener { onEditAed(aed.id, aed.externalId) }
-                                        }
-                                        addView(editBtn)
-                                    }
-                                })
-                            }
-
-                            infoWindow = object : InfoWindow(card, map) {
-                                override fun onOpen(item: Any?) {
-                                    lastOpenInfoWindow?.close()
-                                    lastOpenInfoWindow = this
-                                }
-
-                                override fun onClose() {
-                                    if (lastOpenInfoWindow == this) lastOpenInfoWindow = null
-                                }
-                            }
-                        }
-                        map.overlays.add(marker)
+                map.setMapListener(object : MapListener {
+                    override fun onScroll(event: ScrollEvent?): Boolean {
+                        updateMarkers(map, aeds)
+                        return true
                     }
-                }
 
-                map.invalidate()
+                    override fun onZoom(event: ZoomEvent?): Boolean {
+                        updateMarkers(map, aeds)
+                        return true
+                    }
+                })
             }
         )
 
-        HomeButton(onClick = {
-            navController.navigate("home") {
-                popUpTo(navController.graph.startDestinationId) { inclusive = true }
-            }
-        },
+        CustomIconButton(
+            onClick = { navController.navigate("addAed") },
+            modifier = Modifier
+                .align(Alignment.TopEnd)
+                .padding(end = AppSizes.extraLarge * 2, top = AppSizes.medium)
+                .size(AppSizes.extraLarge),
+            icon = Icons.Filled.Add,
+            contentDescription = "Dodaj punkt AED"
+        )
+
+        CustomIconButton(
+            onClick = {
+                navController.navigate("home") {
+                    popUpTo(navController.graph.startDestinationId) { inclusive = true }
+                }
+            },
             modifier = Modifier
                 .align(Alignment.TopEnd)
                 .padding(AppSizes.medium)
-                .size(AppSizes.extraLarge)
+                .size(AppSizes.extraLarge),
+            icon = Icons.Filled.Home,
+            contentDescription = "Powrót do ekranu głównego"
         )
     }
 }

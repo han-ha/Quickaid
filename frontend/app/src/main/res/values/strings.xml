@@ -1,0 +1,12 @@
+<resources>
+    <string name="app_name">Quickaid</string>
+    <string name="contact_email">kontakt@quickaid.com</string>
+    <string name="contact_description">
+        Masz pytania, uwagi lub chcesz zgłosić problem?
+        Napisz do nas:
+    </string>
+    <string name="emergency_instructions">
+Zachowaj spokój i oceń sytuację:\n\n1. Sprawdź bezpieczeństwo miejsca zdarzenia.\n→ Jeśli miejsce NIE jest bezpieczne: nie podchodź, zadbaj o własne bezpieczeństwo. Jeśli podejrzewasz, że są osoby poszkodowane, wezwij pomoc.\n→ Jeśli miejsce JEST bezpieczne: przejdź do kroku 2.\n\n2. Sprawdź reakcję poszkodowanego. Delikatnie potrząśnij i zapytaj głośno, czy wszystko w porządku.\n→ Reaguje: monitoruj stan, wezwij pomoc w razie potrzeby.\n→ Nie reaguje: przejdź do kroku 3.\n\n3. Wezwij pomoc. Zadzwoń pod numer 112 lub poproś kogoś o wezwanie służb ratunkowych.\n\n4. Sprawdź oddech przez 10 sekund.\n→ Oddycha prawidłowo: Ułóż osobę poszkodowaną w pozycji bocznej bezpiecznej i kontroluj oddech.\n→ Nie oddycha lub oddycha nieprawidłowo: Przejdź do kroku 5.\n\n5. Wykonuj RKO. Uciskaj klatkę piersiową na środku, rytmicznie i mocno, w tempie około 100–120 uciśnięć na minutę do przyjazdu karetki. Jeśli dostępny jest defibrylator (AED), użyj go zgodnie z instrukcjami urządzenia.\n\nPozostań przy poszkodowanym do momentu przyjazdu służb ratunkowych.
+</string>
+
+</resources>

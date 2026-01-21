@@ -20,72 +20,58 @@ import com.quickaid.app.viewmodel.ArticleDetailsViewModel
 @Composable
 fun ArticleDetailsScreen(
     backStackEntry: NavBackStackEntry,
-    navController: NavController,
     viewModel: ArticleDetailsViewModel = hiltViewModel(backStackEntry)
 ) {
     val article by viewModel.article.collectAsState()
     val isLoading by viewModel.isLoading.collectAsState()
     val error by viewModel.error.collectAsState()
 
-    Box(modifier = Modifier.fillMaxSize()) {
-        Column(
-            modifier = Modifier
-                .fillMaxSize()
-                .padding(AppSizes.medium),
-            horizontalAlignment = Alignment.CenterHorizontally
+    Column(
+        modifier = Modifier
+            .fillMaxSize()
+            .padding(AppSizes.medium),
+        horizontalAlignment = Alignment.CenterHorizontally
+    ) {
+
+        Box(
+            modifier = Modifier.fillMaxWidth().padding(horizontal = AppSizes.medium),
+            contentAlignment = Alignment.Center
         ) {
-
-            Box(
-                modifier = Modifier.fillMaxWidth().padding(horizontal = AppSizes.medium),
-                contentAlignment = Alignment.Center
-            ) {
-                Text(
-                    text = article?.title ?: "Szczegóły artykułu",
-                    style = MaterialTheme.typography.headlineMedium,
-                    modifier = Modifier.padding(end = AppSizes.medium)
-                )
-            }
-
-            Spacer(Modifier.height(AppSizes.large))
-
-            when {
-                isLoading -> CircularProgressIndicator()
-                error != null -> Text(
-                    text = "Błąd: $error",
-                    color = MaterialTheme.colorScheme.error,
-                    style = MaterialTheme.typography.bodyMedium
-                )
-                article != null -> {
-                    Column(
-                        modifier = Modifier
-                            .fillMaxWidth()
-                            .padding(horizontal = AppSizes.medium)
-                    ) {
-                        Text(
-                            text = article!!.content,
-                            style = MaterialTheme.typography.bodyMedium
-                        )
-                    }
-                }
-                else -> Text(
-                    text = "Nie znaleziono artykułu.",
-                    style = MaterialTheme.typography.bodyMedium
-                )
-            }
+            Text(
+                text = article?.title ?: "Szczegóły artykułu",
+                style = MaterialTheme.typography.headlineMedium,
+                textAlign = TextAlign.Center,
+                modifier = Modifier.padding(end = AppSizes.medium)
+            )
         }
 
-        CustomIconButton(
-            onClick = {
-                navController.navigate("home") {
-                    popUpTo(navController.graph.startDestinationId) { inclusive = true }
+        Spacer(Modifier.height(AppSizes.large))
+
+        when {
+            isLoading -> CircularProgressIndicator()
+            error != null -> Text(
+                text = "Błąd: $error",
+                color = MaterialTheme.colorScheme.error,
+                style = MaterialTheme.typography.bodyMedium
+            )
+
+            article != null -> {
+                Column(
+                    modifier = Modifier
+                        .fillMaxWidth()
+                        .padding(horizontal = AppSizes.medium)
+                ) {
+                    Text(
+                        text = article!!.content,
+                        style = MaterialTheme.typography.bodyMedium
+                    )
                 }
-            },
-            modifier = Modifier
-                .align(Alignment.TopEnd)
-                .padding(AppSizes.medium)
-                .size(AppSizes.extraLarge),
-            icon = Icons.Filled.Home,
-            contentDescription = "Powrót do ekranu głównego"
-        )
+            }
+
+            else -> Text(
+                text = "Nie znaleziono artykułu.",
+                style = MaterialTheme.typography.bodyMedium
+            )
+        }
     }
 }

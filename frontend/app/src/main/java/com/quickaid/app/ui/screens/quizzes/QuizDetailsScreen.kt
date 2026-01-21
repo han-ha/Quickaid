@@ -5,14 +5,19 @@ import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.verticalScroll
+import androidx.compose.material.icons.Icons
+import androidx.compose.material.icons.filled.Home
 import androidx.compose.material3.*
 import androidx.compose.runtime.*
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.hilt.navigation.compose.hiltViewModel
 import androidx.navigation.NavController
+import com.quickaid.app.ui.components.CustomIconButton
 import com.quickaid.app.ui.components.LargeButton
-import com.quickaid.app.ui.theme.*
+import com.quickaid.app.ui.theme.AppSizes
+import com.quickaid.app.ui.theme.GreenPrimary
+import com.quickaid.app.ui.theme.RedPrimary
 import com.quickaid.app.viewmodel.QuizDetailsViewModel
 
 @Composable
@@ -34,64 +39,122 @@ fun QuizDetailsScreen(
         viewModel.fetchQuiz(quizId)
     }
 
-    Column(
-        modifier = Modifier
-            .fillMaxSize()
-            .padding(AppSizes.medium)
-    ) {
-        Box(
+    Box(modifier = Modifier.fillMaxSize()) {
+        Column(
             modifier = Modifier
-                .fillMaxWidth(),
-            contentAlignment = Alignment.Center
+                .fillMaxSize()
+                .padding(AppSizes.medium)
         ) {
-            Text(
-                text = quiz?.title ?: "Szczegóły quizu",
-                style = MaterialTheme.typography.headlineMedium
-            )
-        }
-
-        Spacer(Modifier.height(AppSizes.medium))
-
-        when {
-            isLoading -> Box(
-                modifier = Modifier.fillMaxSize(),
+            Box(
+                modifier = Modifier.fillMaxWidth(),
                 contentAlignment = Alignment.Center
             ) {
-                CircularProgressIndicator()
+                Text(
+                    text = quiz?.title ?: "Szczegóły quizu",
+                    style = MaterialTheme.typography.headlineMedium
+                )
             }
 
-            error != null -> Text(
-                "Błąd: $error",
-                color = MaterialTheme.colorScheme.error
-            )
+            Spacer(Modifier.height(AppSizes.medium))
+
+            when {
+                isLoading -> Box(
+                    modifier = Modifier.fillMaxSize(),
+                    contentAlignment = Alignment.Center
+                ) {
+                    CircularProgressIndicator()
+                }
+
+                error != null -> Text(
+                    "Błąd: $error",
+                    color = MaterialTheme.colorScheme.error
+                )
 
             quiz != null -> {
                 // tryb wynikowy
                 if (result != null) {
                     val (points, maxPoints) = result!!
 
-                    Column(
-                        modifier = Modifier
-                            .weight(1f)
-                            .verticalScroll(scrollState)
-                    ) {
-                        quiz!!.questions.forEachIndexed { index, question ->
-                            val correctAnswerId = question.answers.firstOrNull { it.isCorrect }?.id
-                            val userAnswerId = selectedAnswers[question.id]
+                        Column(
+                            modifier = Modifier
+                                .weight(1f)
+                                .verticalScroll(scrollState)
+                        ) {
+                            quiz!!.questions.forEachIndexed { index, question ->
+                                val correctAnswerId = question.answers.firstOrNull { it.isCorrect }?.id
+                                val userAnswerId = selectedAnswers[question.id]
 
-                            val questionCorrect = userAnswerId == correctAnswerId
-                            val questionColor = if (questionCorrect) {
-                                GreenPrimary.copy(alpha = 0.4f)
-                            } else {
-                                RedPrimary.copy(alpha = 0.4f)
+                                val questionCorrect = userAnswerId == correctAnswerId
+                                val questionColor = if (questionCorrect) {
+                                    GreenPrimary.copy(alpha = 0.4f)
+                                } else {
+                                    RedPrimary.copy(alpha = 0.4f)
+                                }
+
+                                Column(
+                                    modifier = Modifier
+                                        .fillMaxWidth()
+                                        .background(questionColor)
+                                        .padding(vertical = AppSizes.small)
+                                ) {
+                                    Text(
+                                        text = "${index + 1}. ${question.questionText}",
+                                        style = MaterialTheme.typography.titleMedium
+                                    )
+
+                                    Spacer(Modifier.height(AppSizes.extraSmall))
+
+                                    question.answers.forEach { answer ->
+                                        val selected = userAnswerId == answer.id
+                                        Row(
+                                            modifier = Modifier
+                                                .fillMaxWidth()
+                                                .padding(vertical = AppSizes.extraSmall),
+                                            verticalAlignment = Alignment.CenterVertically
+                                        ) {
+                                            RadioButton(
+                                                selected = selected,
+                                                onClick = null
+                                            )
+                                            Spacer(Modifier.width(AppSizes.small))
+                                            Text(answer.answerText)
+                                        }
+                                    }
+
+                                    Spacer(Modifier.height(AppSizes.small))
+                                }
+
+                                Spacer(Modifier.height(AppSizes.medium))
                             }
+                        }
 
-                            Column(
-                                modifier = Modifier
-                                    .fillMaxWidth()
-                                    .background(questionColor)
-                                    .padding(vertical = AppSizes.small)
-                            ) {
+                        Spacer(Modifier.height(AppSizes.medium))
+                        Box(
+                            modifier = Modifier.fillMaxWidth(),
+                            contentAlignment = Alignment.Center
+                        ) {
+                            Text(
+                                text = "Twój wynik: $points / $maxPoints",
+                                style = MaterialTheme.typography.titleLarge
+                            )
+                        }
+                        Box(
+                            modifier = Modifier.fillMaxWidth(),
+                            contentAlignment = Alignment.Center
+                        ) {
+                            LargeButton(
+                                onClick = { navController.navigate("quizzes") },
+                                modifier = Modifier.fillMaxWidth(),
+                                content = "Powrót do listy quizów"
+                            )
+                        }
+                    } else {
+                        Column(
+                            modifier = Modifier
+                                .weight(1f)
+                                .verticalScroll(scrollState)
+                        ) {
+                            quiz!!.questions.forEachIndexed { index, question ->
                                 Text(
                                     text = "${index + 1}. ${question.questionText}",
                                     style = MaterialTheme.typography.titleMedium
@@ -100,90 +163,28 @@ fun QuizDetailsScreen(
                                 Spacer(Modifier.height(AppSizes.extraSmall))
 
                                 question.answers.forEach { answer ->
-                                    val selected = userAnswerId == answer.id
+                                    val selected = selectedAnswers[question.id] == answer.id
                                     Row(
                                         modifier = Modifier
                                             .fillMaxWidth()
+                                            .clickable {
+                                                selectedAnswers[question.id] = answer.id
+                                            }
                                             .padding(vertical = AppSizes.extraSmall),
                                         verticalAlignment = Alignment.CenterVertically
                                     ) {
                                         RadioButton(
                                             selected = selected,
-                                            onClick = null
+                                            onClick = { selectedAnswers[question.id] = answer.id }
                                         )
                                         Spacer(Modifier.width(AppSizes.small))
                                         Text(answer.answerText)
                                     }
                                 }
 
-                                Spacer(Modifier.height(AppSizes.small))
+                                Spacer(Modifier.height(AppSizes.medium))
                             }
-
-                            Spacer(Modifier.height(AppSizes.medium))
                         }
-                    }
-
-                    Spacer(Modifier.height(AppSizes.medium))
-                    Box(
-                        modifier = Modifier.fillMaxWidth(),
-                        contentAlignment = Alignment.Center
-                    ) {
-                        Text(
-                            text = "Twój wynik: $points / $maxPoints",
-                            style = MaterialTheme.typography.titleLarge
-                        )
-                    }
-                    Box(
-                        modifier = Modifier.fillMaxWidth(),
-                        contentAlignment = Alignment.Center
-                    ) {
-                        LargeButton(
-                            onClick = { navController.navigate("quizzes") },
-                            modifier = Modifier.fillMaxWidth(),
-                            content = "Powrót do listy quizów"
-                        )
-
-                    }
-                }
-
-                // tryb rozwiązywania
-                else {
-                    Column(
-                        modifier = Modifier
-                            .weight(1f)
-                            .verticalScroll(scrollState)
-                    ) {
-                        quiz!!.questions.forEachIndexed { index, question ->
-                            Text(
-                                text = "${index + 1}. ${question.questionText}",
-                                style = MaterialTheme.typography.titleMedium
-                            )
-
-                            Spacer(Modifier.height(AppSizes.extraSmall))
-
-                            question.answers.forEach { answer ->
-                                val selected = selectedAnswers[question.id] == answer.id
-                                Row(
-                                    modifier = Modifier
-                                        .fillMaxWidth()
-                                        .clickable {
-                                            selectedAnswers[question.id] = answer.id
-                                        }
-                                        .padding(vertical = AppSizes.extraSmall),
-                                    verticalAlignment = Alignment.CenterVertically
-                                ) {
-                                    RadioButton(
-                                        selected = selected,
-                                        onClick = { selectedAnswers[question.id] = answer.id }
-                                    )
-                                    Spacer(Modifier.width(AppSizes.small))
-                                    Text(answer.answerText)
-                                }
-                            }
-
-                            Spacer(Modifier.height(AppSizes.medium))
-                        }
-                    }
 
                     // komunikat błędu submitu
                     submitError?.let {
@@ -200,20 +201,34 @@ fun QuizDetailsScreen(
                                     answers = selectedAnswers
                                 )
 
-                                result = viewModel.calculateQuizPoints(
-                                    quiz = quiz!!,
-                                    selectedAnswers = selectedAnswers
-                                )
-                            } catch (e: Exception) {
-                                submitError = "Nie udało się zapisać wyniku"
-                            }
-                        },
-                        modifier = Modifier.fillMaxWidth(),
-                        content = "Sprawdź poprawność"
-                    )
-
+                                    result = viewModel.calculateQuizPoints(
+                                        quiz = quiz!!,
+                                        selectedAnswers = selectedAnswers
+                                    )
+                                } catch (e: Exception) {
+                                    submitError = "Nie udało się zapisać wyniku"
+                                }
+                            },
+                            modifier = Modifier.fillMaxWidth(),
+                            content = "Sprawdź poprawność"
+                        )
+                    }
                 }
             }
         }
+
+        CustomIconButton(
+            onClick = {
+                navController.navigate("home") {
+                    popUpTo(navController.graph.startDestinationId) { inclusive = true }
+                }
+            },
+            modifier = Modifier
+                .align(Alignment.TopEnd)
+                .padding(AppSizes.medium)
+                .size(AppSizes.extraLarge),
+            icon = Icons.Filled.Home,
+            contentDescription = "Powrót do ekranu głównego"
+        )
     }
 }

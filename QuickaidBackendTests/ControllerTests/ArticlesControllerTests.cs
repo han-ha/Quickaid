@@ -5,7 +5,7 @@ using Quickaid.Services.Interfaces;
 using Quickaid.Models.DTO;
 using System.Security.Claims;
 
-namespace QuickaidApiTests.ControllerTests
+namespace QuickaidBackendTests.ControllerTests
 {
     [TestClass]
     public class ArticlesControllerTests
@@ -19,7 +19,7 @@ namespace QuickaidApiTests.ControllerTests
             _serviceMock = new Mock<IArticleService>();
             _controller = new ArticlesController(_serviceMock.Object);
 
-            // Fake admin claim dla POST/PUT/DELETE
+            // Fake admin claim
             var user = new ClaimsPrincipal(new ClaimsIdentity(
             [
                 new Claim("id", "1"),

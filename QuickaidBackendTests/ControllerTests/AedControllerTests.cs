@@ -21,7 +21,7 @@ namespace QuickaidBackendTests.ControllerTests
             // AedGeoJsonUtils nie jest używane w tych testach, dlatego jest null
             _controller = new AedController(_serviceMock.Object, null!);
 
-            // Fake admin claim do kontrolera
+            // Fake admin claim
             var user = new ClaimsPrincipal(new ClaimsIdentity(
             [
                 new("id", "1"),

@@ -1,15 +1,11 @@
-﻿using Microsoft.VisualStudio.TestTools.UnitTesting;
-using Moq;
+﻿using Moq;
 using Quickaid.Controllers;
 using Quickaid.Services.Interfaces;
 using Quickaid.Models.DTO;
 using Microsoft.AspNetCore.Mvc;
-using System.Collections.Generic;
-using System.Linq;
 using System.Security.Claims;
-using System.Threading.Tasks;
 
-namespace QuickaidApiTests.ControllerTests
+namespace QuickaidBackendTests.ControllerTests
 {
     [TestClass]
     public class AnswersControllerTests
@@ -23,7 +19,7 @@ namespace QuickaidApiTests.ControllerTests
             _serviceMock = new Mock<IAnswerService>();
             _controller = new AnswersController(_serviceMock.Object);
 
-            // Fake admin claim, żeby można było testować metody admin
+            // Fake admin claim
             var user = new ClaimsPrincipal(new ClaimsIdentity(
             [
                 new Claim("id", "1"),

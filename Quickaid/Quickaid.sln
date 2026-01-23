@@ -5,7 +5,7 @@ VisualStudioVersion = 17.13.35931.197
 MinimumVisualStudioVersion = 10.0.40219.1
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Quickaid", "Quickaid.csproj", "{44984762-3B57-417A-9897-CE62EDAC5B69}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "QuickAidApiTests", "..\QuickAidApiTests\QuickAidApiTests.csproj", "{EF355929-B6A8-419D-B6F7-E9CBE6466A7D}"
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "QuickaidBackendTests", "..\QuickaidBackendTests\QuickaidBackendTests.csproj", "{0274BE21-B28F-4356-A36E-7F5651CCBB5E}"
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
@@ -17,10 +17,10 @@ Global
 		{44984762-3B57-417A-9897-CE62EDAC5B69}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{44984762-3B57-417A-9897-CE62EDAC5B69}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{44984762-3B57-417A-9897-CE62EDAC5B69}.Release|Any CPU.Build.0 = Release|Any CPU
-		{EF355929-B6A8-419D-B6F7-E9CBE6466A7D}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
-		{EF355929-B6A8-419D-B6F7-E9CBE6466A7D}.Debug|Any CPU.Build.0 = Debug|Any CPU
-		{EF355929-B6A8-419D-B6F7-E9CBE6466A7D}.Release|Any CPU.ActiveCfg = Release|Any CPU
-		{EF355929-B6A8-419D-B6F7-E9CBE6466A7D}.Release|Any CPU.Build.0 = Release|Any CPU
+		{0274BE21-B28F-4356-A36E-7F5651CCBB5E}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{0274BE21-B28F-4356-A36E-7F5651CCBB5E}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{0274BE21-B28F-4356-A36E-7F5651CCBB5E}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{0274BE21-B28F-4356-A36E-7F5651CCBB5E}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE

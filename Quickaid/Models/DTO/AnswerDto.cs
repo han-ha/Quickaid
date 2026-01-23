@@ -4,6 +4,6 @@ namespace Quickaid.Models.DTO
     {
         public int Id { get; set; }
         public required string AnswerText { get; set; }
-	public bool IsCorrect { get; set; }
+        public bool IsCorrect { get; set; }
     }
 }

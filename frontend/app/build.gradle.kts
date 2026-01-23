@@ -8,7 +8,7 @@ plugins {
 
 android {
     namespace = "com.quickaid.app"
-    compileSdk = 36 // TODO poprawić wersję do 8.0
+    compileSdk = 36
 
     defaultConfig {
         applicationId = "com.quickaid.app"

@@ -190,3 +190,14 @@ ADD CONSTRAINT FK_articles_users
 FOREIGN KEY ([created_by]) REFERENCES [users]([id])
 ON DELETE SET NULL;
 GO
+
+ALTER TABLE [aed_points]
+ADD CONSTRAINT CHK_aed_points_lat_long
+CHECK (latitude BETWEEN -90 AND 90 AND longitude BETWEEN -180 AND 180);
+GO
+
+ALTER TABLE [users]
+ADD CONSTRAINT CHK_users_role
+CHECK (role IN ('admin', 'user'));
+GO
+

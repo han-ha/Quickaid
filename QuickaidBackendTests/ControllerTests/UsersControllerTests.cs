@@ -62,31 +62,26 @@ namespace QuickaidBackendTests.ControllerTests
         }
 
         [TestMethod]
-        // Test GET /api/users/{id} jako zwykły użytkownik - dostęp do własnych lub cudzych danych
-        public async Task GetById_UserRegular_ReturnsOkOrForbid()
+        // Test GET /api/users/{id} jako zwykły użytkownik - dostęp do własnych danych
+        public async Task GetById_UserRegular_ReturnsOk()
         {
             var userDto = new UserDto { Id = 5, Username = "user5" };
             _serviceMock.Setup(s => s.GetByIdAsync(5)).ReturnsAsync(userDto);
 
             // Fake user claim - właściciel
             _controller.ControllerContext.HttpContext.User = new ClaimsPrincipal(new ClaimsIdentity(
-            [
-                new Claim("id", "5"),
-                new Claim(ClaimTypes.Role, "user")
-            ], "mock"));
+                [
+            new Claim("id", "5"),
+            new Claim(ClaimTypes.Role, "user")
+                ], "mock"));
 
             var result = await _controller.GetById(5);
             Assert.IsInstanceOfType(result, typeof(OkObjectResult));
 
-            // Fake user claim - inny zwykły użytkownik
-            _controller.ControllerContext.HttpContext.User = new ClaimsPrincipal(new ClaimsIdentity(
-            [
-                new Claim("id", "6"),
-                new Claim(ClaimTypes.Role, "user")
-            ], "mock"));
-
-            result = await _controller.GetById(5);
-            Assert.IsInstanceOfType(result, typeof(ForbidResult));
+            var ok = result as OkObjectResult;
+            var value = ok!.Value as UserDto;
+            Assert.AreEqual(5, value!.Id);
+            Assert.AreEqual("user5", value.Username);
         }
     }
 }

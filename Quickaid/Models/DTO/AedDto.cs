@@ -1,4 +1,6 @@
-﻿namespace Quickaid.Models.DTO
+﻿using Quickaid.Enums;
+
+namespace Quickaid.Models.DTO
 {
     public class AedDto
     {
@@ -8,5 +10,6 @@
         public decimal Longitude { get; set; }
         public string? Description { get; set; }
         public bool Verified { get; set; }
+        public AedType Type { get; set; }
     }
 }

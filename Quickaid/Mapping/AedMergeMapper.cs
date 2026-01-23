@@ -1,5 +1,6 @@
 ﻿using Quickaid.Models.DTO;
 using Quickaid.Mapping.Interfaces;
+using Quickaid.Enums;
 
 namespace Quickaid.Mapping
 {
@@ -11,6 +12,7 @@ namespace Quickaid.Mapping
             {
                 Id = internalDto.Id,
                 ExternalId = null,
+                Type = AedType.Internal,
                 Latitude = internalDto.Latitude,
                 Longitude = internalDto.Longitude,
                 Description = internalDto.Description,
@@ -24,11 +26,13 @@ namespace Quickaid.Mapping
             {
                 Id = null,
                 ExternalId = externalDto.ExternalId,
+                Type = AedType.External,
                 Latitude = externalDto.Latitude,
                 Longitude = externalDto.Longitude,
                 Description = externalDto.Description,
                 Verified = true
             };
         }
+
     }
 }

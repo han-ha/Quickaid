@@ -84,6 +84,7 @@ namespace QuickaidBackendTests.TestHelpers
         public static void SeedAeds(AppDbContext db)
         {
             db.AedPoints.AddRange(
+                // Internal (dodane przez użytkownika, bez ExternalId)
                 new AedPoint
                 {
                     Id = 1,
@@ -102,12 +103,26 @@ namespace QuickaidBackendTests.TestHelpers
                     Verified = false,
                     UpdatedAt = DateTime.UtcNow
                 },
+
+                // Combined (modyfikacja AED z ExternalId)
                 new AedPoint
                 {
                     Id = 3,
                     Latitude = 50.067m,
                     Longitude = 19.950m,
-                    Description = "AED 3 w parku",
+                    Description = "AED 3 w parku (Combined)",
+                    Verified = true,
+                    ExternalId = 12345,
+                    UpdatedAt = DateTime.UtcNow
+                },
+
+                // Internal (bez ExternalId)
+                new AedPoint
+                {
+                    Id = 4,
+                    Latitude = 50.070m,
+                    Longitude = 19.955m,
+                    Description = "AED 4 w szpitalu",
                     Verified = true,
                     UpdatedAt = DateTime.UtcNow
                 }

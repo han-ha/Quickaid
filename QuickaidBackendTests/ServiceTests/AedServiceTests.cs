@@ -4,6 +4,7 @@ using Quickaid.Services;
 using Quickaid.Models.DTO;
 using Quickaid.Mapping.Interfaces;
 using QuickaidBackendTests.TestHelpers;
+using Quickaid.Enums;
 
 namespace QuickaidBackendTests.ServiceTests
 {
@@ -53,7 +54,19 @@ namespace QuickaidBackendTests.ServiceTests
                     Latitude = dto.Latitude,
                     Longitude = dto.Longitude,
                     Description = dto.Description,
-                    Verified = dto.Verified
+                    Verified = dto.Verified,
+                    Type = AedType.Internal
+                });
+
+            _mergeMapperMock.Setup(m => m.ToDto(It.IsAny<ExternalAedDto>()))
+                .Returns<ExternalAedDto>(dto => new AedDto
+                {
+                    ExternalId = dto.ExternalId,
+                    Latitude = dto.Latitude,
+                    Longitude = dto.Longitude,
+                    Description = dto.Description,
+                    Verified = true,
+                    Type = AedType.External
                 });
 
             _service = new AedService(

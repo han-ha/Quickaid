@@ -4,6 +4,7 @@ using Quickaid.Services.Interfaces;
 using Quickaid.Models.DTO;
 using Microsoft.AspNetCore.Mvc;
 using System.Security.Claims;
+using Quickaid.Enums;
 
 namespace QuickaidBackendTests.ControllerTests
 {
@@ -41,8 +42,8 @@ namespace QuickaidBackendTests.ControllerTests
             _serviceMock.Setup(s => s.GetMergedAedsAsync())
                 .ReturnsAsync(
                 [
-                    new AedDto { Id = 1, Latitude = 50, Longitude = 20, Description = "AED przy szkole", Verified = true },
-                    new AedDto { Id = 2, Latitude = 51, Longitude = 21, Description = "AED w szpitalu", Verified = false }
+                    new AedDto { Id = 1, Latitude = 50, Longitude = 20, Description = "AED przy szkole", Verified = true, Type = AedType.Internal },
+                    new AedDto { ExternalId = 5, Latitude = 51, Longitude = 21, Description = "AED z API", Verified = true, Type = AedType.External }
                 ]);
 
             var result = await _controller.GetAllAedPoints();
@@ -51,6 +52,8 @@ namespace QuickaidBackendTests.ControllerTests
 
             var list = ok!.Value as IEnumerable<AedDto>;
             Assert.AreEqual(2, list!.Count());
+            Assert.IsTrue(list.Any(a => a.Type == AedType.Internal));
+            Assert.IsTrue(list.Any(a => a.Type == AedType.External));
         }
 
         [TestMethod]

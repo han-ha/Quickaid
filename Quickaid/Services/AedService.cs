@@ -4,6 +4,7 @@ using Quickaid.Models.DTO;
 using Quickaid.Services.Interfaces;
 using Quickaid.Mapping.Interfaces;
 using Quickaid.Utils;
+using Quickaid.Enums;
 
 namespace Quickaid.Services
 {
@@ -92,17 +93,19 @@ namespace Quickaid.Services
             {
                 if (editedByExternalId.TryGetValue(extAed.ExternalId, out var dbEntity))
                 {
-                    // Punkt z API istnieje w bazie i zosta³ nadpisany przez usera
-                    merged.Add(_mergeMapper.ToDto(_internalMapper.ToDto(dbEntity)));
+                    // Punkt z API istnieje w bazie i zosta³ nadpisany przez usera -> COMBINED
+                    var dto = _mergeMapper.ToDto(_internalMapper.ToDto(dbEntity));
+                    dto.Type = AedType.Combined;
+                    merged.Add(dto);
                 }
                 else
                 {
-                    // Nowy punkt z API, Verified = true (wierzymy, ¿e OpenAEDMap dostarcza sprawdzone dane)
+                    // Punkt tylko z API -> EXTERNAL
                     merged.Add(_mergeMapper.ToDto(extAed));
                 }
             }
 
-            // Dodaj AED dodane przez u¿ytkowników (bez ExternalId)
+            // Dodaj AED dodane przez u¿ytkowników (bez ExternalId) -> INTERNAL
             foreach (var added in addedAedPoints)
             {
                 merged.Add(_mergeMapper.ToDto(_internalMapper.ToDto(added)));
@@ -110,5 +113,6 @@ namespace Quickaid.Services
 
             return merged;
         }
+
     }
 }

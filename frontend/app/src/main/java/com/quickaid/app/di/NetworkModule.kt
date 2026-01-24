@@ -26,6 +26,7 @@ import retrofit2.Retrofit
 import retrofit2.converter.gson.GsonConverterFactory
 import java.security.SecureRandom
 import java.security.cert.X509Certificate
+import java.util.concurrent.TimeUnit
 import javax.inject.Singleton
 import javax.net.ssl.*
 
@@ -83,6 +84,11 @@ object NetworkModule {
         }
 
         return getUnsafeOkHttpClient(tokenProvider)
+            .newBuilder()
+            .connectTimeout(60, TimeUnit.SECONDS)
+            .readTimeout(60, TimeUnit.SECONDS)
+            .writeTimeout(60, TimeUnit.SECONDS)
+            .build()
     }
 
     @Provides
@@ -96,6 +102,7 @@ object NetworkModule {
             .addConverterFactory(GsonConverterFactory.create(gson))
             .client(client)
             .build()
+
 
     @Provides
     @Singleton

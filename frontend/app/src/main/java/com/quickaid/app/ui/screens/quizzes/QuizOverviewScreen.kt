@@ -7,9 +7,11 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.hilt.navigation.compose.hiltViewModel
 import androidx.navigation.NavController
+import com.quickaid.app.enums.UserRole
 import com.quickaid.app.ui.components.LargeButton
 import com.quickaid.app.ui.theme.*
 import com.quickaid.app.viewmodel.QuizOverviewViewModel
+import com.quickaid.app.viewmodel.SessionViewModel
 import java.text.ParseException
 import java.text.SimpleDateFormat
 import java.util.*
@@ -20,11 +22,13 @@ fun QuizOverviewScreen(
     quizTitle: String,
     quizMaxScore: Int,
     navController: NavController,
-    viewModel: QuizOverviewViewModel = hiltViewModel()
+    viewModel: QuizOverviewViewModel = hiltViewModel(),
+    sessionViewModel: SessionViewModel = hiltViewModel()
 ) {
     val bestResult by viewModel.bestResult.collectAsState()
     val isLoading by viewModel.isLoading.collectAsState()
     val error by viewModel.error.collectAsState()
+    val userRole by sessionViewModel.role.collectAsState()
 
     LaunchedEffect(quizId) {
         viewModel.fetchBestResult(quizId)
@@ -121,11 +125,11 @@ fun QuizOverviewScreen(
         Spacer(Modifier.height(AppSizes.large))
 
         LargeButton(
-            onClick = { navController.navigate("quizDetails/$quizId") },
+            onClick = {
+                    navController.navigate("quizDetails/$quizId")
+                },
             modifier = Modifier.fillMaxWidth(),
-//            enabled = quiz.numberOfQuestions > 0, // todo: dodać quiz do tego ekranu, pobierać liczbę pytań
-            content = "Rozwiąż quiz"
+            content = if (userRole == UserRole.ADMIN) "Podgląd quizu" else "Rozwiąż quiz"
         )
-
     }
 }

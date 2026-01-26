@@ -1,6 +1,8 @@
 package com.quickaid.app.ui.screens
 
 import androidx.compose.foundation.layout.*
+import androidx.compose.material.icons.Icons
+import androidx.compose.material.icons.filled.Home
 import androidx.compose.material3.*
 import androidx.compose.runtime.*
 import androidx.compose.ui.Alignment
@@ -8,9 +10,10 @@ import androidx.compose.ui.Modifier
 import androidx.hilt.navigation.compose.hiltViewModel
 import androidx.navigation.NavController
 import com.quickaid.app.ui.components.SmallButton
-import com.quickaid.app.ui.theme.AppSpacing
+import com.quickaid.app.ui.theme.AppSizes
 import com.quickaid.app.viewmodel.SessionViewModel
 import com.quickaid.app.enums.UserRole
+import com.quickaid.app.ui.components.CustomIconButton
 import com.quickaid.app.ui.components.DarkModeRow
 
 @Composable
@@ -31,74 +34,87 @@ fun SettingsScreen(
         }
     }
 
-    Column(
-        modifier = Modifier
-            .fillMaxSize()
-            .padding(AppSpacing.medium),
-        verticalArrangement = Arrangement.Top,
-        horizontalAlignment = Alignment.CenterHorizontally
-    ) {
-        Text(
-            text = "Ustawienia",
-            style = MaterialTheme.typography.headlineMedium
-        )
+    Box {
+        Column(
+            modifier = Modifier
+                .fillMaxSize()
+                .padding(AppSizes.medium),
+            verticalArrangement = Arrangement.Top,
+            horizontalAlignment = Alignment.CenterHorizontally
+        ) {
+            Text(
+                text = "Ustawienia",
+                style = MaterialTheme.typography.headlineMedium
+            )
 
-        Spacer(Modifier.height(AppSpacing.large))
+            Spacer(Modifier.height(AppSizes.large))
 
-        DarkModeRow(
-            darkModeEnabled = darkModeEnabled,
-            onToggle = { enabled -> sessionViewModel.setDarkMode(enabled) }
-        )
+            DarkModeRow(
+                darkModeEnabled = darkModeEnabled,
+                onToggle = { enabled -> sessionViewModel.setDarkMode(enabled) }
+            )
 
-        Spacer(Modifier.height(AppSpacing.large))
+            Spacer(Modifier.height(AppSizes.small))
 
-        when (role) {
-            UserRole.USER -> {
-                SmallButton(
-                    onClick = { navController.navigate("changePassword") },
-                    modifier = Modifier.fillMaxWidth(),
-                    content = "Zmień hasło"
-                )
+            when (role) {
+                UserRole.USER -> {
+                    SmallButton(
+                        onClick = { showDeleteDialog = true },
+                        modifier = Modifier.fillMaxWidth(),
+                        content = "Usuń konto"
+                    )
+                }
 
-                Spacer(Modifier.height(AppSpacing.medium))
+                UserRole.ADMIN -> {
+                    SmallButton(
+                        onClick = { navController.navigate("userManagement") },
+                        modifier = Modifier.fillMaxWidth(),
+                        content = "Zarządzanie użytkownikami"
+                    )
 
-                SmallButton(
-                    onClick = { showDeleteDialog = true },
-                    modifier = Modifier.fillMaxWidth(),
-                    content = "Usuń konto"
-                )
+                    Spacer(Modifier.height(AppSizes.small))
+
+                    SmallButton(
+                        onClick = { navController.navigate("adminList") },
+                        modifier = Modifier.fillMaxWidth(),
+                        content = "Lista administratorów"
+                    )
+                }
+
+                UserRole.ANON -> { /* anon nie ma ustawień */
+                }
             }
 
-            UserRole.ADMIN -> {
-                SmallButton(
-                    onClick = { navController.navigate("userManagement") },
-                    modifier = Modifier.fillMaxWidth(),
-                    content = "Zarządzanie użytkownikami"
-                )
+            Spacer(Modifier.height(AppSizes.small))
 
-                Spacer(Modifier.height(AppSpacing.medium))
+            SmallButton(
+                onClick = {
+                    sessionViewModel.logout()
+                    navController.navigate("welcome") {
+                        popUpTo(0) { inclusive = true }
+                        launchSingleTop = true
+                    }
 
-                SmallButton(
-                    onClick = { navController.navigate("adminList") },
-                    modifier = Modifier.fillMaxWidth(),
-                    content = "Lista administratorów"
-                )
-            }
+                },
+                modifier = Modifier.fillMaxWidth(),
+                content = "Wyloguj"
+            )
 
-            UserRole.ANON -> { /* anon nie ma ustawień */ }
+
         }
 
-        Spacer(Modifier.height(AppSpacing.extraLarge))
-
-        SmallButton(
+        CustomIconButton(
             onClick = {
-                sessionViewModel.logout()
-                navController.navigate("welcome") {
-                    popUpTo("home") { inclusive = true }
+                navController.navigate("home") {
+                    popUpTo(navController.graph.startDestinationId) { inclusive = true }
                 }
             },
-            modifier = Modifier.fillMaxWidth(),
-            content = "Wyloguj się"
+            modifier = Modifier
+                .align(Alignment.TopEnd)
+                .padding(AppSizes.medium)
+                .size(AppSizes.extraLarge),
+            icon = Icons.Filled.Home,
+            contentDescription = "Powrót do ekranu głównego"
         )
     }
 

@@ -1,5 +1,6 @@
 package com.quickaid.app.ui.screens
 
+import androidx.compose.material3.CircularProgressIndicator
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.collectAsState
@@ -18,8 +19,9 @@ fun StartScreen(
 
     LaunchedEffect(role) {
         when (role) {
-            UserRole.ANON -> navController.navigate("welcome") { popUpTo("start") { inclusive = true } }
-            else -> navController.navigate("home") { popUpTo("start") { inclusive = true } }
+            UserRole.ADMIN -> navController.navigate("home") { popUpTo("start") { inclusive = true } }
+            UserRole.USER -> navController.navigate("home") { popUpTo("start") { inclusive = true } }
+            else -> navController.navigate("welcome") { popUpTo("start") { inclusive = true } }
         }
     }
 }

@@ -3,6 +3,8 @@ package com.quickaid.app.ui.screens
 import android.content.Intent
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.text.ClickableText
+import androidx.compose.material.icons.Icons
+import androidx.compose.material.icons.filled.Home
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
@@ -16,62 +18,80 @@ import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.text.withStyle
 import androidx.core.net.toUri
+import androidx.navigation.NavController
 import com.quickaid.app.R
+import com.quickaid.app.ui.components.CustomIconButton
 import com.quickaid.app.ui.theme.AppSizes
 
 @Composable
-fun ContactScreen() {
+fun ContactScreen(navController: NavController) {
     val context = LocalContext.current
     val email = stringResource(id = R.string.contact_email)
     val description = stringResource(id = R.string.contact_description)
 
-    Column(
-        modifier = Modifier
-            .fillMaxSize()
-            .padding(horizontal = AppSizes.large, vertical = AppSizes.medium),
-        verticalArrangement = Arrangement.Top,
-        horizontalAlignment = Alignment.CenterHorizontally
-    ) {
-        Text(
-            text = "Kontakt",
-            style = MaterialTheme.typography.headlineMedium,
-            color = MaterialTheme.colorScheme.onBackground,
-            textAlign = TextAlign.Center,
-            modifier = Modifier.fillMaxWidth()
-        )
+    Box(modifier = Modifier.fillMaxSize()) {
+        Column(
+            modifier = Modifier
+                .fillMaxSize()
+                .padding(horizontal = AppSizes.large, vertical = AppSizes.medium),
+            verticalArrangement = Arrangement.Top,
+            horizontalAlignment = Alignment.CenterHorizontally
+        ) {
+            Text(
+                text = "Kontakt",
+                style = MaterialTheme.typography.headlineMedium,
+                color = MaterialTheme.colorScheme.onBackground,
+                textAlign = TextAlign.Center,
+                modifier = Modifier.fillMaxWidth()
+            )
 
-        Spacer(Modifier.height(AppSizes.large))
+            Spacer(Modifier.height(AppSizes.large))
 
-        val annotatedText = buildAnnotatedString {
-            append("$description\n\n")
-            pushStringAnnotation(tag = "EMAIL", annotation = "mailto:$email")
-            withStyle(
-                style = SpanStyle(
-                    color = MaterialTheme.colorScheme.primary,
-                    fontWeight = FontWeight.Bold
-                )
-            ) {
-                append(email)
+            val annotatedText = buildAnnotatedString {
+                append("$description\n\n")
+                pushStringAnnotation(tag = "EMAIL", annotation = "mailto:$email")
+                withStyle(
+                    style = SpanStyle(
+                        color = MaterialTheme.colorScheme.primary,
+                        fontWeight = FontWeight.Bold
+                    )
+                ) {
+                    append(email)
+                }
+                pop()
             }
-            pop()
+
+            ClickableText(
+                text = annotatedText,
+                style = MaterialTheme.typography.bodyMedium.copy(
+                    color = MaterialTheme.colorScheme.onBackground,
+                    textAlign = TextAlign.Justify
+                ),
+                modifier = Modifier.fillMaxWidth(),
+                onClick = { offset ->
+                    annotatedText.getStringAnnotations(tag = "EMAIL", start = offset, end = offset)
+                        .firstOrNull()?.let { annotation ->
+                            val intent = Intent(Intent.ACTION_SENDTO).apply {
+                                data = annotation.item.toUri()
+                            }
+                            context.startActivity(intent)
+                        }
+                }
+            )
         }
 
-        ClickableText(
-            text = annotatedText,
-            style = MaterialTheme.typography.bodyMedium.copy(
-                color = MaterialTheme.colorScheme.onBackground,
-                textAlign = TextAlign.Justify
-            ),
-            modifier = Modifier.fillMaxWidth(),
-            onClick = { offset ->
-                annotatedText.getStringAnnotations(tag = "EMAIL", start = offset, end = offset)
-                    .firstOrNull()?.let { annotation ->
-                        val intent = Intent(Intent.ACTION_SENDTO).apply {
-                            data = annotation.item.toUri()
-                        }
-                        context.startActivity(intent)
-                    }
-            }
+        CustomIconButton(
+            onClick = {
+                navController.navigate("home") {
+                    popUpTo(navController.graph.startDestinationId) { inclusive = true }
+                }
+            },
+            modifier = Modifier
+                .align(Alignment.TopEnd)
+                .padding(AppSizes.medium)
+                .size(AppSizes.extraLarge),
+            icon = Icons.Filled.Home,
+            contentDescription = "Powrót do ekranu głównego"
         )
     }
 }

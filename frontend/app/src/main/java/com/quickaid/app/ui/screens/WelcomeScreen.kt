@@ -1,24 +1,26 @@
 package com.quickaid.app.ui.screens
 
+import android.content.Context
+import android.content.Intent
+import android.net.ConnectivityManager
+import android.net.NetworkCapabilities
+import android.provider.Settings
 import androidx.compose.foundation.Image
-import androidx.compose.foundation.layout.Arrangement
-import androidx.compose.foundation.layout.Column
-import androidx.compose.foundation.layout.Spacer
-import androidx.compose.foundation.layout.fillMaxSize
-import androidx.compose.foundation.layout.fillMaxWidth
-import androidx.compose.foundation.layout.height
-import androidx.compose.foundation.layout.padding
-import androidx.compose.foundation.layout.size
+import androidx.compose.foundation.layout.*
+import androidx.compose.material3.AlertDialog
+import androidx.compose.material3.Text
 import androidx.compose.material3.MaterialTheme
-import androidx.compose.runtime.Composable
+import androidx.compose.runtime.*
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.painterResource
 import androidx.hilt.navigation.compose.hiltViewModel
 import androidx.navigation.NavController
 import com.quickaid.app.R
 import com.quickaid.app.enums.UserRole
 import com.quickaid.app.ui.components.LargeButton
+import com.quickaid.app.ui.components.SmallButton
 import com.quickaid.app.ui.theme.AppSizes
 import com.quickaid.app.viewmodel.SessionViewModel
 
@@ -27,6 +29,33 @@ fun WelcomeScreen(
     navController: NavController,
     sessionViewModel: SessionViewModel = hiltViewModel()
 ) {
+    val context = LocalContext.current
+
+    var isConnected by remember { mutableStateOf(true) }
+    var showEnableWifiDialog by remember { mutableStateOf(false) }
+
+    // Funkcja sprawdzająca połączenie z internetem
+    fun checkInternet(): Boolean {
+        val connectivityManager =
+            context.getSystemService(Context.CONNECTIVITY_SERVICE) as ConnectivityManager
+        val network = connectivityManager.activeNetwork ?: return false
+        val capabilities = connectivityManager.getNetworkCapabilities(network) ?: return false
+        return capabilities.hasCapability(NetworkCapabilities.NET_CAPABILITY_INTERNET)
+    }
+
+    // Funkcja otwierająca ustawienia wifi
+    fun openWifiSettings() {
+        val intent = Intent(Settings.ACTION_WIFI_SETTINGS)
+        intent.flags = Intent.FLAG_ACTIVITY_NEW_TASK
+        context.startActivity(intent)
+    }
+
+    // Sprawdzamy połączenie przy starcie
+    LaunchedEffect(Unit) {
+        isConnected = checkInternet()
+        if (!isConnected) showEnableWifiDialog = true
+    }
+
     Column(
         modifier = Modifier
             .fillMaxSize()
@@ -70,6 +99,26 @@ fun WelcomeScreen(
             modifier = Modifier.fillMaxWidth(),
             content = "Kontynuuj jako gość",
             buttonColor = MaterialTheme.colorScheme.primary
+        )
+    }
+
+    if (showEnableWifiDialog) {
+        // AlertDialog dla wifi
+        AlertDialog(
+            onDismissRequest = {},
+            title = { Text("Wymagane połączenie z Internetem") },
+            text = { Text("Aplikacja wymaga połączenia z Internetem, aby działać poprawnie. Włącz Wi-Fi lub dane mobilne.") },
+            confirmButton = {
+                SmallButton(onClick = {
+                    openWifiSettings()
+                    showEnableWifiDialog = false
+                }, content = "Otwórz ustawienia")
+            },
+            dismissButton = {
+                SmallButton(
+                    onClick = { showEnableWifiDialog = false },
+                    content = "Anuluj")
+            }
         )
     }
 }

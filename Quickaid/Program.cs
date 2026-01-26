@@ -44,8 +44,7 @@ namespace Quickaid
                 });
             });
 
-            // klucz JWT z konfiguracji TODO daæ lepszy default
-            var key = Encoding.ASCII.GetBytes(builder.Configuration["Jwt:Key"] ?? "super_secret_dev_key");
+            var key = Encoding.ASCII.GetBytes(builder.Configuration["Jwt:Key"] ?? "");
 
             // konfiguracja uwierzytelniania JWT
             builder.Services.AddAuthentication(options =>

@@ -4,6 +4,7 @@ using Quickaid.Services.Interfaces;
 using Microsoft.AspNetCore.Authorization;
 using Quickaid.Utils;
 using Quickaid.Models.Entities;
+using Quickaid.Enums;
 
 namespace Quickaid.Controllers
 {
@@ -40,6 +41,9 @@ namespace Quickaid.Controllers
         {
             if (!ModelState.IsValid) return BadRequest(ModelState);
 
+            if (dto.Type != AedType.Internal)
+                return BadRequest("Mo¿na dodawaæ tylko AED typu Internal");
+
             var created = await _aedService.AddAsync(dto);
             return CreatedAtAction(nameof(GetAedById), new { id = created.Id }, created);
         }
@@ -50,6 +54,9 @@ namespace Quickaid.Controllers
         public async Task<IActionResult> UpdateAed(int id, [FromBody] InternalAedDto dto)
         {
             if (!ModelState.IsValid) return BadRequest(ModelState);
+
+            if (dto.Type != AedType.Internal)
+                return BadRequest("Nie mo¿na edytowaæ AED zewnêtrznych");
 
             var updated = await _aedService.UpdateAsync(id, dto);
             if (updated == null) return NotFound();
@@ -70,7 +77,7 @@ namespace Quickaid.Controllers
         [HttpGet("external")]
         [AllowAnonymous]
         public async Task<IActionResult> GetExternalAeds()
-        {;
+        {
             try
             {
                 var list = await _geoJsonUtils.FetchExternalAedsAsync();
@@ -97,7 +104,5 @@ namespace Quickaid.Controllers
                 return StatusCode(500, "Nie uda³o siê pobraæ AED z bazy danych. " + ex.Message);
             }
         }
-
-
     }
 }

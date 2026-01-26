@@ -72,47 +72,23 @@ namespace Quickaid.Services
             // Pobierz AED z API
             var externalAeds = await new AedGeoJsonUtils().FetchExternalAedsAsync();
 
-            // Pobierz z bazy tylko potrzebne wiersze
-            var editedAedPoints = await _db.AedPoints
-                .Where(a => a.ExternalId.HasValue)
-                .AsNoTracking()
-                .ToListAsync();
-
-            var addedAedPoints = await _db.AedPoints
-                .Where(a => !a.ExternalId.HasValue)
-                .AsNoTracking()
-                .ToListAsync();
-
-            // S³ownik edytowanych AED po ExternalId
-            var editedByExternalId = editedAedPoints.ToDictionary(a => a.ExternalId!.Value, a => a);
+            // Pobierz AED z bazy
+            var internalAeds = await _db.AedPoints.AsNoTracking().ToListAsync();
 
             var merged = new List<AedDto>();
 
-            // Po³¹cz API z editedAedPoints
-            foreach (var extAed in externalAeds)
+            // Konwertujemy i dodajemy AED z API do listy wynikowej
+            foreach (var ext in externalAeds)
             {
-                if (editedByExternalId.TryGetValue(extAed.ExternalId, out var dbEntity))
-                {
-                    // Punkt z API istnieje w bazie i zosta³ nadpisany przez usera -> COMBINED
-                    var dto = _mergeMapper.ToDto(_internalMapper.ToDto(dbEntity));
-                    dto.Type = AedType.Combined;
-                    merged.Add(dto);
-                }
-                else
-                {
-                    // Punkt tylko z API -> EXTERNAL
-                    merged.Add(_mergeMapper.ToDto(extAed));
-                }
+                merged.Add(_mergeMapper.ToDto(ext));
             }
 
-            // Dodaj AED dodane przez u¿ytkowników (bez ExternalId) -> INTERNAL
-            foreach (var added in addedAedPoints)
+            // Konwertujemy i dodajemy AED z bazy do listy wynikowej
+            foreach (var internalAed in internalAeds)
             {
-                merged.Add(_mergeMapper.ToDto(_internalMapper.ToDto(added)));
+                merged.Add(_mergeMapper.ToDto(_internalMapper.ToDto(internalAed)));
             }
-
             return merged;
         }
-
     }
 }

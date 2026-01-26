@@ -50,7 +50,8 @@ namespace Quickaid.Utils
                             Latitude = (decimal)coords[1],
                             Description = feature.Properties.Location
                                 ?? feature.Properties.Name
-                                ?? feature.Properties.Description
+                                ?? feature.Properties.Description,
+                            Type = Quickaid.Enums.AedType.External
                         });
                     }
                 }

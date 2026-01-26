@@ -44,11 +44,11 @@ class AuthViewModel @Inject constructor(
         }
     }
 
-    fun register(username: String, email: String, password: String) {
+    fun register(username: String, email: String, password: String, confirmPassword: String) {
         viewModelScope.launch {
             _authStateDto.value = AuthStateDto.Loading
             try {
-                val response = repository.register(RegisterDto(username, email, password))
+                val response = repository.register(RegisterDto(username, email, password, confirmPassword))
                 _authStateDto.value = AuthStateDto.Success(response)
             } catch (e: Exception) {
                 _authStateDto.value = AuthStateDto.Error(e.message ?: "Nieznany błąd.")

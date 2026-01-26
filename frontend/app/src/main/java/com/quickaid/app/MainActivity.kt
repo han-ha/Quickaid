@@ -24,7 +24,9 @@ import com.quickaid.app.ui.screens.RegisterScreen
 import com.quickaid.app.ui.screens.SettingsScreen
 import com.quickaid.app.ui.screens.StartScreen
 import com.quickaid.app.ui.screens.WelcomeScreen
+import com.quickaid.app.ui.screens.aed.AddAedScreen
 import com.quickaid.app.ui.screens.aed.AedMapScreen
+import com.quickaid.app.ui.screens.aed.EditAedScreen
 import com.quickaid.app.ui.screens.articles.AddArticleScreen
 import com.quickaid.app.ui.screens.articles.ArticleDetailsScreen
 import com.quickaid.app.ui.screens.articles.ArticleListScreen
@@ -105,30 +107,20 @@ fun AppNavigation(jwtUtils: JwtUtils) {
         composable("articles") { ArticleListScreen(navController) }
         composable("aeds") {
             AedMapScreen(
-                navController = navController,
-                onEditAed = { id, externalId ->
-                    navController.navigate("editAed?id=$id&externalId=$externalId")
-                }
+                navController = navController
             )
         }
 
-        /* composable("addAed") {
+        composable("addAed") {
             AddAedScreen(navController)
         }
 
-        composable(
-            "editAed?id={id}&externalId={externalId}",
-            arguments = listOf(
-                navArgument("id") { nullable = true; defaultValue = null },
-                navArgument("externalId") { nullable = true; defaultValue = null }
-            )
-        ) { backStackEntry ->
+        composable("editAed") {
             EditAedScreen(
-                navController = navController,
-                id = backStackEntry.arguments?.getString("id")?.toIntOrNull(),
-                externalId = backStackEntry.arguments?.getString("externalId")?.toLongOrNull()
+                navController = navController
             )
-        } */
+        }
+
 
         composable("settings") { SettingsScreen(navController, sessionViewModel) }
 

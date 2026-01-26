@@ -10,6 +10,7 @@ import androidx.compose.ui.text.input.KeyboardType
 import androidx.hilt.navigation.compose.hiltViewModel
 import androidx.navigation.NavController
 import com.quickaid.app.data.models.AedDto
+import com.quickaid.app.enums.AedType
 import com.quickaid.app.ui.components.LargeButton
 import com.quickaid.app.ui.theme.AppSizes
 import com.quickaid.app.viewmodel.AedViewModel
@@ -106,7 +107,8 @@ fun AddAedScreen(
                             latitude = lat,
                             longitude = lon,
                             description = description.ifBlank { null },
-                            verified = verified
+                            verified = verified,
+                            type = AedType.Internal
                         )
                     )
                 }

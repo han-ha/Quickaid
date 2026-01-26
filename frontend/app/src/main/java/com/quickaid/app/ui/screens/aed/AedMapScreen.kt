@@ -17,10 +17,7 @@ import androidx.activity.compose.BackHandler
 import androidx.activity.compose.rememberLauncherForActivityResult
 import androidx.activity.result.contract.ActivityResultContracts
 import androidx.cardview.widget.CardView
-import androidx.compose.foundation.layout.Box
-import androidx.compose.foundation.layout.fillMaxSize
-import androidx.compose.foundation.layout.padding
-import androidx.compose.foundation.layout.size
+import androidx.compose.foundation.layout.*
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.Add
 import androidx.compose.material.icons.filled.Home
@@ -35,6 +32,7 @@ import androidx.core.app.ActivityCompat
 import androidx.hilt.navigation.compose.hiltViewModel
 import androidx.navigation.NavController
 import com.quickaid.app.data.models.AedDto
+import com.quickaid.app.enums.AedType
 import com.quickaid.app.enums.UserRole
 import com.quickaid.app.ui.components.CustomIconButton
 import com.quickaid.app.ui.theme.AppSizes
@@ -56,8 +54,7 @@ import org.osmdroid.views.overlay.mylocation.MyLocationNewOverlay
 fun AedMapScreen(
     navController: NavController,
     viewModel: AedViewModel = hiltViewModel(),
-    sessionViewModel: SessionViewModel = hiltViewModel(),
-    onEditAed: (id: Int?, externalId: Long?) -> Unit = { _, _ -> }
+    sessionViewModel: SessionViewModel = hiltViewModel()
 ) {
     val context = LocalContext.current
     val aeds by viewModel.aeds.collectAsState()
@@ -119,7 +116,7 @@ fun AedMapScreen(
     }
 
     fun createInfoWindow(aed: AedDto): CardView {
-        val card = CardView(context).apply {
+        return CardView(context).apply {
             radius = TypedValue.applyDimension(
                 TypedValue.COMPLEX_UNIT_DIP,
                 8f,
@@ -145,16 +142,19 @@ fun AedMapScreen(
                 }
                 addView(titleView)
                 addView(descView)
-                if (userRole != UserRole.ANON) {
+
+                if (userRole != UserRole.ANON && aed.type == AedType.Internal) {
                     val editBtn = Button(context).apply {
                         text = "Edytuj"
-                        setOnClickListener { onEditAed(aed.id, aed.externalId) }
+                        setOnClickListener {
+                            viewModel.selectAed(aed)
+                            navController.navigate("editAed")
+                        }
                     }
                     addView(editBtn)
                 }
             })
         }
-        return card
     }
 
     fun updateMarkers(map: MapView, aeds: List<AedDto>) {
@@ -258,15 +258,17 @@ fun AedMapScreen(
             }
         )
 
-        CustomIconButton(
-            onClick = { navController.navigate("addAed") },
-            modifier = Modifier
-                .align(Alignment.TopEnd)
-                .padding(end = AppSizes.extraLarge * 2, top = AppSizes.medium)
-                .size(AppSizes.extraLarge),
-            icon = Icons.Filled.Add,
-            contentDescription = "Dodaj punkt AED"
-        )
+        if (userRole != UserRole.ANON) {
+            CustomIconButton(
+                onClick = { navController.navigate("addAed") },
+                modifier = Modifier
+                    .align(Alignment.TopEnd)
+                    .padding(end = AppSizes.extraLarge * 2, top = AppSizes.medium)
+                    .size(AppSizes.extraLarge),
+                icon = Icons.Filled.Add,
+                contentDescription = "Dodaj punkt AED"
+            )
+        }
 
         CustomIconButton(
             onClick = {

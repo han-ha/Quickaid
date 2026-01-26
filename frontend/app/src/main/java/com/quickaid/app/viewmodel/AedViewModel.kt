@@ -4,6 +4,7 @@ import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.quickaid.app.data.models.AedDto
 import com.quickaid.app.data.repository.AedRepository
+import com.quickaid.app.enums.AedType
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
@@ -50,6 +51,10 @@ class AedViewModel @Inject constructor(
         }
     }
 
+    fun selectAed(aed: AedDto) {
+        _selectedAed.value = aed
+    }
+
     fun fetchAedById(id: Int) {
         if (_isLoading.value) return
         viewModelScope.launch {
@@ -69,7 +74,12 @@ class AedViewModel @Inject constructor(
             _isLoading.value = true
             _error.value = null
             try {
-                repository.addAed(aed)
+                if (aed.type != AedType.Internal) {
+                    _error.value = "Można dodawać tylko AED typu Internal"
+                    return@launch
+                }
+                val saved = repository.addAed(aed)
+                _selectedAed.value = saved
                 _addSuccess.value = true
                 fetchAeds()
             } catch (e: Exception) {
@@ -79,13 +89,20 @@ class AedViewModel @Inject constructor(
     }
 
     fun updateAed(aed: AedDto) {
-        val idForBackend = aed.id ?: 0
         if (_isLoading.value) return
         viewModelScope.launch {
             _isLoading.value = true
             _error.value = null
             try {
-                repository.updateAed(idForBackend, aed)
+                if (aed.type != AedType.Internal) {
+                    _error.value = "Nie można edytować AED zewnętrznych"
+                    return@launch
+                }
+                val result = repository.updateAed(
+                    aed.id ?: throw IllegalArgumentException("AED musi mieć ID"),
+                    aed
+                )
+                _selectedAed.value = result
                 _updateSuccess.value = true
                 fetchAeds()
             } catch (e: Exception) {

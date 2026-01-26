@@ -1,43 +1,33 @@
 package com.quickaid.app.ui.screens.aed
 
-import androidx.compose.foundation.layout.Box
-import androidx.compose.foundation.layout.Column
-import androidx.compose.foundation.layout.Row
-import androidx.compose.foundation.layout.Spacer
-import androidx.compose.foundation.layout.fillMaxSize
-import androidx.compose.foundation.layout.fillMaxWidth
-import androidx.compose.foundation.layout.height
-import androidx.compose.foundation.layout.padding
-import androidx.compose.foundation.layout.width
+import android.util.Log
+import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.text.KeyboardOptions
-import androidx.compose.material3.Checkbox
-import androidx.compose.material3.CircularProgressIndicator
-import androidx.compose.material3.MaterialTheme
-import androidx.compose.material3.OutlinedTextField
-import androidx.compose.material3.Text
-import androidx.compose.runtime.Composable
-import androidx.compose.runtime.LaunchedEffect
-import androidx.compose.runtime.collectAsState
-import androidx.compose.runtime.getValue
-import androidx.compose.runtime.mutableStateOf
-import androidx.compose.runtime.remember
-import androidx.compose.runtime.setValue
+import androidx.compose.material3.*
+import androidx.compose.runtime.*
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.text.input.KeyboardType
 import androidx.hilt.navigation.compose.hiltViewModel
 import androidx.navigation.NavController
+import androidx.navigation.compose.currentBackStackEntryAsState
+import com.quickaid.app.enums.AedType
 import com.quickaid.app.ui.components.LargeButton
 import com.quickaid.app.ui.theme.AppSizes
 import com.quickaid.app.viewmodel.AedViewModel
 
 @Composable
 fun EditAedScreen(
-    navController: NavController,
-    id: Int?,
-    externalId: Long?,
-    viewModel: AedViewModel = hiltViewModel()
+    navController: NavController
 ) {
+    val currentBackStackEntry by navController.currentBackStackEntryAsState()
+
+    val parentEntry = remember(currentBackStackEntry) {
+        navController.getBackStackEntry("aeds")
+    }
+
+    val viewModel: AedViewModel = hiltViewModel(parentEntry)
+
     val aed by viewModel.selectedAed.collectAsState()
     val isLoading by viewModel.isLoading.collectAsState()
     val error by viewModel.error.collectAsState()
@@ -47,10 +37,6 @@ fun EditAedScreen(
     var longitude by remember { mutableStateOf("") }
     var description by remember { mutableStateOf("") }
     var verified by remember { mutableStateOf(false) }
-
-    LaunchedEffect(id) {
-        id?.let { viewModel.fetchAedById(it) }
-    }
 
     LaunchedEffect(aed) {
         aed?.let {
@@ -134,24 +120,22 @@ fun EditAedScreen(
 
         LargeButton(
             modifier = Modifier.fillMaxWidth(),
-            enabled = !isLoading && aed != null && description.isNotBlank() && latitude.isNotBlank() && longitude.isNotBlank(),
+            enabled = !isLoading && aed?.type == AedType.Internal && description.isNotBlank() && latitude.isNotBlank() && longitude.isNotBlank(),
             content = if (isLoading) "Zapisywanie..." else "Zapisz",
             onClick = {
-                val currentAed = aed
-                val lat = latitude.toDoubleOrNull()
-                val lon = longitude.toDoubleOrNull()
-
-                if (currentAed != null) {
+                aed?.let { currentAed ->
+                    val lat = latitude.toDoubleOrNull() ?: currentAed.latitude
+                    val lon = longitude.toDoubleOrNull() ?: currentAed.longitude
                     val updated = currentAed.copy(
-                        latitude = lat ?: currentAed.latitude,
-                        longitude = lon ?: currentAed.longitude,
+                        latitude = lat,
+                        longitude = lon,
                         description = description.ifBlank { null },
-                        verified = verified
+                        verified = verified,
+                        type = currentAed.type
                     )
                     viewModel.updateAed(updated)
                 }
             }
         )
-
     }
 }

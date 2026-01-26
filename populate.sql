@@ -53,12 +53,6 @@ VALUES
 (5, 'Nie', 0);
 GO
 
-INSERT INTO [user_quiz_results] ([user_id], [quiz_id], [score])
-VALUES
-(2, 1, 2),
-(2, 2, 3);
-GO
-
 INSERT INTO [articles] ([title], [content], [created_by])
 VALUES
 ('Podstawy pierwszej pomocy – co musisz wiedzieæ',
@@ -93,3 +87,8 @@ Jeœli poszkodowany oddycha, ale jest nieprzytomny — u³ó¿ go w pozycji bocznej us
 Nie musisz byæ ratownikiem — wa¿na jest szybka, rozs¹dna i przemyœlana reakcja. Twoje dzia³ania mog¹ ocaliæ komuœ ¿ycie.', 2);
 GO
 
+INSERT INTO users (username, email, role)
+VALUES ('admin', 'admin@example.com', 'admin');
+
+INSERT INTO passwords (user_id, hashed_password, salt)
+VALUES (15, 'hmGYc4KiTBHKyCoXFRPzPmHY3wmxhnmjzYlGylbFALI=', 'Bs0TKfVUG2HnAq2OBbRxZQ==');

@@ -23,20 +23,24 @@ fun UserListScreen(
     onlyAdmins: Boolean = false,
     viewModel: AdminViewModel = hiltViewModel()
 ) {
+    // Stany z ViewModelu
     val users by viewModel.users.collectAsState()
     val isLoading by viewModel.isLoading.collectAsState()
     val error by viewModel.error.collectAsState()
     val currentUserId by viewModel.currentUserId.collectAsState()
 
+    // Obsługa stanu powrotu z edycji użytkowników
     val savedStateHandle = navController.currentBackStackEntry?.savedStateHandle
     val usersUpdated by savedStateHandle
         ?.getStateFlow("usersUpdated", false)
         ?.collectAsState() ?: remember { mutableStateOf(false) }
 
+    // Pobranie użytkowników przy uruchomieniu
     LaunchedEffect(Unit) {
         viewModel.fetchUsers()
     }
 
+    // Pobranie użytkowników po aktualizacji
     LaunchedEffect(usersUpdated) {
         if (usersUpdated) {
             viewModel.fetchUsers()
@@ -44,9 +48,10 @@ fun UserListScreen(
         }
     }
 
+    // Filtrowanie użytkowników, jeśli chcemy tylko administratorów
     val filteredUsers = users.filter { !onlyAdmins || it.role == "admin" }
 
-    Box() {
+    Box {
         Column(
             modifier = Modifier
                 .fillMaxSize()
@@ -54,18 +59,21 @@ fun UserListScreen(
             verticalArrangement = Arrangement.Top,
             horizontalAlignment = Alignment.CenterHorizontally
         ) {
+            // Nagłówek ekranu
             Text(
                 text = if (onlyAdmins) "Administratorzy" else "Użytkownicy",
                 style = MaterialTheme.typography.headlineMedium
             )
             Spacer(Modifier.height(AppSizes.medium))
 
+            // Obsługa stanu ładowania, błędu i pustej listy
             when {
                 isLoading -> CircularProgressIndicator()
                 error != null -> {
                     Text(text = error ?: "", color = MaterialTheme.colorScheme.error)
                 }
 
+                // Wyświetlanie listy użytkowników
                 filteredUsers.isEmpty() -> {
                     Text(
                         if (onlyAdmins) "Brak administratorów do wyświetlenia"
@@ -84,6 +92,7 @@ fun UserListScreen(
             }
         }
 
+        // Przycisk powrotu do ekranu głównego
         CustomIconButton(
             onClick = {
                 navController.navigate("home") {

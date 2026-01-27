@@ -17,17 +17,21 @@ fun RegisterScreen(
     viewModel: AuthViewModel = hiltViewModel(),
     onSuccess: () -> Unit
 ) {
+    // Stan z ViewModelu
     val authState by viewModel.authState.collectAsState()
 
+    // Lokalne stany pól formularza
     var username by remember { mutableStateOf("") }
     var email by remember { mutableStateOf("") }
     var password by remember { mutableStateOf("") }
     var confirmPassword by remember { mutableStateOf("") }
 
+    // Stany dla pop-upu i sukcesu rejestracji
     var showDialog by remember { mutableStateOf(false) }
     var dialogMessage by remember { mutableStateOf("") }
     var handledSuccess by remember { mutableStateOf(false) }
 
+    // Obsługa wyników rejestracji
     LaunchedEffect(authState) {
         when (authState) {
             is AuthState.Success -> {
@@ -53,12 +57,14 @@ fun RegisterScreen(
         horizontalAlignment = Alignment.CenterHorizontally
     ) {
 
+        // Nagłówek
         Text(
             text = "Zarejestruj się",
             style = MaterialTheme.typography.headlineMedium,
             modifier = Modifier.padding(bottom = AppSizes.large)
         )
 
+        // Pole nazwy użytkownika
         TextField(
             value = username,
             onValueChange = { username = it },
@@ -70,6 +76,7 @@ fun RegisterScreen(
 
         Spacer(Modifier.height(AppSizes.small))
 
+        // Pole adresu email
         TextField(
             value = email,
             onValueChange = { email = it },
@@ -81,6 +88,7 @@ fun RegisterScreen(
 
         Spacer(Modifier.height(AppSizes.small))
 
+        // Pole hasła z maskowaniem
         TextField(
             value = password,
             onValueChange = { password = it },
@@ -93,6 +101,7 @@ fun RegisterScreen(
 
         Spacer(Modifier.height(AppSizes.small))
 
+        // Pole potwierdzenia hasła
         TextField(
             value = confirmPassword,
             onValueChange = { confirmPassword = it },
@@ -105,6 +114,7 @@ fun RegisterScreen(
 
         Spacer(Modifier.height(AppSizes.medium))
 
+        // Przycisk utworzenia konta
         LargeButton(
             onClick = { viewModel.register(username, email, password, confirmPassword) },
             modifier = Modifier.fillMaxWidth(),
@@ -113,6 +123,7 @@ fun RegisterScreen(
 
         Spacer(Modifier.height(AppSizes.medium))
 
+        // Wyświetlanie stanu ładowania
         when (authState) {
             is AuthState.Loading -> {
                 Box(
@@ -128,6 +139,7 @@ fun RegisterScreen(
         }
     }
 
+    // Pop-up sukcesu lub błędu rejestracji
     if (showDialog) {
         AlertDialog(
             onDismissRequest = { showDialog = false },

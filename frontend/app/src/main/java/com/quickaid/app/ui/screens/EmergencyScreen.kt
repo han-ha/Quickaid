@@ -28,20 +28,15 @@ fun EmergencyScreen(
     val context = LocalContext.current
     val instructions = stringResource(id = R.string.emergency_instructions)
 
-    Box(
-        modifier = Modifier
-            .fillMaxSize()
-
-    ) {
-
+    Box(modifier = Modifier.fillMaxSize()) {
         Column(
             modifier = Modifier
                 .fillMaxSize()
                 .padding(horizontal = AppSizes.large, vertical = AppSizes.medium)
                 .verticalScroll(rememberScrollState()),
             horizontalAlignment = Alignment.CenterHorizontally,
-
         ) {
+            // Nagłówek
             Text(
                 text = "Tryb awaryjny",
                 style = MaterialTheme.typography.headlineMedium,
@@ -52,6 +47,7 @@ fun EmergencyScreen(
 
             Spacer(Modifier.height(AppSizes.large))
 
+            // Instrukcje awaryjne
             Column(
                 modifier = Modifier
                     .weight(1f)
@@ -74,6 +70,7 @@ fun EmergencyScreen(
 
             Spacer(Modifier.height(AppSizes.large))
 
+            // Przycisk dzwonienia na 112
             LargeButton(
                 onClick = {
                     val intent = Intent(Intent.ACTION_DIAL).apply {
@@ -87,6 +84,7 @@ fun EmergencyScreen(
             )
         }
 
+        // Przycisk powrotu do ekranu głównego
         CustomIconButton(
             onClick = {
                 navController.navigate("home") {

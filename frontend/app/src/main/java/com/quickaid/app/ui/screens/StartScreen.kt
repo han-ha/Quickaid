@@ -15,8 +15,10 @@ fun StartScreen(
     navController: NavController,
     sessionViewModel: SessionViewModel = hiltViewModel()
 ) {
+    // Stan z ViewModelu
     val role by sessionViewModel.role.collectAsState()
 
+    // StartScreen służy wyłącznie do decydowania, od jakiego ekranu użytkownik powinien rozpocząć
     LaunchedEffect(role) {
         when (role) {
             UserRole.ADMIN -> navController.navigate("home") { popUpTo("start") { inclusive = true } }

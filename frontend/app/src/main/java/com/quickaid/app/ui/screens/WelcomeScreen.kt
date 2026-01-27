@@ -31,10 +31,11 @@ fun WelcomeScreen(
 ) {
     val context = LocalContext.current
 
+    // Stan połączenia internetowego
     var isConnected by remember { mutableStateOf(true) }
     var showEnableWifiDialog by remember { mutableStateOf(false) }
 
-    // Funkcja sprawdzająca połączenie z internetem
+    // Funkcja sprawdzająca, czy urządzenie ma dostęp do Internetu
     fun checkInternet(): Boolean {
         val connectivityManager =
             context.getSystemService(Context.CONNECTIVITY_SERVICE) as ConnectivityManager
@@ -43,14 +44,14 @@ fun WelcomeScreen(
         return capabilities.hasCapability(NetworkCapabilities.NET_CAPABILITY_INTERNET)
     }
 
-    // Funkcja otwierająca ustawienia wifi
+    // Funkcja otwierająca systemowe ustawienia wifi
     fun openWifiSettings() {
         val intent = Intent(Settings.ACTION_WIFI_SETTINGS)
         intent.flags = Intent.FLAG_ACTIVITY_NEW_TASK
         context.startActivity(intent)
     }
 
-    // Sprawdzamy połączenie przy starcie
+    // Sprawdzenie połączenia z Internetem przy uruchomieniu ekranu
     LaunchedEffect(Unit) {
         isConnected = checkInternet()
         if (!isConnected) showEnableWifiDialog = true
@@ -63,6 +64,7 @@ fun WelcomeScreen(
         verticalArrangement = Arrangement.Center,
         horizontalAlignment = Alignment.CenterHorizontally
     ) {
+        // Logo aplikacji
         Image(
             painter = painterResource(id = R.drawable.quickaid_logo),
             contentDescription = "Quickaid Logo",
@@ -71,6 +73,7 @@ fun WelcomeScreen(
 
         Spacer(modifier = Modifier.height(AppSizes.large))
 
+        // Przycisk logowania
         LargeButton(
             onClick = { navController.navigate("login") },
             modifier = Modifier.fillMaxWidth(),
@@ -80,6 +83,7 @@ fun WelcomeScreen(
 
         Spacer(modifier = Modifier.height(AppSizes.small))
 
+        // Przycisk rejestracji
         LargeButton(
             onClick = { navController.navigate("register") },
             modifier = Modifier.fillMaxWidth(),
@@ -89,6 +93,7 @@ fun WelcomeScreen(
 
         Spacer(modifier = Modifier.height(AppSizes.small))
 
+        // Przycisk kontynuowania jako gość
         LargeButton(
             onClick = {
                 sessionViewModel.setRole(UserRole.ANON)
@@ -102,8 +107,8 @@ fun WelcomeScreen(
         )
     }
 
+    // Pop-up informujący o braku połączenia internetowego
     if (showEnableWifiDialog) {
-        // AlertDialog dla wifi
         AlertDialog(
             onDismissRequest = {},
             title = { Text("Wymagane połączenie z Internetem") },

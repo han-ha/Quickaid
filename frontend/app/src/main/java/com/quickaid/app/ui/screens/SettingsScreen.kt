@@ -21,13 +21,16 @@ fun SettingsScreen(
     navController: NavController,
     sessionViewModel: SessionViewModel = hiltViewModel()
 ) {
+    // Stan z ViewModelu
     val role by sessionViewModel.role.collectAsState()
     val darkModeEnabled by sessionViewModel.darkModeEnabled.collectAsState()
     val deleteSuccess by sessionViewModel.deleteSuccess.collectAsState()
 
+    // Lokalny stan
     var showDeleteDialog by remember { mutableStateOf(false) }
     var showDeletedPopup by remember { mutableStateOf(false) }
 
+    // Pokazanie pop-upu po pomyślnym usunięciu konta
     LaunchedEffect(deleteSuccess) {
         if (deleteSuccess) {
             showDeletedPopup = true
@@ -42,6 +45,7 @@ fun SettingsScreen(
             verticalArrangement = Arrangement.Top,
             horizontalAlignment = Alignment.CenterHorizontally
         ) {
+            // Nagłówek
             Text(
                 text = "Ustawienia",
                 style = MaterialTheme.typography.headlineMedium
@@ -49,6 +53,7 @@ fun SettingsScreen(
 
             Spacer(Modifier.height(AppSizes.large))
 
+            // Przełącznik trybu ciemnego
             DarkModeRow(
                 darkModeEnabled = darkModeEnabled,
                 onToggle = { enabled -> sessionViewModel.setDarkMode(enabled) }
@@ -56,8 +61,10 @@ fun SettingsScreen(
 
             Spacer(Modifier.height(AppSizes.small))
 
+            // Opcje zależne od roli użytkownika
             when (role) {
                 UserRole.USER -> {
+                    // Usuwanie konta
                     SmallButton(
                         onClick = { showDeleteDialog = true },
                         modifier = Modifier.fillMaxWidth(),
@@ -66,6 +73,7 @@ fun SettingsScreen(
                 }
 
                 UserRole.ADMIN -> {
+                    // Zarządzanie użytkownikami
                     SmallButton(
                         onClick = { navController.navigate("userManagement") },
                         modifier = Modifier.fillMaxWidth(),
@@ -74,6 +82,7 @@ fun SettingsScreen(
 
                     Spacer(Modifier.height(AppSizes.small))
 
+                    // Zarządzanie administratorami
                     SmallButton(
                         onClick = { navController.navigate("adminList") },
                         modifier = Modifier.fillMaxWidth(),
@@ -81,12 +90,13 @@ fun SettingsScreen(
                     )
                 }
 
-                UserRole.ANON -> { /* anon nie ma ustawień */
-                }
+                // Anonimowy użytkownik nie ma ustawień
+                UserRole.ANON -> { }
             }
 
             Spacer(Modifier.height(AppSizes.small))
 
+            // Przycisk wylogowania
             SmallButton(
                 onClick = {
                     sessionViewModel.logout()
@@ -99,10 +109,9 @@ fun SettingsScreen(
                 modifier = Modifier.fillMaxWidth(),
                 content = "Wyloguj"
             )
-
-
         }
 
+        // Przyciski powrotu do ekranu głównego
         CustomIconButton(
             onClick = {
                 navController.navigate("home") {
@@ -118,6 +127,7 @@ fun SettingsScreen(
         )
     }
 
+    // Dialog potwierdzający usunięcie konta
     if (showDeleteDialog) {
         AlertDialog(
             onDismissRequest = { showDeleteDialog = false },
@@ -142,6 +152,7 @@ fun SettingsScreen(
         )
     }
 
+    // Pop-up informujący o pomyślnym usunięciu konta
     if (showDeletedPopup) {
         AlertDialog(
             onDismissRequest = {},
@@ -163,5 +174,3 @@ fun SettingsScreen(
         )
     }
 }
-
-

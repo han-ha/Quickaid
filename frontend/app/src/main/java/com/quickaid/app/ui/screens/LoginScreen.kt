@@ -16,12 +16,15 @@ fun LoginScreen(
     viewModel: AuthViewModel = hiltViewModel(),
     onSuccess: () -> Unit
 ) {
+    // Stan z ViewModelu
     val authState by viewModel.authState.collectAsState()
 
+    // Lokalne stany pól formularza
     var username by remember { mutableStateOf("") }
     var password by remember { mutableStateOf("") }
     var handledSuccess by remember { mutableStateOf(false) }
 
+    // Obsługa sukcesu logowania
     LaunchedEffect(authState) {
         if (authState is AuthState.Success && !handledSuccess) {
             handledSuccess = true
@@ -37,12 +40,14 @@ fun LoginScreen(
         horizontalAlignment = Alignment.CenterHorizontally
     ) {
 
+        // Nagłówek
         Text(
             text = "Zaloguj się",
             style = MaterialTheme.typography.headlineMedium,
             modifier = Modifier.padding(bottom = AppSizes.large)
         )
 
+        // Pole nazwy użytkownika
         TextField(
             value = username,
             onValueChange = { username = it },
@@ -54,6 +59,7 @@ fun LoginScreen(
 
         Spacer(Modifier.height(AppSizes.small))
 
+        // Pole hasła z maskowaniem
         TextField(
             value = password,
             onValueChange = { password = it },
@@ -66,6 +72,7 @@ fun LoginScreen(
 
         Spacer(Modifier.height(AppSizes.medium))
 
+        // Przycisk logowania
         LargeButton(
             onClick = { viewModel.login(username, password) },
             modifier = Modifier.fillMaxWidth(),
@@ -74,6 +81,7 @@ fun LoginScreen(
 
         Spacer(Modifier.height(AppSizes.medium))
 
+        // Wyświetlanie stanu logowania - ładowanie lub błąd
         when (authState) {
             is AuthState.Loading -> {
                 Box(

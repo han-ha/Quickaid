@@ -30,6 +30,7 @@ fun ContactScreen(navController: NavController) {
     val description = stringResource(id = R.string.contact_description)
 
     Box(modifier = Modifier.fillMaxSize()) {
+        // Kolumna z nagłówkiem i tekstem kontaktowym
         Column(
             modifier = Modifier
                 .fillMaxSize()
@@ -47,6 +48,7 @@ fun ContactScreen(navController: NavController) {
 
             Spacer(Modifier.height(AppSizes.large))
 
+            // Klikalny tekst z e-mailem
             val annotatedText = buildAnnotatedString {
                 append("$description\n\n")
                 pushStringAnnotation(tag = "EMAIL", annotation = "mailto:$email")
@@ -79,7 +81,7 @@ fun ContactScreen(navController: NavController) {
                 }
             )
         }
-
+        // Przycisk powrotu do ekranu głównego
         CustomIconButton(
             onClick = {
                 navController.navigate("home") {

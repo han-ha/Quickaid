@@ -36,16 +36,20 @@ fun EditUserScreen(
     navController: NavController,
     viewModel: AdminViewModel = hiltViewModel()
 ) {
+    // Stan z ViewModelu
     val users by viewModel.users.collectAsState()
+
+    // Znajdź użytkownika o podanym ID
     val user = users.find { it.id == userId }
 
-
+    // Pobierz użytkowników po uruchomieniu ekranu
     LaunchedEffect(userId) {
         if (user == null) {
             viewModel.fetchUsers()
         }
     }
 
+    // Ekran ładowania, jeśli użytkownik jeszcze nie został pobrany
     if (user == null) {
         Column(
             modifier = Modifier.fillMaxSize(),
@@ -57,6 +61,7 @@ fun EditUserScreen(
         return
     }
 
+    // Lokalne stany pól formularza
     var username by remember(user) { mutableStateOf(user.username) }
     var email by remember(user) { mutableStateOf(user.email) }
     var role by remember(user) { mutableStateOf(UserRole.fromString(user.role)) }
@@ -64,6 +69,7 @@ fun EditUserScreen(
     val isLoading by viewModel.isLoading.collectAsState()
     val error by viewModel.error.collectAsState()
 
+    // Główny kod ekranu
     Column(
         modifier = Modifier
             .fillMaxSize()
@@ -71,6 +77,7 @@ fun EditUserScreen(
         verticalArrangement = Arrangement.Top,
         horizontalAlignment = Alignment.CenterHorizontally
     ) {
+        // Nagłówek
         Text(
             text = "Edycja użytkownika",
             style = MaterialTheme.typography.headlineMedium
@@ -78,6 +85,7 @@ fun EditUserScreen(
 
         Spacer(Modifier.height(AppSizes.extraLarge))
 
+        // Pola formularza
         OutlinedTextField(
             value = username,
             onValueChange = {
@@ -100,6 +108,7 @@ fun EditUserScreen(
 
         Spacer(Modifier.height(AppSizes.medium))
 
+        // Wybór roli użytkownika
         Text("Rola użytkownika")
         Spacer(Modifier.height(AppSizes.small))
 
@@ -125,6 +134,7 @@ fun EditUserScreen(
 
         Spacer(Modifier.height(AppSizes.large))
 
+        // Wyświetlenie błędu
         if (error != null) {
             Text(
                 text = error ?: "",
@@ -133,6 +143,7 @@ fun EditUserScreen(
             Spacer(Modifier.height(AppSizes.medium))
         }
 
+        // Przycisk zapisu zmian
         LargeButton(
             onClick = {
                 val request = UserDto(
@@ -153,8 +164,5 @@ fun EditUserScreen(
             enabled = !isLoading,
             content = if (isLoading) "Zapisywanie..." else "Zapisz zmiany"
         )
-
     }
 }
-
-

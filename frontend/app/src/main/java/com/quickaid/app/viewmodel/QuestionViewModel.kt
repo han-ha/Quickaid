@@ -15,12 +15,15 @@ class QuestionViewModel @Inject constructor(
     private val repository: QuestionRepository
 ) : ViewModel() {
 
+    // Stan ładowania
     private val _isLoading = MutableStateFlow(false)
     val isLoading: StateFlow<Boolean> = _isLoading
 
+    // Przechowuje komunikat błędu
     private val _error = MutableStateFlow<String?>(null)
     val error: StateFlow<String?> = _error
 
+    // Flagi sukcesu operacji
     private val _saveSuccess = MutableStateFlow(false)
     val saveSuccess: StateFlow<Boolean> = _saveSuccess
 
@@ -28,15 +31,19 @@ class QuestionViewModel @Inject constructor(
     val deleteSuccess: StateFlow<Boolean> = _deleteSuccess
     fun resetDeleteState() { _deleteSuccess.value = false }
 
+    // Funkcja ustawiająca flagę sukcesu zapisu na true
     private fun notifySuccess() {
         _saveSuccess.value = true
     }
 
+    // Resetuje flagę sukcesu zapisu
     fun resetSaveState() { _saveSuccess.value = false }
 
+    // Aktualnie wybrane pytanie
     private val _question = MutableStateFlow<QuestionDto?>(null)
     val question: StateFlow<QuestionDto?> = _question
 
+    // Pobiera pytanie po jego ID i ustawia je w _question
     fun fetchQuestionById(questionId: Int) {
         _isLoading.value = true
         viewModelScope.launch {
@@ -51,6 +58,7 @@ class QuestionViewModel @Inject constructor(
         }
     }
 
+    // Dodaje nowe pytanie do bazy danych
     fun addQuestion(question: QuestionDto) {
         _isLoading.value = true
         viewModelScope.launch {
@@ -66,6 +74,7 @@ class QuestionViewModel @Inject constructor(
         }
     }
 
+    // Aktualizuje istniejące pytanie po ID
     fun updateQuestion(questionId: Int, question: QuestionDto) {
         _isLoading.value = true
         viewModelScope.launch {
@@ -82,6 +91,7 @@ class QuestionViewModel @Inject constructor(
         }
     }
 
+    // Dodaje pytanie do konkretnego quizu
     fun addQuestionToQuiz(
         quizId: Int,
         dto: QuestionDto,
@@ -102,6 +112,7 @@ class QuestionViewModel @Inject constructor(
         }
     }
 
+    // Usuwa pytanie z quizu po ID
     fun deleteQuestion(questionId: Int, quizId: Int) {
         _isLoading.value = true
         viewModelScope.launch {

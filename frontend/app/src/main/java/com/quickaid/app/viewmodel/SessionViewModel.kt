@@ -22,38 +22,48 @@ class SessionViewModel @Inject constructor(
     private val usersApi: UsersApi
 ) : ViewModel() {
 
+    // Aktualna rola użytkownika z DataStore, jeśli nie ma zapisanej roli, przyjmujemy ANON
     val role: StateFlow<UserRole> = session.role
         .map { it?.let { UserRole.fromString(it) } ?: UserRole.ANON }
         .stateIn(viewModelScope, SharingStarted.WhileSubscribed(5000), UserRole.ANON)
 
+    // Nazwa użytkownika z DataStore
     val username: StateFlow<String?> = session.username
         .stateIn(viewModelScope, SharingStarted.WhileSubscribed(5000), null)
 
+    // Informacja o włączeniu trybu ciemnego
     val darkModeEnabled: StateFlow<Boolean> = session.darkMode
         .stateIn(viewModelScope, SharingStarted.WhileSubscribed(5000), false)
 
+    // Token użytkownika
     val token: StateFlow<String?> = session.token
         .stateIn(viewModelScope, SharingStarted.WhileSubscribed(5000), null)
 
+    // Flaga sukcesu usunięcia konta
     private val _deleteSuccess = MutableStateFlow(false)
     val deleteSuccess = _deleteSuccess.asStateFlow()
 
+    // Zapisuje rolę użytkownika w DataStore
     fun setRole(role: UserRole) {
         viewModelScope.launch { session.setRole(role.toStorageString()) }
     }
 
+    // Zapisuje nazwę użytkownika w DataStore
     fun setUsername(name: String) {
         viewModelScope.launch { session.setUsername(name) }
     }
 
+    // Ustawia tryb ciemny w DataStore
     fun setDarkMode(enabled: Boolean) {
         viewModelScope.launch { session.setDarkMode(enabled) }
     }
 
+    // Wylogowanie - czyści wszystkie dane DataStore
     fun logout() {
         viewModelScope.launch { session.clearSession() }
     }
 
+    // Usuwa konto użytkownika
     fun deleteAccount() {
         viewModelScope.launch {
             try {
@@ -70,6 +80,7 @@ class SessionViewModel @Inject constructor(
         }
     }
 
+    // Resetuje flagę sukcesu usunięcia konta
     fun resetDeleteState() {
         _deleteSuccess.value = false
     }

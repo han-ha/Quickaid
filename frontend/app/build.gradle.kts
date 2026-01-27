@@ -17,7 +17,9 @@ android {
         versionCode = 1
         versionName = "1.0"
 
-        testInstrumentationRunner = "androidx.test.runner.AndroidJUnitRunner"
+        testInstrumentationRunner = "dagger.hilt.android.testing.HiltTestRunner"
+        testInstrumentationRunner = "dagger.hilt.android.testing.HiltTestRunner"
+
     }
 
     buildFeatures {
@@ -32,6 +34,7 @@ android {
         sourceCompatibility = JavaVersion.VERSION_17
         targetCompatibility = JavaVersion.VERSION_17
     }
+
     kotlinOptions {
         jvmTarget = "17"
     }
@@ -67,6 +70,13 @@ dependencies {
     kapt(libs.hiltCompiler)
     implementation(libs.hiltNavigationCompose)
 
+    // DataStore
+    implementation("androidx.datastore:datastore-preferences:1.1.1")
+    implementation("androidx.datastore:datastore-core:1.1.1")
+
+    // Osmdroid
+    implementation("org.osmdroid:osmdroid-android:6.1.18")
+
     // Tests
     testImplementation(libs.junit)
     androidTestImplementation(libs.junitExt)
@@ -74,13 +84,21 @@ dependencies {
     androidTestImplementation(platform(libs.composeBom))
     androidTestImplementation(libs.composeUiTestJunit4)
 
+    // Compose
+    androidTestImplementation(platform(libs.composeBom))
+    androidTestImplementation(libs.composeUiTestJunit4)
+    debugImplementation(libs.composeUiTooling)
+
+    // Hilt
+    androidTestImplementation("com.google.dagger:hilt-android-testing:2.51.1")
+    kaptAndroidTest("com.google.dagger:hilt-android-compiler:2.51.1")
+
+    // JUnit
+    testImplementation(libs.junit)
+    androidTestImplementation(libs.junitExt)
+
     debugImplementation(libs.composeUiTooling)
     debugImplementation(libs.composeUiTestManifest)
-
-    implementation("androidx.datastore:datastore-preferences:1.1.1")
-    implementation("androidx.datastore:datastore-core:1.1.1")
-
-    implementation("org.osmdroid:osmdroid-android:6.1.18")
 }
 
 kapt {

@@ -1,6 +1,6 @@
 package com.quickaid.app.viewmodel
 
-import AuthStateDto
+import AuthState
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.quickaid.app.data.datastore.SessionDataStore
@@ -21,15 +21,15 @@ class AuthViewModel @Inject constructor(
     private val jwtUtils: JwtUtils
 ) : ViewModel() {
 
-    private val _authStateDto = MutableStateFlow<AuthStateDto>(AuthStateDto.Idle)
-    val authStateDto: StateFlow<AuthStateDto> = _authStateDto
+    private val _authState = MutableStateFlow<AuthState>(AuthState.Idle)
+    val authState: StateFlow<AuthState> = _authState
 
     fun login(username: String, password: String) {
         viewModelScope.launch {
-            _authStateDto.value = AuthStateDto.Loading
+            _authState.value = AuthState.Loading
             try {
                 val response = repository.login(LoginDto(username, password))
-                _authStateDto.value = AuthStateDto.Success(response)
+                _authState.value = AuthState.Success(response)
 
                 val token = response.token ?: ""
                 val role = jwtUtils.getRole(token)
@@ -39,19 +39,19 @@ class AuthViewModel @Inject constructor(
                 session.saveSession(token, role, username, userId)
 
             } catch (e: Exception) {
-                _authStateDto.value = AuthStateDto.Error(e.message ?: "Nieznany błąd.")
+                _authState.value = AuthState.Error(e.message ?: "Nieznany błąd.")
             }
         }
     }
 
     fun register(username: String, email: String, password: String, confirmPassword: String) {
         viewModelScope.launch {
-            _authStateDto.value = AuthStateDto.Loading
+            _authState.value = AuthState.Loading
             try {
                 val response = repository.register(RegisterDto(username, email, password, confirmPassword))
-                _authStateDto.value = AuthStateDto.Success(response)
+                _authState.value = AuthState.Success(response)
             } catch (e: Exception) {
-                _authStateDto.value = AuthStateDto.Error(e.message ?: "Nieznany błąd.")
+                _authState.value = AuthState.Error(e.message ?: "Nieznany błąd.")
             }
         }
     }

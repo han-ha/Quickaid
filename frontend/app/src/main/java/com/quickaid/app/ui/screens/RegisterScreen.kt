@@ -17,7 +17,7 @@ fun RegisterScreen(
     viewModel: AuthViewModel = hiltViewModel(),
     onSuccess: () -> Unit
 ) {
-    val authState by viewModel.authStateDto.collectAsState()
+    val authState by viewModel.authState.collectAsState()
 
     var username by remember { mutableStateOf("") }
     var email by remember { mutableStateOf("") }
@@ -30,15 +30,15 @@ fun RegisterScreen(
 
     LaunchedEffect(authState) {
         when (authState) {
-            is AuthStateDto.Success -> {
+            is AuthState.Success -> {
                 if (!handledSuccess) {
                     handledSuccess = true
                     dialogMessage = "Konto zostało utworzone pomyślnie!"
                     showDialog = true
                 }
             }
-            is AuthStateDto.Error -> {
-                dialogMessage = (authState as AuthStateDto.Error).message
+            is AuthState.Error -> {
+                dialogMessage = (authState as AuthState.Error).message
                 showDialog = true
             }
             else -> {}
@@ -114,7 +114,7 @@ fun RegisterScreen(
         Spacer(Modifier.height(AppSizes.medium))
 
         when (authState) {
-            is AuthStateDto.Loading -> {
+            is AuthState.Loading -> {
                 Box(
                     modifier = Modifier
                         .fillMaxWidth()
@@ -131,13 +131,13 @@ fun RegisterScreen(
     if (showDialog) {
         AlertDialog(
             onDismissRequest = { showDialog = false },
-            title = { Text(if (authState is AuthStateDto.Success) "Sukces" else "Błąd") },
+            title = { Text(if (authState is AuthState.Success) "Sukces" else "Błąd") },
             text = { Text(dialogMessage) },
             confirmButton = {
                 SmallButton(
                     onClick = {
                         showDialog = false
-                        if (authState is AuthStateDto.Success) {
+                        if (authState is AuthState.Success) {
                             onSuccess()
                         }
                     },

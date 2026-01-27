@@ -16,14 +16,14 @@ fun LoginScreen(
     viewModel: AuthViewModel = hiltViewModel(),
     onSuccess: () -> Unit
 ) {
-    val authState by viewModel.authStateDto.collectAsState()
+    val authState by viewModel.authState.collectAsState()
 
     var username by remember { mutableStateOf("") }
     var password by remember { mutableStateOf("") }
     var handledSuccess by remember { mutableStateOf(false) }
 
     LaunchedEffect(authState) {
-        if (authState is AuthStateDto.Success && !handledSuccess) {
+        if (authState is AuthState.Success && !handledSuccess) {
             handledSuccess = true
             onSuccess()
         }
@@ -75,7 +75,7 @@ fun LoginScreen(
         Spacer(Modifier.height(AppSizes.medium))
 
         when (authState) {
-            is AuthStateDto.Loading -> {
+            is AuthState.Loading -> {
                 Box(
                     modifier = Modifier
                         .fillMaxWidth()
@@ -85,8 +85,8 @@ fun LoginScreen(
                     CircularProgressIndicator()
                 }
             }
-            is AuthStateDto.Error -> {
-                val message = (authState as? AuthStateDto.Error)?.message ?: "Nieznany błąd"
+            is AuthState.Error -> {
+                val message = (authState as? AuthState.Error)?.message ?: "Nieznany błąd"
                 Text(
                     text = "Błąd: $message",
                     color = MaterialTheme.colorScheme.error,

@@ -35,7 +35,6 @@ fun RegisterScreen(
                     handledSuccess = true
                     dialogMessage = "Konto zostało utworzone pomyślnie!"
                     showDialog = true
-                    onSuccess()
                 }
             }
             is AuthStateDto.Error -> {
@@ -107,7 +106,7 @@ fun RegisterScreen(
         Spacer(Modifier.height(AppSizes.medium))
 
         LargeButton(
-            onClick = { viewModel.register(username, email, password) },
+            onClick = { viewModel.register(username, email, password, confirmPassword) },
             modifier = Modifier.fillMaxWidth(),
             content = "Utwórz konto"
         )
@@ -136,9 +135,13 @@ fun RegisterScreen(
             text = { Text(dialogMessage) },
             confirmButton = {
                 SmallButton(
-                    onClick = { showDialog = false },
-                    content = "OK",
-                    modifier = Modifier
+                    onClick = {
+                        showDialog = false
+                        if (authState is AuthStateDto.Success) {
+                            onSuccess()
+                        }
+                    },
+                    content = "OK"
                 )
             }
         )

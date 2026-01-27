@@ -7,12 +7,14 @@ using Quickaid.Models.Entities;
 
 namespace Quickaid.Services
 {
+    // Serwis obsługujący pytania i powiązania pytań z quizami
     public class QuestionService(AppDbContext context, IQuestionMapper mapper, IAnswerMapper answerMapper) : IQuestionService
     {
         private readonly AppDbContext _context = context;
         private readonly IQuestionMapper _mapper = mapper;
         private readonly IAnswerMapper _answerMapper = answerMapper;
 
+        // Zwraca wszystkie pytania z odpowiedziami
         public async Task<IEnumerable<QuestionDto>> GetAllAsync()
         {
             var questions = await _context.Questions.ToListAsync();
@@ -35,6 +37,7 @@ namespace Quickaid.Services
             return result;
         }
 
+        // Zwraca pytanie po Id wraz z odpowiedziami
         public async Task<QuestionDto?> GetByIdAsync(int id)
         {
             var question = await _context.Questions.FindAsync(id);
@@ -52,6 +55,7 @@ namespace Quickaid.Services
             };
         }
 
+        // Dodaje nowe pytanie
         public async Task<QuestionDto> AddAsync(QuestionDto dto)
         {
             var entity = _mapper.ToEntity(dto);
@@ -61,21 +65,25 @@ namespace Quickaid.Services
             return _mapper.ToDto(entity);
         }
 
+        // Aktualizuje pytanie i jego odpowiedzi
         public async Task<QuestionDto?> UpdateAsync(int id, QuestionDto dto)
         {
             var question = await _context.Questions.FindAsync(id);
             if (question == null) return null;
 
+            // Aktualizacja tekstu pytania i liczby odpowiedzi
             question.QuestionText = dto.QuestionText;
             question.NumberOfAnswers = dto.Answers?.Count ?? 0;
 
+            // Usuń stare odpowiedzi
             var currentAnswers = await _context.Answers
                 .Where(a => a.QuestionId == id)
                 .ToListAsync();
             if (currentAnswers.Count != 0)
                 _context.Answers.RemoveRange(currentAnswers);
 
-            var newAnswers = (dto.Answers ?? new List<AnswerDto>()).Select(a => new Answer
+            // Dodaj nowe odpowiedzi
+            var newAnswers = (dto.Answers ?? []).Select(a => new Answer
             {
                 QuestionId = id,
                 AnswerText = a.AnswerText,
@@ -88,6 +96,7 @@ namespace Quickaid.Services
             return _mapper.ToDto(question);
         }
 
+        // Usuwa pytanie i jego powiązania z quizami
         public async Task<bool> DeleteAsync(int questionId, int quizId)
         {
             var question = await _context.Questions.FindAsync(questionId);
@@ -124,11 +133,12 @@ namespace Quickaid.Services
                 _context.Questions.Remove(question);
             }
 
-            // Zapisz wszystkie zmiany w jednym kroku
+            // Zapis wszystkich zmian
             await _context.SaveChangesAsync();
             return true;
         }
 
+        // Zwraca pytania dla konkretnego quizu
         public async Task<List<QuestionDto>> GetByQuizIdAsync(int quizId)
         {
             var quizQuestions = await _context.QuizQuestions
@@ -147,6 +157,7 @@ namespace Quickaid.Services
             return result;
         }
 
+        // Dodaje pytanie do quizu wraz z odpowiedziami
         public async Task<QuestionDto> AddToQuizAsync(int quizId, QuestionDto dto)
         {
             var question = new Question
@@ -156,6 +167,7 @@ namespace Quickaid.Services
                 NumberOfAnswers = dto.Answers?.Count ?? 0
             };
 
+            // Dodanie pytania do bazy
             _context.Questions.Add(question);
             await _context.SaveChangesAsync();
 
@@ -179,7 +191,7 @@ namespace Quickaid.Services
                 _context.Answers.AddRange(answers);
             }
 
-            // Zmiana liczby pytań w quizie i max score
+            // Aktualizacja liczby pytań i max score w quizie
             var quiz = await _context.Quizzes.FindAsync(quizId);
             if (quiz != null)
             {
@@ -191,9 +203,9 @@ namespace Quickaid.Services
 
             await _context.SaveChangesAsync();
 
+            // Pobranie pytania wraz z nowymi odpowiedziami
             var questionWithAnswers = await GetByIdAsync(question.Id);
             return questionWithAnswers!;
         }
-
     }
 }

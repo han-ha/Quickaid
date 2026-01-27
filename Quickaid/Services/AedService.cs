@@ -8,6 +8,7 @@ using Quickaid.Enums;
 
 namespace Quickaid.Services
 {
+    // Serwis obs³uguj¹cy AED
     public class AedService(
         AppDbContext db,
         IInternalAedMapper internalMapper,
@@ -19,18 +20,21 @@ namespace Quickaid.Services
         private readonly IAedMergeMapper _mergeMapper = mergeMapper;
         private readonly IExternalAedMapper _externalMapper = externalMapper;
 
+        // Zwraca wszystkie AED z bazy danych
         public async Task<IEnumerable<InternalAedDto>> GetInternalAedsAsync()
         {
             var entities = await _db.AedPoints.AsNoTracking().ToListAsync();
             return entities.Select(e => _internalMapper.ToDto(e));
         }
 
+        // Zwraca AED po Id
         public async Task<InternalAedDto?> GetByIdAsync(int id)
         {
             var entity = await _db.AedPoints.AsNoTracking().FirstOrDefaultAsync(a => a.Id == id);
             return entity == null ? null : _internalMapper.ToDto(entity);
         }
 
+        // Dodaje nowe AED do bazy
         public async Task<InternalAedDto> AddAsync(InternalAedDto dto)
         {
             var entity = _internalMapper.ToEntity(dto);
@@ -42,6 +46,7 @@ namespace Quickaid.Services
             return _internalMapper.ToDto(entity);
         }
 
+        // Aktualizuje AED o podanym Id
         public async Task<InternalAedDto?> UpdateAsync(int id, InternalAedDto dto)
         {
             var entity = await _db.AedPoints.FirstOrDefaultAsync(a => a.Id == id);
@@ -57,6 +62,7 @@ namespace Quickaid.Services
             return _internalMapper.ToDto(entity);
         }
 
+        // Usuwa AED po Id
         public async Task<bool> DeleteAsync(int id)
         {
             var entity = await _db.AedPoints.FirstOrDefaultAsync(a => a.Id == id);
@@ -67,6 +73,7 @@ namespace Quickaid.Services
             return true;
         }
 
+        // Zwraca po³¹czon¹ listê AED z bazy i zewnêtrznego API
         public async Task<IEnumerable<AedDto>> GetMergedAedsAsync()
         {
             // Pobierz AED z API

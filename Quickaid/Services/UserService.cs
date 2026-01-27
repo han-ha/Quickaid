@@ -6,10 +6,12 @@ using Quickaid.Services.Interfaces;
 
 namespace Quickaid.Services
 {
+    // Serwis obs³uguj¹cy u¿ytkowników i ich role
     public class UserService(AppDbContext db) : IUserService
     {
         private readonly AppDbContext _db = db;
 
+        // Zwraca wszystkich u¿ytkowników
         public async Task<IEnumerable<UserDto>> GetAllAsync()
         {
             var users = await _db.Users.ToListAsync();
@@ -23,6 +25,7 @@ namespace Quickaid.Services
             });
         }
 
+        // Zwraca u¿ytkownika po Id
         public async Task<UserDto?> GetByIdAsync(int id)
         {
             var user = await _db.Users.FirstOrDefaultAsync(u => u.Id == id);
@@ -37,11 +40,13 @@ namespace Quickaid.Services
             };
         }
 
+        // Aktualizuje dane u¿ytkownika
         public async Task<UserDto?> UpdateAsync(int id, UserDto dto)
         {
             var user = await _db.Users.FirstOrDefaultAsync(u => u.Id == id);
             if (user == null) return null;
 
+            // Aktualizacja pól tylko jeœli podano wartoœci
             user.Username = string.IsNullOrWhiteSpace(dto.Username) ? user.Username : dto.Username;
             user.Email = string.IsNullOrWhiteSpace(dto.Email) ? user.Email : dto.Email;
 
@@ -61,6 +66,7 @@ namespace Quickaid.Services
             };
         }
 
+        // Usuwa u¿ytkownika z bazy
         public async Task<bool> DeleteAsync(int id)
         {
             var user = await _db.Users.FirstOrDefaultAsync(u => u.Id == id);
@@ -71,6 +77,7 @@ namespace Quickaid.Services
             return true;
         }
 
+        // Zmienia rolê u¿ytkownika
         public async Task<bool> ChangeUserRoleAsync(int userId, string newRole)
         {
             var user = await _db.Users.FindAsync(userId);

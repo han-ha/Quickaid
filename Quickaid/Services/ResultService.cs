@@ -6,10 +6,12 @@ using Quickaid.Services.Interfaces;
 
 namespace Quickaid.Services
 {
+    // Serwis obs³uguj¹cy wyniki quizów u¿ytkowników
     public class ResultService(AppDbContext db) : IResultService
     {
         private readonly AppDbContext _db = db;
 
+        // Zwraca wszystkie wyniki wszystkich u¿ytkowników
         public async Task<IEnumerable<ResultDto>> GetAllAsync()
         {
             var results = await _db.UserQuizResults.ToListAsync();
@@ -23,6 +25,7 @@ namespace Quickaid.Services
             });
         }
 
+        // Zwraca wyniki konkretnego u¿ytkownika
         public async Task<IEnumerable<ResultDto>> GetByUserAsync(int userId)
         {
             var results = await _db.UserQuizResults
@@ -39,6 +42,7 @@ namespace Quickaid.Services
             });
         }
 
+        // Dodaje nowy wynik do bazy
         public async Task<ResultDto> AddAsync(ResultDto dto)
         {
             var entity = new Result
@@ -56,6 +60,7 @@ namespace Quickaid.Services
             return dto;
         }
 
+        // Zwraca wynik po Id
         public async Task<ResultDto?> GetByIdAsync(int id)
         {
             var entity = await _db.UserQuizResults.FindAsync(id);
@@ -71,6 +76,7 @@ namespace Quickaid.Services
             };
         }
 
+        // Aktualizuje wynik u¿ytkownika
         public async Task<ResultDto?> UpdateAsync(int id, ResultDto dto)
         {
             var entity = await _db.UserQuizResults.FindAsync(id);
@@ -91,6 +97,7 @@ namespace Quickaid.Services
             };
         }
 
+        // Usuwa wynik po Id
         public async Task<bool> DeleteAsync(int id)
         {
             var entity = await _db.UserQuizResults.FindAsync(id);
@@ -101,8 +108,10 @@ namespace Quickaid.Services
             return true;
         }
 
+        // Zwraca najlepszy wynik u¿ytkownika dla danego quizu
         public async Task<ResultDto?> GetBestResultForUserAsync(int userId, int quizId)
         {
+            // Pobranie najlepszego wyniku wed³ug punktów, przy równej liczbie punktów wybieramy najwczeœniejszy
             var best = await _db.UserQuizResults
                 .Where(r => r.UserId == userId && r.QuizId == quizId)
                 .OrderBy(r => r.CompletedAt)

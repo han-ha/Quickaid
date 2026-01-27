@@ -9,6 +9,7 @@ using Quickaid.Mapping;
 using Quickaid.Mapping.Interfaces;
 using System.Text;
 using Quickaid.Utils;
+using Microsoft.OpenApi.Models;
 
 namespace Quickaid
 {
@@ -33,15 +34,44 @@ namespace Quickaid
             builder.Services.AddEndpointsApiExplorer();
             builder.Services.AddSwaggerGen(c =>
             {
-                c.SwaggerDoc("v1", new Microsoft.OpenApi.Models.OpenApiInfo
+                // podstawowe info o API
+                c.SwaggerDoc("v1", new OpenApiInfo
                 {
                     Title = "Quickaid API",
                     Version = "v1"
                 });
 
-                var xmlFile = $"{System.Reflection.Assembly.GetExecutingAssembly().GetName().Name}.xml";
-                var xmlPath = System.IO.Path.Combine(System.AppContext.BaseDirectory, xmlFile);
-                c.IncludeXmlComments(xmlPath);
+                // JWT w Swaggerze
+                var securityScheme = new OpenApiSecurityScheme
+                {
+                    Name = "Authorization",
+                    Description = "Wpisz: Bearer {token}",
+                    In = ParameterLocation.Header,
+                    Type = SecuritySchemeType.Http,
+                    Scheme = "bearer",
+                    BearerFormat = "JWT",
+                    Reference = new OpenApiReference
+                    {
+                        Id = JwtBearerDefaults.AuthenticationScheme,
+                        Type = ReferenceType.SecurityScheme
+                    }
+                };
+
+                c.AddSecurityDefinition(securityScheme.Reference.Id, securityScheme);
+
+                c.AddSecurityRequirement(new OpenApiSecurityRequirement
+                {
+                    {
+                        securityScheme,
+                        Array.Empty<string>()
+                    }
+                });
+
+                // XML comments (jeœli plik istnieje)
+                var xmlFile = $"{Assembly.GetExecutingAssembly().GetName().Name}.xml";
+                var xmlPath = Path.Combine(AppContext.BaseDirectory, xmlFile);
+                if (File.Exists(xmlPath))
+                    c.IncludeXmlComments(xmlPath);
             });
 
             // CORS (dla testów w Swaggerze)
@@ -77,38 +107,7 @@ namespace Quickaid
                 };
             });
 
-            builder.Services.AddSwaggerGen(c =>
-            {
-                c.SwaggerDoc("v1", new Microsoft.OpenApi.Models.OpenApiInfo { Title = "Quickaid API", Version = "v1" });
-
-                var securityScheme = new Microsoft.OpenApi.Models.OpenApiSecurityScheme
-                {
-                    Name = "Authorization",
-                    Description = "Enter JWT Bearer token **_only_**",
-                    In = Microsoft.OpenApi.Models.ParameterLocation.Header,
-                    Type = Microsoft.OpenApi.Models.SecuritySchemeType.Http,
-                    Scheme = "bearer",
-                    BearerFormat = "JWT",
-                    Reference = new Microsoft.OpenApi.Models.OpenApiReference
-                    {
-                        Id = JwtBearerDefaults.AuthenticationScheme,
-                        Type = Microsoft.OpenApi.Models.ReferenceType.SecurityScheme
-                    }
-                };
-
-                c.AddSecurityDefinition(securityScheme.Reference.Id, securityScheme);
-
-                c.AddSecurityRequirement(new Microsoft.OpenApi.Models.OpenApiSecurityRequirement
-                {
-                    {
-                        securityScheme,
-                        Array.Empty<string>()
-                    }
-                });
-            });
-
-
-            // konfiguracja autoryzacji
+            // autoryzacja
             builder.Services.AddAuthorization();
 
             // rejestracja serwisów aplikacyjnych

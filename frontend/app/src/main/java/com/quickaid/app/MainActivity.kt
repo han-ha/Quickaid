@@ -133,9 +133,7 @@ fun AppNavigation(jwtUtils: JwtUtils) {
 
         composable("addArticle") {
             AddArticleScreen(
-                navController = navController,
-                sessionViewModel = sessionViewModel,
-                jwtUtils = jwtUtils
+                navController = navController
             )
         }
 
@@ -146,9 +144,7 @@ fun AppNavigation(jwtUtils: JwtUtils) {
             val articleId = backStackEntry.arguments?.getInt("articleId") ?: 0
             EditArticleScreen(
                 navController = navController,
-                articleId = articleId,
-                sessionViewModel = sessionViewModel,
-                jwtUtils = jwtUtils
+                articleId = articleId
             )
         }
 

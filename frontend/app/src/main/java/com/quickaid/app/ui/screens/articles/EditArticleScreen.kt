@@ -11,32 +11,29 @@ import androidx.navigation.NavController
 import com.quickaid.app.data.models.ArticleDto
 import com.quickaid.app.ui.components.LargeButton
 import com.quickaid.app.ui.theme.AppSizes
-import com.quickaid.app.util.JwtUtils
 import com.quickaid.app.viewmodel.ArticleViewModel
-import com.quickaid.app.viewmodel.SessionViewModel
 
 @Composable
 fun EditArticleScreen(
     navController: NavController,
     articleId: Int,
-    viewModel: ArticleViewModel = hiltViewModel(),
-    sessionViewModel: SessionViewModel = hiltViewModel(),
-    jwtUtils: JwtUtils
+    viewModel: ArticleViewModel = hiltViewModel()
 ) {
+    // Stan z ViewModelu
     val article by viewModel.selectedArticle.collectAsState()
     val isLoading by viewModel.isLoading.collectAsState()
     val error by viewModel.error.collectAsState()
-    val token by sessionViewModel.token.collectAsState(initial = null)
 
-    val userId = token?.let { jwtUtils.getUserId(it)?.toIntOrNull() } ?: 0
-
+    // Lokalny stan formularza
     var title by remember { mutableStateOf("") }
     var content by remember { mutableStateOf("") }
 
+    // Pobranie artykułu po jego ID przy wejściu na ekran
     LaunchedEffect(articleId) {
         viewModel.fetchArticleById(articleId)
     }
 
+    // Aktualizacja lokalnych pól formularza po załadowaniu artykułu
     LaunchedEffect(article) {
         article?.let {
             title = it.title
@@ -44,6 +41,7 @@ fun EditArticleScreen(
         }
     }
 
+    // Ładowanie przy czekaniu na artykuł
     if (isLoading && article == null) {
         Box(
             modifier = Modifier.fillMaxSize(),
@@ -54,12 +52,14 @@ fun EditArticleScreen(
         return
     }
 
+    // Główny kod ekranu z formularzem edycji
     Column(
         modifier = Modifier
             .fillMaxSize()
             .padding(AppSizes.medium),
         horizontalAlignment = Alignment.CenterHorizontally
     ) {
+        // Nagłówek ekranu
         Text(
             "Edytuj artykuł",
             style = MaterialTheme.typography.headlineMedium,
@@ -67,6 +67,7 @@ fun EditArticleScreen(
         )
         Spacer(Modifier.height(AppSizes.medium))
 
+        // Pole do edycji tytułu artykułu
         OutlinedTextField(
             value = title,
             onValueChange = { title = it },
@@ -77,6 +78,7 @@ fun EditArticleScreen(
 
         Spacer(Modifier.height(AppSizes.small))
 
+        // Pole do edycji treści artykułu
         OutlinedTextField(
             value = content,
             onValueChange = { content = it },
@@ -88,10 +90,12 @@ fun EditArticleScreen(
 
         Spacer(Modifier.height(AppSizes.medium))
 
+        // Wyświetlenie komunikatu błędu, jeśli wystąpił
         if (error != null) {
             Text(text = "Błąd: $error", color = MaterialTheme.colorScheme.error)
         }
 
+        // Przycisk zapisu zmian artykułu (z odświeżaniem ekranu listy)
         LargeButton(
             onClick = {
                 viewModel.updateArticle(

@@ -28,27 +28,33 @@ fun ArticleListScreen(
     viewModel: ArticleViewModel = hiltViewModel(),
     sessionViewModel: SessionViewModel = hiltViewModel()
 ) {
+    // Stany z ViewModelu
     val articles by viewModel.articles.collectAsState()
     val isLoading by viewModel.isLoading.collectAsState()
     val error by viewModel.error.collectAsState()
     val role by sessionViewModel.role.collectAsState()
 
+    // Zmienne do potwierdzenia usunięcia artykułu
     var articleToDeleteId by remember { mutableStateOf<Int?>(null) }
     var articleToDeleteTitle by remember { mutableStateOf<String?>(null) }
 
+    // SavedStateHandle poprzedniego ekranu - do odświeżenia listy po dodaniu/edycji
     val savedStateHandle = navController.currentBackStackEntry?.savedStateHandle
     val articlesUpdated by savedStateHandle
         ?.getStateFlow("articlesUpdated", false)
         ?.collectAsState() ?: remember { mutableStateOf(false) }
 
+    // Stany sukcesów
     val deleteSuccess by viewModel.deleteSuccess.collectAsState()
     val addSuccess by viewModel.addSuccess.collectAsState()
     val updateSuccess by viewModel.updateSuccess.collectAsState()
 
+    // Początkowe pobranie listy artykułów
     LaunchedEffect(Unit) {
         viewModel.fetchArticles()
     }
 
+    // Odświeżenie listy, jeśli poprzedni ekran zgłosił zmiany
     LaunchedEffect(articlesUpdated) {
         if (articlesUpdated) {
             viewModel.fetchArticles()
@@ -56,6 +62,7 @@ fun ArticleListScreen(
         }
     }
 
+    // Obsługa stanu po usunięciu artykułu
     LaunchedEffect(deleteSuccess) {
         if (deleteSuccess) {
             viewModel.fetchArticles()
@@ -63,6 +70,7 @@ fun ArticleListScreen(
         }
     }
 
+    // Obsługa stanu po dodaniu artykułu
     LaunchedEffect(addSuccess) {
         if (addSuccess) {
             viewModel.fetchArticles()
@@ -70,6 +78,7 @@ fun ArticleListScreen(
         }
     }
 
+    // Obsługa stanu po aktualizacji artykułu
     LaunchedEffect(updateSuccess) {
         if (updateSuccess) {
             viewModel.fetchArticles()
@@ -78,12 +87,14 @@ fun ArticleListScreen(
     }
 
     Box(modifier = Modifier.fillMaxSize()) {
+        // Główny kod ekranu
         Column(
             modifier = Modifier
                 .fillMaxSize()
                 .padding(AppSizes.medium),
             horizontalAlignment = Alignment.CenterHorizontally
         ) {
+            // Tytuł ekranu
             Text(
                 text = "Materiały edukacyjne",
                 style = MaterialTheme.typography.headlineMedium,
@@ -92,6 +103,7 @@ fun ArticleListScreen(
 
             Spacer(Modifier.height(AppSizes.large))
 
+            // Warunkowe renderowanie treści: loader, błąd lub lista artykułów
             when {
                 isLoading -> CircularProgressIndicator()
                 error != null -> Text(
@@ -103,6 +115,7 @@ fun ArticleListScreen(
                     modifier = Modifier.weight(1f),
                     verticalArrangement = Arrangement.spacedBy(AppSizes.small)
                 ) {
+                    // Każdy artykuł w kafelku z możliwością kliknięcia
                     items(items = articles, key = { it.id }) { article ->
                         Card(
                             modifier = Modifier
@@ -117,6 +130,7 @@ fun ArticleListScreen(
                                     style = MaterialTheme.typography.headlineSmall
                                 )
 
+                                // Przyciski administratora: edycja i usuwanie
                                 if (role == UserRole.ADMIN) {
                                     Spacer(Modifier.height(AppSizes.small))
                                     AdminActions(
@@ -135,6 +149,7 @@ fun ArticleListScreen(
                 }
             }
 
+            // Przycisk dodawania artykułu dla admina
             if (role == UserRole.ADMIN) {
                 Spacer(Modifier.height(AppSizes.medium))
                 LargeButton(
@@ -145,6 +160,7 @@ fun ArticleListScreen(
                 )
             }
 
+            // Dialog potwierdzający usunięcie artykułu
             if (articleToDeleteId != null) {
                 AlertDialog(
                     onDismissRequest = {
@@ -184,6 +200,7 @@ fun ArticleListScreen(
             }
         }
 
+        // Przycisk powrotu do ekranu głównego
         CustomIconButton(
             onClick = {
                 navController.navigate("home") {

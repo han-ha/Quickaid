@@ -22,10 +22,12 @@ fun ArticleDetailsScreen(
     backStackEntry: NavBackStackEntry,
     viewModel: ArticleDetailsViewModel = hiltViewModel(backStackEntry)
 ) {
+    // Stany z ViewModelu
     val article by viewModel.article.collectAsState()
     val isLoading by viewModel.isLoading.collectAsState()
     val error by viewModel.error.collectAsState()
 
+    // Główny kod ekranu szczegółów artykułu
     Column(
         modifier = Modifier
             .fillMaxSize()
@@ -33,8 +35,11 @@ fun ArticleDetailsScreen(
         horizontalAlignment = Alignment.CenterHorizontally
     ) {
 
+        // Nagłówek z tytułem artykułu
         Box(
-            modifier = Modifier.fillMaxWidth().padding(horizontal = AppSizes.medium),
+            modifier = Modifier
+                .fillMaxWidth()
+                .padding(horizontal = AppSizes.medium),
             contentAlignment = Alignment.Center
         ) {
             Text(
@@ -47,6 +52,7 @@ fun ArticleDetailsScreen(
 
         Spacer(Modifier.height(AppSizes.large))
 
+        // Treść artykułu, loader lub błąd
         when {
             isLoading -> CircularProgressIndicator()
             error != null -> Text(

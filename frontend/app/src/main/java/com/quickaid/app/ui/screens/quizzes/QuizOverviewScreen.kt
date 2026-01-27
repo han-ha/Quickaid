@@ -25,15 +25,18 @@ fun QuizOverviewScreen(
     viewModel: QuizOverviewViewModel = hiltViewModel(),
     sessionViewModel: SessionViewModel = hiltViewModel()
 ) {
+    // Stany z ViewModeli
     val bestResult by viewModel.bestResult.collectAsState()
     val isLoading by viewModel.isLoading.collectAsState()
     val error by viewModel.error.collectAsState()
     val userRole by sessionViewModel.role.collectAsState()
 
+    // Pobranie najlepszego wyniku dla użytkownika
     LaunchedEffect(quizId) {
         viewModel.fetchBestResult(quizId)
     }
 
+    // Formatowanie daty najlepszego wyniku
     val formattedDate = remember(bestResult) {
         bestResult?.completedAt?.let { dateStr ->
             try {
@@ -58,6 +61,7 @@ fun QuizOverviewScreen(
         }
     }
 
+    // Ekran ładowania
     if (isLoading) {
         Box(
             modifier = Modifier.fillMaxSize(),
@@ -68,6 +72,7 @@ fun QuizOverviewScreen(
         return
     }
 
+    // Główny układ ekranu
     Column(
         modifier = Modifier
             .fillMaxSize()
@@ -75,6 +80,7 @@ fun QuizOverviewScreen(
         horizontalAlignment = Alignment.CenterHorizontally,
         verticalArrangement = Arrangement.Top
     ) {
+        // Tytuł
         Text(
             text = quizTitle,
             style = AppTypography.headlineMedium
@@ -82,7 +88,9 @@ fun QuizOverviewScreen(
 
         Spacer(Modifier.height(AppSizes.large))
 
+        // Sekcja wyników
         when {
+            // Wyświetlenie błędu
             error != null -> {
                 Text(
                     text = "Błąd: $error",
@@ -91,6 +99,7 @@ fun QuizOverviewScreen(
                 )
             }
 
+            // Wyświetlenie najlepszego wyniku
             bestResult != null -> {
                 Text(
                     text = "Twój najlepszy wynik",
@@ -103,7 +112,6 @@ fun QuizOverviewScreen(
                     color = GreenPrimary,
                     modifier = Modifier.padding(top = AppSizes.small)
                 )
-
                 formattedDate?.let {
                     Text(
                         text = "Osiągnięto po raz pierwszy: $it",
@@ -113,6 +121,7 @@ fun QuizOverviewScreen(
                 }
             }
 
+            // Brak wyniku
             else -> {
                 Text(
                     text = "Jeszcze nie rozwiązałeś tego quizu.",
@@ -124,6 +133,7 @@ fun QuizOverviewScreen(
         }
         Spacer(Modifier.height(AppSizes.large))
 
+        // Przycisk przejścia do rozwiązywania/podglądu
         LargeButton(
             onClick = {
                     navController.navigate("quizDetails/$quizId")

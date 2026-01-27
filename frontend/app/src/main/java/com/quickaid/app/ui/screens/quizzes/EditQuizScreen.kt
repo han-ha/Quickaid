@@ -28,21 +28,25 @@ fun EditQuizScreen(
     questionViewModel: QuestionViewModel = hiltViewModel(),
     sessionViewModel: SessionViewModel = hiltViewModel()
 ) {
+    // Stany z ViewModelu
     val selectedQuiz by quizViewModel.selectedQuiz.collectAsState()
     val isLoading by quizViewModel.isLoading.collectAsState()
     val error by quizViewModel.error.collectAsState()
     val role by sessionViewModel.role.collectAsState()
 
+    // Lokalne stany pól formularza
     var title by remember { mutableStateOf("") }
     var description by remember { mutableStateOf("") }
     var questionToDelete by remember { mutableStateOf<QuestionDto?>(null) }
 
     val savedStateHandle = navController.currentBackStackEntry?.savedStateHandle
 
+    // Flaga informująca o aktualizacji quizu z poprzedniego ekranu
     val quizUpdated by savedStateHandle
         ?.getStateFlow("quizUpdated", false)
         ?.collectAsState() ?: remember { mutableStateOf(false) }
 
+    // Po powrocie z aktualizacji quizu, pobierz najnowsze dane
     LaunchedEffect(quizUpdated) {
         if (quizUpdated) {
             quizViewModel.fetchQuizById(quizId)
@@ -50,10 +54,12 @@ fun EditQuizScreen(
         }
     }
 
+    // Pobranie danych quizu przy pierwszym uruchomieniu
     LaunchedEffect(quizId) {
         quizViewModel.fetchQuizById(quizId)
     }
 
+    // Ustawienie lokalnych pól formularza po załadowaniu quizu
     LaunchedEffect(selectedQuiz) {
         selectedQuiz?.let {
             title = it.title
@@ -61,8 +67,10 @@ fun EditQuizScreen(
         }
     }
 
+    // Lista pytań wybranego quizu
     val questions by remember(selectedQuiz) { derivedStateOf { selectedQuiz?.questions ?: emptyList() } }
 
+    // Ekran ładowania
     if (isLoading && selectedQuiz == null) {
         Box(
             modifier = Modifier.fillMaxSize(),
@@ -78,9 +86,11 @@ fun EditQuizScreen(
             .fillMaxSize()
             .padding(AppSizes.medium)
     ) {
+        // Nagłówek
         Text("Edytuj quiz", style = MaterialTheme.typography.headlineMedium)
         Spacer(Modifier.height(AppSizes.medium))
 
+        // Pole tytułu
         OutlinedTextField(
             value = title,
             onValueChange = { title = it },
@@ -91,6 +101,7 @@ fun EditQuizScreen(
 
         Spacer(Modifier.height(AppSizes.small))
 
+        // Pole opisu
         OutlinedTextField(
             value = description,
             onValueChange = { description = it },
@@ -102,6 +113,7 @@ fun EditQuizScreen(
 
         Spacer(Modifier.height(AppSizes.medium))
 
+        // Lista pytań
         Text("Pytania:", style = MaterialTheme.typography.headlineSmall)
         Spacer(Modifier.height(AppSizes.small))
 
@@ -118,15 +130,15 @@ fun EditQuizScreen(
                             "${question.answers.size} odpowiedzi",
                             style = MaterialTheme.typography.bodySmall
                         )
-                        if (role == UserRole.ADMIN) {
-                            Spacer(Modifier.height(AppSizes.small))
-                            AdminActions(
-                                onEdit = {
-                                    navController.navigate("editQuestion/${question.id}/$quizId")
-                                },
-                                onDelete = { questionToDelete = question }
-                            )
-                        }
+                        Spacer(Modifier.height(AppSizes.small))
+
+                        // Opcje edycji i usunięcia
+                        AdminActions(
+                            onEdit = {
+                                navController.navigate("editQuestion/${question.id}/$quizId")
+                            },
+                            onDelete = { questionToDelete = question }
+                        )
                     }
                 }
             }
@@ -134,6 +146,7 @@ fun EditQuizScreen(
 
         Spacer(Modifier.height(AppSizes.medium))
 
+        // Przycisk dodania nowego pytania
         LargeButton(
             onClick = { navController.navigate("addQuestion/$quizId") },
             modifier = Modifier.fillMaxWidth(),
@@ -142,11 +155,13 @@ fun EditQuizScreen(
 
         Spacer(Modifier.height(AppSizes.medium))
 
+        // Wyświetlenie błędu
         if (!error.isNullOrBlank()) {
             Text("Błąd: $error", color = MaterialTheme.colorScheme.error)
             Spacer(Modifier.height(AppSizes.medium))
         }
 
+        // Przycisk zapisania quizu z walidacją
         LargeButton(
             onClick = {
                 quizViewModel.updateQuiz(
@@ -170,6 +185,7 @@ fun EditQuizScreen(
 
     }
 
+    // Dialog potwierdzający usunięcie pytania
     if (questionToDelete != null) {
         AlertDialog(
             onDismissRequest = { questionToDelete = null },

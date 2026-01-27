@@ -46,22 +46,27 @@ fun QuizListScreen(
     viewModel: QuizViewModel = hiltViewModel(),
     sessionViewModel: SessionViewModel = hiltViewModel()
 ) {
+    // Stany z ViewModelu
     val quizzes by viewModel.quizzes.collectAsState()
     val isLoading by viewModel.isLoading.collectAsState()
     val error by viewModel.error.collectAsState()
     val role by sessionViewModel.role.collectAsState(initial = null)
 
+    // Lokalny stan
     var quizToDeleteId by remember { mutableStateOf<Int?>(null) }
     var quizToDeleteTitle by remember { mutableStateOf<String?>(null) }
 
     val savedStateHandle = navController.currentBackStackEntry?.savedStateHandle
 
+    // Pobranie quizów przy pierwszym wyświetleniu ekranu
     LaunchedEffect(Unit) { viewModel.fetchQuizzes() }
 
+    // Stany sukcesów operacji
     val addSuccess by viewModel.addSuccess.collectAsState()
     val updateSuccess by viewModel.updateSuccess.collectAsState()
     val deleteSuccess by viewModel.deleteSuccess.collectAsState()
 
+    // Reakcja na dodanie quizu - pobranie listy i reset flagi
     LaunchedEffect(addSuccess) {
         if (addSuccess) {
             viewModel.fetchQuizzes()
@@ -69,6 +74,7 @@ fun QuizListScreen(
         }
     }
 
+    // Reakcja na aktualizację quizu - pobranie listy i reset flagi
     LaunchedEffect(updateSuccess) {
         if (updateSuccess) {
             viewModel.fetchQuizzes()
@@ -76,6 +82,7 @@ fun QuizListScreen(
         }
     }
 
+    // Reakcja na usunięcie quizu: pobranie listy i reset flagi
     LaunchedEffect(deleteSuccess) {
         if (deleteSuccess) {
             viewModel.fetchQuizzes()
@@ -83,6 +90,7 @@ fun QuizListScreen(
         }
     }
 
+    // Odbiór sygnału z poprzedniego ekranu, że quizy zostały zaktualizowane
     LaunchedEffect(savedStateHandle) {
         savedStateHandle?.getStateFlow("quizzesUpdated", false)?.collect { updated ->
             if (updated) {
@@ -99,15 +107,19 @@ fun QuizListScreen(
                 .padding(AppSizes.medium),
             horizontalAlignment = Alignment.CenterHorizontally
         ) {
+            // Nagłówek ekranu
             Text("Quizy", style = MaterialTheme.typography.headlineMedium)
             Spacer(Modifier.height(AppSizes.large))
 
             when {
+                // Ekran ładowania
                 isLoading -> Box(modifier = Modifier.fillMaxSize(), contentAlignment = Alignment.Center) {
                     CircularProgressIndicator()
                 }
+                // Wyświetlenie błędu
                 error != null -> Text(text = "Błąd: $error", color = MaterialTheme.colorScheme.error)
                 else -> {
+                    // Dla admina pokazujemy wszystkie quizy, dla zwykłego użytkownika tylko te z pytaniami
                     val visibleQuizzes = if (role == UserRole.ADMIN) quizzes
                     else quizzes.filter { it.numberOfQuestions > 0 }
 
@@ -115,11 +127,13 @@ fun QuizListScreen(
                         modifier = Modifier.weight(1f),
                         verticalArrangement = Arrangement.spacedBy(AppSizes.small)
                     ) {
+                        // Wyświetlenie listy quizów
                         items(visibleQuizzes, key = { it.id }) { quiz ->
                             Card(
                                 modifier = Modifier
                                     .fillMaxWidth()
                                     .clickable {
+                                        // Przejście do podglądu quizu
                                         val encodedTitle = URLEncoder.encode(quiz.title, "UTF-8")
                                         navController.navigate("quizOverview/${quiz.id}/$encodedTitle/${quiz.numberOfQuestions}")
                                     }
@@ -127,6 +141,7 @@ fun QuizListScreen(
                                 Column(modifier = Modifier.padding(AppSizes.medium)) {
                                     Text(quiz.title, style = MaterialTheme.typography.headlineSmall)
 
+                                    // Opcje admina do edycji/usunięcia quizu
                                     if (role == UserRole.ADMIN) {
                                         Spacer(Modifier.height(AppSizes.small))
                                         AdminActions(
@@ -144,6 +159,7 @@ fun QuizListScreen(
                 }
             }
 
+            // Przycisk dodania nowego quizu
             if (role == UserRole.ADMIN) {
                 Spacer(Modifier.height(AppSizes.medium))
                 LargeButton(
@@ -153,6 +169,7 @@ fun QuizListScreen(
                 )
             }
 
+            // Dialog potwierdzający usunięcie quizu
             if (quizToDeleteId != null) {
                 AlertDialog(
                     onDismissRequest = { quizToDeleteId = null; quizToDeleteTitle = null },
@@ -182,6 +199,7 @@ fun QuizListScreen(
             }
         }
 
+        // Przycisk powrotu do ekranu głównego
         CustomIconButton(
             onClick = {
                 navController.navigate("home") {

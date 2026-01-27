@@ -20,18 +20,22 @@ fun EditQuestionScreen(
     navController: NavController,
     questionViewModel: QuestionViewModel = hiltViewModel()
 ) {
+    // Stany z ViewModelu
     val isLoading by questionViewModel.isLoading.collectAsState()
     val saveSuccess by questionViewModel.saveSuccess.collectAsState()
-    val savedStateHandle = navController.previousBackStackEntry?.savedStateHandle
-
     val question by questionViewModel.question.collectAsState()
 
+    // Uzyskanie dostępu do savedStateHandle poprzedniego ekranu
+    val savedStateHandle = navController.previousBackStackEntry?.savedStateHandle
+
+    // Pobranie danych pytania po ID
     LaunchedEffect(questionId) {
         questionId?.let {
             questionViewModel.fetchQuestionById(it)
         }
     }
 
+    // Reakcja na zapisanie/aktualizację pytania
     LaunchedEffect(saveSuccess) {
         if (saveSuccess) {
             savedStateHandle?.set("quizUpdated", true)
@@ -41,17 +45,20 @@ fun EditQuestionScreen(
     }
 
     Box(modifier = Modifier.fillMaxSize()) {
+        // Formularz pytania, jeśli dane zostały pobrane
         question?.let { q ->
             QuestionForm(
                 viewModel = questionViewModel,
                 questionId = q.id,
                 quizId = quizId,
                 onSave = { updatedQuestion ->
+                    // Aktualizacja pytania w ViewModelu
                     questionViewModel.updateQuestion(q.id, updatedQuestion)
                 }
             )
         }
 
+        // Ładowanie, jeśli trwa pobieranie lub zapis
         if (isLoading) {
             Spacer(modifier = Modifier.height(AppSizes.medium))
             CircularProgressIndicator()

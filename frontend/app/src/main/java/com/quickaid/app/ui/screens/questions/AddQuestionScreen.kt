@@ -12,13 +12,16 @@ fun AddQuestionScreen(
     quizId: Int,
     questionViewModel: QuestionViewModel = hiltViewModel()
 ) {
+    // Uzyskanie dostępu do savedStateHandle poprzedniego ekranu
     val savedStateHandle = navController.previousBackStackEntry?.savedStateHandle
 
+    // Wyświetlenie formularza pytania
     QuestionForm(
         viewModel = questionViewModel,
-        questionId = null,
+        questionId = null, // Dodawanie nowego pytania, czyli id jeszcze nie istnieje
         quizId = quizId,
         onSave = { newQuestion ->
+            // Po zapisaniu pytania: dodanie do quizu, ustawienie flagi i powrót
             questionViewModel.addQuestionToQuiz(quizId, newQuestion) {
                 savedStateHandle?.set("quizUpdated", true)
                 navController.popBackStack()

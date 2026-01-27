@@ -2,18 +2,33 @@ package com.quickaid.app.ui.screens.quizzes
 
 import androidx.compose.foundation.background
 import androidx.compose.foundation.clickable
-import androidx.compose.foundation.layout.*
+import androidx.compose.foundation.layout.Box
+import androidx.compose.foundation.layout.Column
+import androidx.compose.foundation.layout.Row
+import androidx.compose.foundation.layout.Spacer
+import androidx.compose.foundation.layout.fillMaxSize
+import androidx.compose.foundation.layout.fillMaxWidth
+import androidx.compose.foundation.layout.height
+import androidx.compose.foundation.layout.padding
+import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.verticalScroll
-import androidx.compose.material.icons.Icons
-import androidx.compose.material.icons.filled.Home
-import androidx.compose.material3.*
-import androidx.compose.runtime.*
+import androidx.compose.material3.CircularProgressIndicator
+import androidx.compose.material3.MaterialTheme
+import androidx.compose.material3.RadioButton
+import androidx.compose.material3.Text
+import androidx.compose.runtime.Composable
+import androidx.compose.runtime.LaunchedEffect
+import androidx.compose.runtime.collectAsState
+import androidx.compose.runtime.getValue
+import androidx.compose.runtime.mutableStateMapOf
+import androidx.compose.runtime.mutableStateOf
+import androidx.compose.runtime.remember
+import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.hilt.navigation.compose.hiltViewModel
 import androidx.navigation.NavController
-import com.quickaid.app.ui.components.CustomIconButton
 import com.quickaid.app.ui.components.LargeButton
 import com.quickaid.app.ui.theme.AppSizes
 import com.quickaid.app.ui.theme.GreenPrimary
@@ -26,15 +41,18 @@ fun QuizDetailsScreen(
     navController: NavController,
     viewModel: QuizDetailsViewModel = hiltViewModel()
 ) {
+    // Stan z ViewModelu
     val quiz by viewModel.quiz.collectAsState()
     val isLoading by viewModel.isLoading.collectAsState()
     val error by viewModel.error.collectAsState()
     val scrollState = rememberScrollState()
 
+    // Lokalny stan
     val selectedAnswers = remember { mutableStateMapOf<Int, Int>() }
     var result by remember { mutableStateOf<Pair<Int, Int>?>(null) }
     var submitError by remember { mutableStateOf<String?>(null) }
 
+    // Pobranie quizu po wejściu na ekran
     LaunchedEffect(quizId) {
         viewModel.fetchQuiz(quizId)
     }
@@ -44,6 +62,7 @@ fun QuizDetailsScreen(
             .fillMaxSize()
             .padding(AppSizes.medium)
     ) {
+        // Nagłówek
         Box(
             modifier = Modifier.fillMaxWidth(),
             contentAlignment = Alignment.Center
@@ -57,6 +76,7 @@ fun QuizDetailsScreen(
         Spacer(Modifier.height(AppSizes.medium))
 
         when {
+            // Ekran ładowania
             isLoading -> Box(
                 modifier = Modifier.fillMaxSize(),
                 contentAlignment = Alignment.Center
@@ -64,13 +84,15 @@ fun QuizDetailsScreen(
                 CircularProgressIndicator()
             }
 
+            // Wyświetlenie błędu
             error != null -> Text(
                 "Błąd: $error",
                 color = MaterialTheme.colorScheme.error
             )
 
+            // Quiz załadowany
             quiz != null -> {
-                // tryb wynikowy
+                // Tryb wynikowy
                 if (result != null) {
                     val (points, maxPoints) = result!!
 
@@ -148,6 +170,7 @@ fun QuizDetailsScreen(
                         )
                     }
                 } else {
+                    // Tryb rozwiązywania quizu
                     Column(
                         modifier = Modifier
                             .weight(1f)
@@ -185,13 +208,13 @@ fun QuizDetailsScreen(
                         }
                     }
 
-                    // komunikat błędu submitu
+                    // Komunikat błędu submitu
                     submitError?.let {
                         Spacer(Modifier.height(AppSizes.small))
                         Text(it, color = MaterialTheme.colorScheme.error)
                     }
 
-                    // przycisk sprawdzenia poprawności
+                    // Przycisk sprawdzenia poprawności
                     LargeButton(
                         onClick = {
                             try {

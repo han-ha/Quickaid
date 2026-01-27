@@ -29,15 +29,18 @@ fun AddQuizScreen(
     navController: NavController,
     viewModel: QuizViewModel = hiltViewModel()
 ) {
+    // Lokalne stany formularza
     var title by remember { mutableStateOf("") }
     var description by remember { mutableStateOf("") }
     var numberOfQuestions by remember { mutableStateOf("0") }
 
+    // Stany z ViewModelu
     val isLoading by viewModel.isLoading.collectAsState()
     val error by viewModel.error.collectAsState()
 
     var newQuizId by remember { mutableStateOf<Int?>(null) }
 
+    // Po dodaniu quizu - przejście do edycji nowo utworzonego quizu
     LaunchedEffect(newQuizId) {
         newQuizId?.let {
             navController.navigate("editQuiz/$it") {
@@ -50,9 +53,11 @@ fun AddQuizScreen(
     Column(
         modifier = Modifier.fillMaxSize().padding(AppSizes.medium)
     ) {
+        // Nagłówek ekranu
         Text("Dodaj quiz", style = MaterialTheme.typography.headlineMedium)
         Spacer(Modifier.height(AppSizes.medium))
 
+        // Pole tytułu quizu
         OutlinedTextField(
             value = title,
             onValueChange = { title = it },
@@ -63,6 +68,7 @@ fun AddQuizScreen(
 
         Spacer(Modifier.height(AppSizes.small))
 
+        // Pole opisu quizu
         OutlinedTextField(
             value = description,
             onValueChange = { description = it },
@@ -72,8 +78,10 @@ fun AddQuizScreen(
 
         Spacer(Modifier.height(AppSizes.medium))
 
+        // Komunikat błędu
         if (error != null) Text(text = "Błąd: $error", color = MaterialTheme.colorScheme.error)
 
+        // Przycisk dodawania quizu i przejścia do edycji
         LargeButton(
             onClick = {
                 viewModel.addQuiz(

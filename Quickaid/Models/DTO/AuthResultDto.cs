@@ -1,5 +1,6 @@
 ﻿namespace Quickaid.Models.DTO
 {
+    // DTO dla wyniku logowania/rejestracji
     public class AuthResultDto
     {
         public bool Success { get; set; }

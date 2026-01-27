@@ -2,6 +2,7 @@
 
 namespace Quickaid.Models.DTO
 {
+    // DTO dla AED z API
     public class ExternalAedDto
     {
         public long ExternalId { get; set; }

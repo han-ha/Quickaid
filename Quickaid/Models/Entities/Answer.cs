@@ -2,6 +2,7 @@ using System.ComponentModel.DataAnnotations.Schema;
 
 namespace Quickaid.Models.Entities
 {
+    // Encja mapuj¹ca tabelê answers w bazie danych
     [Table("answers")]
     public class Answer
     {

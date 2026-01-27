@@ -3,6 +3,7 @@ using Quickaid.Utils;
 
 namespace Quickaid.Models.DTO
 {
+    // DTO rejestracji
     public class RegisterDto
     {
         public string Username { get; set; } = "";

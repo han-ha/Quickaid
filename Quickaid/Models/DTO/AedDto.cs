@@ -2,6 +2,7 @@
 
 namespace Quickaid.Models.DTO
 {
+    // DTO dla AED gotowego do wysłania do frontendu
     public class AedDto
     {
         public int? Id { get; set; } // Id w bazie (nullable, bo punkty z API mogą go nie mieć)

@@ -2,8 +2,9 @@ using System.ComponentModel.DataAnnotations.Schema;
 
 namespace Quickaid.Models.Entities
 {
+    // Encja mapuj¹ca tabelê passwords w bazie danych
     [Table("passwords")]
-    public class Password // TODO resetowanie has³a w bezpieczny sposób
+    public class Password
     {
         [Column("id")]
         public int Id { get; set; }

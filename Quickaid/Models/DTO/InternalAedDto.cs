@@ -2,6 +2,7 @@ using Quickaid.Enums;
 
 namespace Quickaid.Models.DTO
 {
+    // DTO dla AED z bazy danych
     public class InternalAedDto
     {
         public int Id { get; set; }

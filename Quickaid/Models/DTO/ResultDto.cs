@@ -1,5 +1,6 @@
 namespace Quickaid.Models.DTO
 {
+    // DTO dla wyniku
     public class ResultDto
     {
         public int Id { get; set; }

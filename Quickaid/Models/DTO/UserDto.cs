@@ -1,5 +1,6 @@
 namespace Quickaid.Models.DTO
 {
+    // DTO u¿ytkownika
     public class UserDto
     {
         public int Id { get; set; }

@@ -52,6 +52,7 @@ fun AedMapScreen(
     val aeds by viewModel.aeds.collectAsState()
     val userRole by sessionViewModel.role.collectAsState()
 
+    // Sprawdzenie zezwolenia na lokalizację
     var hasLocationPermission by remember {
         mutableStateOf(
             ActivityCompat.checkSelfPermission(
@@ -67,7 +68,6 @@ fun AedMapScreen(
 
     var showEnableLocationDialog by remember { mutableStateOf(false) }
     var lastOpenInfoWindow: InfoWindow? by remember { mutableStateOf(null) }
-    var isMapReady by remember { mutableStateOf(false) }
     var isCenteredOnUser by remember { mutableStateOf(false) }
 
     fun isLocationEnabled(context: Context): Boolean {
@@ -82,6 +82,7 @@ fun AedMapScreen(
         context.startActivity(intent)
     }
 
+    // Pobranie AED i sprawdzenie zezwolenia na lokalizację
     LaunchedEffect(Unit) {
         viewModel.fetchAeds()
         if (!hasLocationPermission) {
@@ -95,6 +96,7 @@ fun AedMapScreen(
         lastOpenInfoWindow?.close() ?: navController.popBackStack()
     }
 
+    // Tworzymy mapę z domyślnym centrum Warszawa
     val mapView = remember {
         Configuration.getInstance().userAgentValue = context.packageName
         MapView(context).apply {
@@ -108,6 +110,7 @@ fun AedMapScreen(
         }
     }
 
+    // InfoWindow dla markerów AED
     fun createInfoWindow(aed: AedDto): ComposeView {
         return ComposeView(context).apply {
             setContent {
@@ -151,6 +154,7 @@ fun AedMapScreen(
         }
     }
 
+    // Funkcja aktualizacji markerów AED
     fun updateMarkers(map: MapView, aeds: List<AedDto>) {
         map.post {
             map.overlays.removeAll { it is Marker }
@@ -179,15 +183,14 @@ fun AedMapScreen(
         }
     }
 
+    // Aktualizacja markerów po zmianie listy AED
     LaunchedEffect(aeds) {
-        if (hasLocationPermission && isLocationEnabled(context)) {
-            updateMarkers(mapView, aeds)
-            isMapReady = true
-        }
+        updateMarkers(mapView, aeds)
     }
 
     Box(modifier = Modifier.fillMaxSize()) {
 
+        // Dialog o włączenie lokalizacji
         if (showEnableLocationDialog) {
             AlertDialog(
                 onDismissRequest = {},
@@ -211,35 +214,30 @@ fun AedMapScreen(
             )
         }
 
-        if (!isMapReady) {
-            Box(modifier = Modifier.fillMaxSize(), contentAlignment = Alignment.Center) {
-                CircularProgressIndicator()
-            }
-        } else {
-            AndroidView(
-                factory = { mapView },
-                modifier = Modifier.fillMaxSize(),
-                update = { map ->
-                    if (hasLocationPermission && isLocationEnabled(context)) {
-                        val locationProvider = GpsMyLocationProvider(context)
-                        val myLocationOverlay = MyLocationNewOverlay(locationProvider, map)
-                        myLocationOverlay.enableMyLocation()
-                        myLocationOverlay.runOnFirstFix {
-                            val loc = myLocationOverlay.myLocation
-                            if (loc != null && !isCenteredOnUser) {
-                                Handler(Looper.getMainLooper()).post {
-                                    map.controller.animateTo(loc)
-                                    isCenteredOnUser = true
-                                }
+        // Render mapy
+        AndroidView(
+            factory = { mapView },
+            modifier = Modifier.fillMaxSize(),
+            update = { map ->
+                if (hasLocationPermission && isLocationEnabled(context)) {
+                    val locationProvider = GpsMyLocationProvider(context)
+                    val myLocationOverlay = MyLocationNewOverlay(locationProvider, map)
+                    myLocationOverlay.enableMyLocation()
+                    myLocationOverlay.runOnFirstFix {
+                        val loc = myLocationOverlay.myLocation
+                        if (loc != null && !isCenteredOnUser) {
+                            Handler(Looper.getMainLooper()).post {
+                                map.controller.animateTo(loc)
+                                isCenteredOnUser = true
                             }
                         }
-                        if (!map.overlays.contains(myLocationOverlay)) {
-                            map.overlays.add(myLocationOverlay)
-                        }
+                    }
+                    if (!map.overlays.contains(myLocationOverlay)) {
+                        map.overlays.add(myLocationOverlay)
                     }
                 }
-            )
-        }
+            }
+        )
 
         // Przycisk dodawania AED (tylko dla użytkowników nieanonimowych)
         if (userRole != UserRole.ANON) {

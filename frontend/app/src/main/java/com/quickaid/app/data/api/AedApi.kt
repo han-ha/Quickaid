@@ -1,6 +1,7 @@
 package com.quickaid.app.data.api
 
 import com.quickaid.app.data.models.AedDto
+import retrofit2.Response
 import retrofit2.http.Body
 import retrofit2.http.DELETE
 import retrofit2.http.GET
@@ -26,5 +27,5 @@ interface AedApi {
     ): AedDto
 
     @DELETE("aed/{id}")
-    suspend fun deleteAed(@Path("id") id: Int)
+    suspend fun deleteAed(@Path("id") id: Int) : Response<Unit>
 }

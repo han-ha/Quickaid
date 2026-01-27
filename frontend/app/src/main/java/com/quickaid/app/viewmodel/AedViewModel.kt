@@ -34,8 +34,12 @@ class AedViewModel @Inject constructor(
     private val _updateSuccess = MutableStateFlow(false)
     val updateSuccess: StateFlow<Boolean> = _updateSuccess
 
+    private val _deleteSuccess = MutableStateFlow(false)
+    val deleteSuccess: StateFlow<Boolean> = _deleteSuccess
+
     fun resetAddSuccess() { _addSuccess.value = false }
     fun resetUpdateSuccess() { _updateSuccess.value = false }
+    fun resetDeleteSuccess() { _deleteSuccess.value = false }
     fun clearSelected() { _selectedAed.value = null }
 
     fun fetchAeds() {
@@ -55,19 +59,6 @@ class AedViewModel @Inject constructor(
         _selectedAed.value = aed
     }
 
-    fun fetchAedById(id: Int) {
-        if (_isLoading.value) return
-        viewModelScope.launch {
-            _isLoading.value = true
-            _error.value = null
-            try {
-                _selectedAed.value = repository.getAedById(id)
-            } catch (e: Exception) {
-                _error.value = e.message ?: "Nie udało się pobrać AED"
-            } finally { _isLoading.value = false }
-        }
-    }
-
     fun addAed(aed: AedDto) {
         if (_isLoading.value) return
         viewModelScope.launch {
@@ -81,7 +72,6 @@ class AedViewModel @Inject constructor(
                 val saved = repository.addAed(aed)
                 _selectedAed.value = saved
                 _addSuccess.value = true
-                fetchAeds()
             } catch (e: Exception) {
                 _error.value = e.message ?: "Nie udało się dodać AED"
             } finally { _isLoading.value = false }
@@ -104,22 +94,20 @@ class AedViewModel @Inject constructor(
                 )
                 _selectedAed.value = result
                 _updateSuccess.value = true
-                fetchAeds()
             } catch (e: Exception) {
                 _error.value = e.message ?: "Nie udało się zapisać AED"
             } finally { _isLoading.value = false }
         }
     }
 
-    fun deleteAed(id: Int, onSuccess: () -> Unit = {}) {
+    fun deleteAed(id: Int) {
         if (_isLoading.value) return
         viewModelScope.launch {
             _isLoading.value = true
             _error.value = null
             try {
                 repository.deleteAed(id)
-                fetchAeds()
-                onSuccess()
+                _deleteSuccess.value = true
             } catch (e: Exception) {
                 _error.value = e.message ?: "Nie udało się usunąć AED"
             } finally { _isLoading.value = false }

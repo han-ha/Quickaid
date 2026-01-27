@@ -1,5 +1,6 @@
 package com.quickaid.app.data.models
 
+// DTO dla quizu
 data class QuizDto(
     val id: Int,
     val title: String,

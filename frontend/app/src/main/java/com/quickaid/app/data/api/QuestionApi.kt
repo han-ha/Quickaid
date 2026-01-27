@@ -9,30 +9,35 @@ import retrofit2.http.POST
 import retrofit2.http.PUT
 import retrofit2.http.Path
 
+// Interfejs API do operacji na pytaniach w quizach
 interface QuestionApi {
+
+    // Pobiera pytanie po Id
     @GET("questions/{id}")
     suspend fun getQuestionById(@Path("id") id: Int): QuestionDto
 
+    // Dodaje nowe pytanie
     @POST("questions")
     suspend fun addQuestion(@Body question: QuestionDto): QuestionDto
 
+    // Aktualizuje pytanie po Id
     @PUT("questions/{id}")
     suspend fun updateQuestion(
         @Path("id") id: Int,
         @Body question: QuestionDto
     ): QuestionDto
 
+    // Usuwa pytanie z konkretnego quizu
     @DELETE("questions/{questionId}/quiz/{quizId}")
     suspend fun deleteQuestion(
         @Path("questionId") questionId: Int,
         @Path("quizId") quizId: Int
     ): Response<Unit>
 
-
+    // Dodaje pytanie do konkretnego quizu
     @POST("quizzes/{quizId}/questions")
     suspend fun addQuestionToQuiz(
         @Path("quizId") quizId: Int,
         @Body dto: QuestionDto
     ): QuestionDto
-
 }

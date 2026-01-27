@@ -1,5 +1,6 @@
 package com.quickaid.app.data.models
 
+// DTO dla wyniku
 data class ResultDto(
     val id: Int,
     val userId: Int,

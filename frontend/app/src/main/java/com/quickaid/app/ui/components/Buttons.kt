@@ -13,6 +13,7 @@ import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.vector.ImageVector
 import com.quickaid.app.ui.theme.AppSizes
 
+// Komponenty przycisków aplikacji
 @Composable
 fun LargeButton(
     onClick: () -> Unit,

@@ -9,6 +9,7 @@ import com.quickaid.app.data.models.UserDto
 import com.quickaid.app.viewmodel.AdminViewModel
 import com.quickaid.app.ui.theme.AppSizes
 
+// Komponent użytkownika do listy użytkowników
 @Composable
 fun UserItem(
     user: UserDto,

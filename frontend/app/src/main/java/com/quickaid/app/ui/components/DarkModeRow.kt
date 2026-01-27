@@ -10,6 +10,7 @@ import androidx.compose.runtime.Composable
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 
+// Komponent do wyświetlania ustawień trybu ciemnego
 @Composable
 fun DarkModeRow(
     darkModeEnabled: Boolean,

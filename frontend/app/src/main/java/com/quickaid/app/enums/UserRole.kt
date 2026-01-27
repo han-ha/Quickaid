@@ -1,5 +1,6 @@
 package com.quickaid.app.enums
 
+// Enum reprezentujący rolę użytkownika
 enum class UserRole {
     ANON, USER, ADMIN;
 

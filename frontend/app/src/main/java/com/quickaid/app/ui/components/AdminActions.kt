@@ -7,6 +7,7 @@ import androidx.compose.runtime.Composable
 import androidx.compose.ui.Modifier
 import com.quickaid.app.ui.theme.AppSizes
 
+// Komponent przycisków admina do zarządzania treściami aplikacji
 @Composable
 fun AdminActions(
     onEdit: () -> Unit,

@@ -3,18 +3,9 @@ package com.quickaid.app.di
 import com.google.gson.Gson
 import com.google.gson.GsonBuilder
 import com.quickaid.app.Constants
-import com.quickaid.app.data.api.AdminApi
-import com.quickaid.app.data.api.AuthApi
-import com.quickaid.app.data.api.ArticleApi
-import com.quickaid.app.data.api.QuestionApi
-import com.quickaid.app.data.api.QuizApi
-import com.quickaid.app.data.api.ResultApi
-import com.quickaid.app.data.api.UsersApi
+import com.quickaid.app.data.api.*
 import com.quickaid.app.data.datastore.SessionDataStore
-import com.quickaid.app.data.repository.AuthRepository
-import com.quickaid.app.data.repository.ArticleRepository
-import com.quickaid.app.data.repository.QuizRepository
-import com.quickaid.app.data.repository.ResultRepository
+import com.quickaid.app.data.repository.*
 import dagger.Module
 import dagger.Provides
 import dagger.hilt.InstallIn
@@ -34,10 +25,13 @@ import javax.net.ssl.*
 @InstallIn(SingletonComponent::class)
 object NetworkModule {
 
+    // Dostarcza Gson do serializacji/deserializacji JSON
     @Provides
     @Singleton
     fun provideGson(): Gson = GsonBuilder().create()
 
+    // Tworzy klienta OkHttp ignorującego certyfikaty SSL
+    // (Uwaga: należy używać tylko w wersji deweloperskiej aplikacji!)
     private fun getUnsafeOkHttpClient(
         tokenProvider: () -> String?
     ): OkHttpClient {
@@ -71,18 +65,19 @@ object NetworkModule {
             .build()
     }
 
+    // Dostarcza klienta HTTP z timeoutami i tokenem sesyjnym
     @Provides
     @Singleton
     fun provideOkHttpClient(
         sessionDataStore: SessionDataStore
     ): OkHttpClient {
-
         val tokenProvider = {
             runBlocking {
                 sessionDataStore.getToken()
             }
         }
 
+        // W wersji deweloperskiej użyta jest funkcja ignorująca certyfikaty SSL
         return getUnsafeOkHttpClient(tokenProvider)
             .newBuilder()
             .connectTimeout(60, TimeUnit.SECONDS)
@@ -91,6 +86,7 @@ object NetworkModule {
             .build()
     }
 
+    // Dostarcza Retrofit skonfigurowany z Gson i OkHttpClient
     @Provides
     @Singleton
     fun provideRetrofit(
@@ -103,6 +99,7 @@ object NetworkModule {
             .client(client)
             .build()
 
+    // Dostarczenie API i repozytoriów
 
     @Provides
     @Singleton
@@ -160,17 +157,15 @@ object NetworkModule {
     @Provides
     @Singleton
     fun provideQuestionRepository(api: QuestionApi) =
-        com.quickaid.app.data.repository.QuestionRepository(api)
+        QuestionRepository(api)
 
     @Provides
     @Singleton
-    fun provideAedApi(retrofit: Retrofit): com.quickaid.app.data.api.AedApi =
-        retrofit.create(com.quickaid.app.data.api.AedApi::class.java)
+    fun provideAedApi(retrofit: Retrofit): AedApi =
+        retrofit.create(AedApi::class.java)
 
     @Provides
     @Singleton
-    fun provideAedRepository(api: com.quickaid.app.data.api.AedApi): com.quickaid.app.data.repository.AedRepository =
-        com.quickaid.app.data.repository.AedRepository(api)
-
-
+    fun provideAedRepository(api: AedApi): AedRepository =
+        AedRepository(api)
 }

@@ -14,9 +14,10 @@ import com.quickaid.app.data.models.QuestionDto
 import com.quickaid.app.ui.theme.AppSizes
 import com.quickaid.app.viewmodel.QuestionViewModel
 
+// Komponent formularza dodawania/edycji pytania
 @Composable
 fun QuestionForm(
-        viewModel: QuestionViewModel,
+    viewModel: QuestionViewModel,
     questionId: Int?,
     quizId: Int?,
     onSave: ((QuestionDto) -> Unit)? = null

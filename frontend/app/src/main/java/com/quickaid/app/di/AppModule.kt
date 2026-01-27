@@ -13,6 +13,7 @@ import javax.inject.Singleton
 @InstallIn(SingletonComponent::class)
 object AppModule {
 
+    // Dostarcza singleton SessionDataStore
     @Provides
     @Singleton
     fun provideSessionDataStore(@ApplicationContext context: Context): SessionDataStore {

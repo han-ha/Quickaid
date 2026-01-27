@@ -17,21 +17,27 @@ class ArticleDetailsViewModel @Inject constructor(
     savedStateHandle: SavedStateHandle
 ) : ViewModel() {
 
+    // Przechowuje szczegóły artykułu
     private val _article = MutableStateFlow<ArticleDto?>(null)
     val article: StateFlow<ArticleDto?> = _article
 
+    // Stan ładowania
     private val _isLoading = MutableStateFlow(false)
     val isLoading: StateFlow<Boolean> = _isLoading
 
+    // Przechowuje komunikat błędu
     private val _error = MutableStateFlow<String?>(null)
     val error: StateFlow<String?> = _error
 
+    // Pobiera ID artykułu z SavedStateHandle
     private val articleId: Int? = savedStateHandle.get<Int>("articleId")
 
+    // Przy inicjalizacji, jeśli ID istnieje, pobiera artykuł
     init {
         articleId?.let { fetchArticle(it) }
     }
 
+    // Pobiera szczegóły artykułu
     fun fetchArticle(id: Int) {
         viewModelScope.launch {
             _isLoading.value = true

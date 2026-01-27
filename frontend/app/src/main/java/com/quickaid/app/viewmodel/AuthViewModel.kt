@@ -21,9 +21,11 @@ class AuthViewModel @Inject constructor(
     private val jwtUtils: JwtUtils
 ) : ViewModel() {
 
+    // Stan logowania/rejestracji
     private val _authState = MutableStateFlow<AuthState>(AuthState.Idle)
     val authState: StateFlow<AuthState> = _authState
 
+    // Funkcja logowania
     fun login(username: String, password: String) {
         viewModelScope.launch {
             _authState.value = AuthState.Loading
@@ -44,6 +46,7 @@ class AuthViewModel @Inject constructor(
         }
     }
 
+    // Funkcja rejestracji
     fun register(username: String, email: String, password: String, confirmPassword: String) {
         viewModelScope.launch {
             _authState.value = AuthState.Loading

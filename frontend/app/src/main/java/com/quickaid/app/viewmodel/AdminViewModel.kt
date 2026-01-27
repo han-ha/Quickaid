@@ -16,18 +16,23 @@ class AdminViewModel @Inject constructor(
     private val sessionDataStore: SessionDataStore
 ) : ViewModel() {
 
+    // Przechowuje listę wszystkich użytkowników
     private val _users = MutableStateFlow<List<UserDto>>(emptyList())
     val users: StateFlow<List<UserDto>> = _users.asStateFlow()
 
+    // Stan ładowania
     private val _isLoading = MutableStateFlow(false)
     val isLoading: StateFlow<Boolean> = _isLoading.asStateFlow()
 
+    // Przechowuje ewentualny błąd operacji
     private val _error = MutableStateFlow<String?>(null)
     val error: StateFlow<String?> = _error.asStateFlow()
 
+    // Przechowuje ID aktualnie zalogowanego użytkownika
     private val _currentUserId = MutableStateFlow<Int?>(null)
     val currentUserId: StateFlow<Int?> = _currentUserId.asStateFlow()
 
+    // Inicjalizacja: pobranie ID aktualnego użytkownika z sesji
     init {
         viewModelScope.launch {
             sessionDataStore.userId.map { it?.toIntOrNull() }.collect {
@@ -36,6 +41,7 @@ class AdminViewModel @Inject constructor(
         }
     }
 
+    // Funkcja pobiera listę użytkowników z API i sortuje alfabetycznie
     fun fetchUsers() {
         viewModelScope.launch {
             _isLoading.value = true
@@ -50,6 +56,7 @@ class AdminViewModel @Inject constructor(
         }
     }
 
+    // Funkcja usuwa użytkownika przez API i odświeża listę
     fun deleteUser(user: UserDto) {
         viewModelScope.launch {
             _isLoading.value = true
@@ -66,6 +73,7 @@ class AdminViewModel @Inject constructor(
         }
     }
 
+    // Funkcja aktualizuje dane użytkownika i wywołuje callback po sukcesie
     fun updateUser(request: UserDto, onSuccess: () -> Unit) {
         viewModelScope.launch {
             _isLoading.value = true

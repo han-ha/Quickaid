@@ -15,18 +15,23 @@ class ArticleViewModel @Inject constructor(
     private val repository: ArticleRepository
 ) : ViewModel() {
 
+    // Lista wszystkich artykułów
     private val _articles = MutableStateFlow<List<ArticleDto>>(emptyList())
     val articles: StateFlow<List<ArticleDto>> = _articles
 
+    // Wybrany artykuł
     private val _selectedArticle = MutableStateFlow<ArticleDto?>(null)
     val selectedArticle: StateFlow<ArticleDto?> = _selectedArticle
 
+    // Stan ładowania
     private val _isLoading = MutableStateFlow(false)
     val isLoading: StateFlow<Boolean> = _isLoading
 
+    // Przechowuje komunikat błędu
     private val _error = MutableStateFlow<String?>(null)
     val error: StateFlow<String?> = _error
 
+    // Flagi sukcesu operacji
     private val _addSuccess = MutableStateFlow(false)
     val addSuccess: StateFlow<Boolean> = _addSuccess
 
@@ -36,6 +41,7 @@ class ArticleViewModel @Inject constructor(
     private val _deleteSuccess = MutableStateFlow(false)
     val deleteSuccess: StateFlow<Boolean> = _deleteSuccess
 
+    // Funkcje resetujące flagi sukcesu
     fun resetAddState() {
         _addSuccess.value = false
     }
@@ -48,6 +54,7 @@ class ArticleViewModel @Inject constructor(
         _deleteSuccess.value = false
     }
 
+    // Pobranie wszystkich artykułów
     fun fetchArticles() {
         if (_isLoading.value) return
         viewModelScope.launch {
@@ -63,6 +70,7 @@ class ArticleViewModel @Inject constructor(
         }
     }
 
+    // Pobranie artykułu po ID
     fun fetchArticleById(articleId: Int) {
         if (_isLoading.value) return
         viewModelScope.launch {
@@ -78,6 +86,7 @@ class ArticleViewModel @Inject constructor(
         }
     }
 
+    // Dodanie nowego artykułu
     fun addArticle(article: ArticleDto) {
         if (_isLoading.value) return
         viewModelScope.launch {
@@ -95,6 +104,7 @@ class ArticleViewModel @Inject constructor(
         }
     }
 
+    // Aktualizacja artykułu po ID
     fun updateArticle(articleId: Int, article: ArticleDto) {
         if (_isLoading.value) return
         viewModelScope.launch {
@@ -113,6 +123,7 @@ class ArticleViewModel @Inject constructor(
         }
     }
 
+    // Usunięcie artykułu po ID
     fun deleteArticle(articleId: Int) {
         if (_isLoading.value) return
         viewModelScope.launch {

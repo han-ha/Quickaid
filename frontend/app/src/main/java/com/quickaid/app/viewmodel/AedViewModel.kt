@@ -16,18 +16,23 @@ class AedViewModel @Inject constructor(
     private val repository: AedRepository
 ) : ViewModel() {
 
+    // Lista wszystkich AED
     private val _aeds = MutableStateFlow<List<AedDto>>(emptyList())
     val aeds: StateFlow<List<AedDto>> = _aeds
 
+    // Aktualnie wybrane AED
     private val _selectedAed = MutableStateFlow<AedDto?>(null)
     val selectedAed: StateFlow<AedDto?> = _selectedAed
 
+    // Stan ładowania
     private val _isLoading = MutableStateFlow(false)
     val isLoading: StateFlow<Boolean> = _isLoading
 
+    // Przechowuje komunikat błędu
     private val _error = MutableStateFlow<String?>(null)
     val error: StateFlow<String?> = _error
 
+    // Flagi sukcesu operacji
     private val _addSuccess = MutableStateFlow(false)
     val addSuccess: StateFlow<Boolean> = _addSuccess
 
@@ -37,11 +42,13 @@ class AedViewModel @Inject constructor(
     private val _deleteSuccess = MutableStateFlow(false)
     val deleteSuccess: StateFlow<Boolean> = _deleteSuccess
 
+    // Funkcje resetujące flagi sukcesu i zaznaczenie AED
     fun resetAddSuccess() { _addSuccess.value = false }
     fun resetUpdateSuccess() { _updateSuccess.value = false }
     fun resetDeleteSuccess() { _deleteSuccess.value = false }
     fun clearSelected() { _selectedAed.value = null }
 
+    // Pobiera wszystkie AED
     fun fetchAeds() {
         if (_isLoading.value) return
         viewModelScope.launch {
@@ -55,10 +62,12 @@ class AedViewModel @Inject constructor(
         }
     }
 
+    // Zaznacza wybrane AED
     fun selectAed(aed: AedDto) {
         _selectedAed.value = aed
     }
 
+    // Dodaje nowe AED
     fun addAed(aed: AedDto) {
         if (_isLoading.value) return
         viewModelScope.launch {
@@ -78,6 +87,7 @@ class AedViewModel @Inject constructor(
         }
     }
 
+    // Aktualizuje istniejące AED
     fun updateAed(aed: AedDto) {
         if (_isLoading.value) return
         viewModelScope.launch {
@@ -100,6 +110,7 @@ class AedViewModel @Inject constructor(
         }
     }
 
+    // Usuwa AED po ID
     fun deleteAed(id: Int) {
         if (_isLoading.value) return
         viewModelScope.launch {

@@ -34,9 +34,9 @@ fun AddAedScreen(
 
     LaunchedEffect(addSuccess) {
         if (addSuccess) {
+            viewModel.resetAddSuccess()
             savedStateHandle?.set("aedsUpdated", true)
             navController.popBackStack()
-            viewModel.resetAddSuccess()
         }
     }
 

@@ -56,15 +56,18 @@ class MainActivity : ComponentActivity() {
         super.onCreate(savedInstanceState)
 
         setContent {
+            // Pobranie ViewModelu sesji
             val sessionViewModel: SessionViewModel = hiltViewModel()
             val darkModeEnabled by sessionViewModel.darkModeEnabled.collectAsState()
 
+            // Ustawienie motywu aplikacji
             AppTheme(darkTheme = darkModeEnabled) {
                 Surface(
                     modifier = Modifier.fillMaxSize(),
                     color = MaterialTheme.colorScheme.background
                 ) {
-                    AppNavigation(jwtUtils)
+                    // Nawigacja całej aplikacji
+                    AppNavigation()
                 }
             }
         }
@@ -72,7 +75,7 @@ class MainActivity : ComponentActivity() {
 }
 
 @Composable
-fun AppNavigation(jwtUtils: JwtUtils) {
+fun AppNavigation() {
     val navController = rememberNavController()
     val sessionViewModel: SessionViewModel = hiltViewModel()
 
@@ -80,9 +83,11 @@ fun AppNavigation(jwtUtils: JwtUtils) {
         navController = navController,
         startDestination = "start"
     ) {
+        // Ekrany startowe
         composable("start") { StartScreen(navController, sessionViewModel) }
         composable("welcome") { WelcomeScreen(navController, sessionViewModel) }
 
+        // Ekrany logowania i rejestracji
         composable("login") {
             LoginScreen(
                 onSuccess = {
@@ -100,30 +105,15 @@ fun AppNavigation(jwtUtils: JwtUtils) {
             )
         }
 
+        // Główny ekran aplikacji
         composable("home") { HomeScreen(navController, sessionViewModel) }
 
+        // Ekrany pomocy i kontaktu
         composable("emergency") { EmergencyScreen(navController) }
         composable("contact") { ContactScreen(navController) }
+
+        // Ekrany artykułów
         composable("articles") { ArticleListScreen(navController) }
-        composable("aeds") {
-            AedMapScreen(
-                navController = navController
-            )
-        }
-
-        composable("addAed") {
-            AddAedScreen(navController)
-        }
-
-        composable("editAed") {
-            EditAedScreen(
-                navController = navController
-            )
-        }
-
-
-        composable("settings") { SettingsScreen(navController, sessionViewModel) }
-
         composable(
             route = "articleDetails/{articleId}",
             arguments = listOf(navArgument("articleId") { type = NavType.IntType })
@@ -148,6 +138,15 @@ fun AppNavigation(jwtUtils: JwtUtils) {
             )
         }
 
+        // Ekrany AED
+        composable("aeds") { AedMapScreen(navController) }
+        composable("addAed") { AddAedScreen(navController) }
+        composable("editAed") { EditAedScreen(navController) }
+
+        // Ustawienia
+        composable("settings") { SettingsScreen(navController, sessionViewModel) }
+
+        // Ekrany quizów
         composable("quizzes") { QuizListScreen(navController) }
 
         composable(
@@ -195,6 +194,7 @@ fun AppNavigation(jwtUtils: JwtUtils) {
             )
         }
 
+        // Ekrany pytań
         composable(
             route = "addQuestion/{quizId}",
             arguments = listOf(navArgument("quizId") { type = NavType.IntType })
@@ -222,6 +222,7 @@ fun AppNavigation(jwtUtils: JwtUtils) {
             )
         }
 
+        // Ekrany zarządzania użytkownikami
         composable("userManagement") { UserListScreen(navController) }
         composable("adminList") { UserListScreen(navController, onlyAdmins = true) }
 

@@ -14,6 +14,7 @@ import androidx.navigation.compose.currentBackStackEntryAsState
 import com.quickaid.app.enums.AedType
 import com.quickaid.app.ui.components.LargeButton
 import com.quickaid.app.ui.theme.AppSizes
+import com.quickaid.app.util.AedFormValidator
 import com.quickaid.app.viewmodel.AedViewModel
 
 @Composable
@@ -120,7 +121,11 @@ fun EditAedScreen(
 
         LargeButton(
             modifier = Modifier.fillMaxWidth(),
-            enabled = !isLoading && aed?.type == AedType.Internal && description.isNotBlank() && latitude.isNotBlank() && longitude.isNotBlank(),
+            enabled = !isLoading
+                    && aed?.type == AedType.Internal
+                    && description.isNotBlank()
+                    && AedFormValidator.validateLatitude(latitude)
+                    && AedFormValidator.validateLongitude(longitude),
             content = if (isLoading) "Zapisywanie..." else "Zapisz",
             onClick = {
                 aed?.let { currentAed ->

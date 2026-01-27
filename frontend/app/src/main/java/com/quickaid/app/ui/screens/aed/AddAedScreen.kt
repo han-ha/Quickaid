@@ -13,6 +13,7 @@ import com.quickaid.app.data.models.AedDto
 import com.quickaid.app.enums.AedType
 import com.quickaid.app.ui.components.LargeButton
 import com.quickaid.app.ui.theme.AppSizes
+import com.quickaid.app.util.AedFormValidator
 import com.quickaid.app.viewmodel.AedViewModel
 
 @Composable
@@ -94,7 +95,10 @@ fun AddAedScreen(
 
         LargeButton(
             modifier = Modifier.fillMaxWidth(),
-            enabled = !isLoading && description.isNotBlank() && latitude.isNotBlank() && longitude.isNotBlank(),
+            enabled = !isLoading
+                    && description.isNotBlank()
+                    && AedFormValidator.validateLatitude(latitude)
+                    && AedFormValidator.validateLongitude(longitude),
             content = if (isLoading) "Zapisywanie..." else "Dodaj",
             onClick = {
                 val lat = latitude.toDoubleOrNull()

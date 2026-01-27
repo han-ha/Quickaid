@@ -3,8 +3,12 @@ using Quickaid.Models.Entities;
 
 namespace Quickaid.Data
 {
+    /// <summary>
+    /// Kontekst bazy danych aplikacji Quickaid.
+    /// </summary>
     public class AppDbContext(DbContextOptions<AppDbContext> options) : DbContext(options)
     {
+        // Zbiory encji
         public DbSet<User> Users { get; set; }
         public DbSet<Password> Passwords { get; set; }
         public DbSet<AedPoint> AedPoints { get; set; }
@@ -15,11 +19,16 @@ namespace Quickaid.Data
         public DbSet<Result> UserQuizResults { get; set; }
         public DbSet<Article> Articles { get; set; }
 
+        /// <summary>
+        /// Konfiguracja relacji między encjami.
+        /// </summary>
         protected override void OnModelCreating(ModelBuilder modelBuilder)
         {
+            // Klucz złożony dla QuizQuestion
             modelBuilder.Entity<QuizQuestion>()
                 .HasKey(q => new { q.QuizId, q.QuestionId });
 
+            // Relacje
             modelBuilder.Entity<Password>()
                 .HasOne<User>()
                 .WithMany()
@@ -49,10 +58,6 @@ namespace Quickaid.Data
                 .HasOne<User>()
                 .WithMany()
                 .HasForeignKey(a => a.AddedBy);
-
-            modelBuilder.Entity<QuizQuestion>()
-                .HasKey(q => new { q.QuizId, q.QuestionId });
-
         }
     }
 }

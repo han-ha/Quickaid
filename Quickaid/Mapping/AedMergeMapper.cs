@@ -4,8 +4,10 @@ using Quickaid.Enums;
 
 namespace Quickaid.Mapping
 {
+    // Mapuje AED wewnętrzne i zewnętrzne na DTO wysyłane do frontendu
     public class AedMergeMapper : IAedMergeMapper
     {
+        // Konwertuje InternalAedDto na AedDto
         public AedDto ToDto(InternalAedDto internalDto)
         {
             return new AedDto
@@ -20,6 +22,7 @@ namespace Quickaid.Mapping
             };
         }
 
+        // Konwertuje ExternalAedDto na AedDto
         public AedDto ToDto(ExternalAedDto externalDto)
         {
             return new AedDto

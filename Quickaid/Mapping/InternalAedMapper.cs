@@ -6,6 +6,7 @@ namespace Quickaid.Mapping
 {
     public class InternalAedMapper : IInternalAedMapper
     {
+        // Mapuje encjê AedPoint na InternalAedDto
         public InternalAedDto ToDto(AedPoint entity)
         {
             return new InternalAedDto
@@ -18,6 +19,7 @@ namespace Quickaid.Mapping
             };
         }
 
+        // Mapuje InternalAedDto na encjê AedPoint
         public AedPoint ToEntity(InternalAedDto dto)
         {
             return new AedPoint

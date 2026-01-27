@@ -4,8 +4,10 @@ using Quickaid.Mapping.Interfaces;
 
 namespace Quickaid.Mapping
 {
+    // Mapuje u¿ytkowników miêdzy encj¹ a DTO
     public class UserMapper : IUserMapper
     {
+        // Konwertuje encjê User na DTO
         public UserDto ToDto(User entity)
         {
             return new UserDto
@@ -17,6 +19,7 @@ namespace Quickaid.Mapping
             };
         }
 
+        // Konwertuje DTO na encjê User
         public User ToEntity(UserDto dto)
         {
             return new User
@@ -28,4 +31,3 @@ namespace Quickaid.Mapping
         }
     }
 }
-

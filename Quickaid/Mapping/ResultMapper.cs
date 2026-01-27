@@ -4,8 +4,10 @@ using Quickaid.Mapping.Interfaces;
 
 namespace Quickaid.Mapping
 {
+    // Mapuje wyniki quizów miêdzy encj¹ a DTO
     public class ResultMapper : IResultMapper
     {
+        // Konwertuje encjê Result na DTO
         public ResultDto ToDto(Result entity)
         {
             return new ResultDto
@@ -17,6 +19,7 @@ namespace Quickaid.Mapping
             };
         }
 
+        // Konwertuje DTO na encjê Result
         public Result ToEntity(ResultDto dto)
         {
             return new Result
@@ -28,4 +31,3 @@ namespace Quickaid.Mapping
         }
     }
 }
-

@@ -24,6 +24,7 @@ import com.quickaid.app.viewmodel.AedViewModel
 fun EditAedScreen(
     navController: NavController
 ) {
+    // Współdzielenie ViewModelu z mapą AED
     val currentBackStackEntry by navController.currentBackStackEntryAsState()
     val parentEntry = remember(currentBackStackEntry) {
         navController.getBackStackEntry("aeds")
@@ -31,21 +32,26 @@ fun EditAedScreen(
 
     val viewModel: AedViewModel = hiltViewModel(parentEntry)
 
+    // Stany z ViewModelu
     val aed by viewModel.selectedAed.collectAsState()
     val isLoading by viewModel.isLoading.collectAsState()
     val error by viewModel.error.collectAsState()
     val updateSuccess by viewModel.updateSuccess.collectAsState()
     val deleteSuccess by viewModel.deleteSuccess.collectAsState()
 
+    // Lokalne stany formularza
     var latitude by remember { mutableStateOf("") }
     var longitude by remember { mutableStateOf("") }
     var description by remember { mutableStateOf("") }
     var verified by remember { mutableStateOf(false) }
 
+    // Stan sterujący widocznością dialogu usuwania
     var showDeleteDialog by remember { mutableStateOf(false) }
 
+    // Dostęp do savedStateHandle poprzedniego ekranu (do odświeżenia listy AED)
     val savedStateHandle = navController.previousBackStackEntry?.savedStateHandle
 
+    // Uzupełnienie formularza danymi wybranego AED
     LaunchedEffect(aed) {
         aed?.let {
             latitude = it.latitude.toString()
@@ -55,7 +61,7 @@ fun EditAedScreen(
         }
     }
 
-    // Po aktualizacji AED
+    // Reakcja na poprawną aktualizację AED - cofnięcie ekranu i reset stanów
     LaunchedEffect(updateSuccess) {
         if (updateSuccess) {
             savedStateHandle?.set("aedsUpdated", true)
@@ -65,7 +71,7 @@ fun EditAedScreen(
         }
     }
 
-    // Po usunięciu AED
+    // Reakcja na poprawne usunięcie AED - cofnięcie ekranu i reset stanów
     LaunchedEffect(deleteSuccess) {
         if (deleteSuccess) {
             savedStateHandle?.set("aedsUpdated", true)
@@ -75,6 +81,7 @@ fun EditAedScreen(
         }
     }
 
+    // Widok ładowania, gdy dane AED nie są jeszcze dostępne
     if (isLoading && aed == null) {
         Box(modifier = Modifier.fillMaxSize(), contentAlignment = Alignment.Center) {
             CircularProgressIndicator()
@@ -85,6 +92,7 @@ fun EditAedScreen(
     Box(modifier = Modifier.fillMaxSize()) {
         val currentAed = aed
 
+        // Główna kolumna formularza edycji AED
         Column(
             modifier = Modifier
                 .fillMaxSize()
@@ -94,6 +102,7 @@ fun EditAedScreen(
             Text("Edytuj AED", style = MaterialTheme.typography.headlineMedium)
             Spacer(Modifier.height(AppSizes.large))
 
+            // Pole szerokości geograficznej
             OutlinedTextField(
                 value = latitude,
                 onValueChange = { latitude = it.replace(',', '.') },
@@ -104,6 +113,7 @@ fun EditAedScreen(
             )
             Spacer(Modifier.height(AppSizes.small))
 
+            // Pole długości geograficznej
             OutlinedTextField(
                 value = longitude,
                 onValueChange = { longitude = it.replace(',', '.') },
@@ -114,6 +124,7 @@ fun EditAedScreen(
             )
             Spacer(Modifier.height(AppSizes.small))
 
+            // Pole opisu AED
             OutlinedTextField(
                 value = description,
                 onValueChange = { description = it },
@@ -122,6 +133,7 @@ fun EditAedScreen(
             )
             Spacer(Modifier.height(AppSizes.small))
 
+            // Checkbox do oznaczenia AED jako zweryfikowanego
             Row(
                 verticalAlignment = Alignment.CenterVertically,
                 modifier = Modifier.fillMaxWidth()
@@ -133,11 +145,13 @@ fun EditAedScreen(
 
             Spacer(Modifier.height(AppSizes.large))
 
+            // Wyświetlenie komunikatu błędu, jeśli wystąpił
             if (error != null) {
                 Text(error!!, color = MaterialTheme.colorScheme.error)
                 Spacer(Modifier.height(AppSizes.small))
             }
 
+            // Przycisk zapisu zmian z walidacją i obsługą stanu ładowania
             LargeButton(
                 modifier = Modifier.fillMaxWidth(),
                 enabled = !isLoading
@@ -163,7 +177,7 @@ fun EditAedScreen(
             )
         }
 
-        // Przycisk usuwania AED
+        // Ikona kosza do usuwania AED
         currentAed?.let {
             CustomIconButton(
                 onClick = { showDeleteDialog = true },
@@ -176,7 +190,7 @@ fun EditAedScreen(
             )
         }
 
-        // Dialog potwierdzający usunięcie
+        // Dialog potwierdzający usunięcie punktu AED
         if (showDeleteDialog && currentAed != null) {
             AlertDialog(
                 onDismissRequest = { showDeleteDialog = false },

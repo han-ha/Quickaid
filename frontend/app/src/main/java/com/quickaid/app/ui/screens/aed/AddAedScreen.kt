@@ -21,17 +21,21 @@ fun AddAedScreen(
     navController: NavController,
     viewModel: AedViewModel = hiltViewModel()
 ) {
+    // Pobranie stanów z ViewModelu
     val isLoading by viewModel.isLoading.collectAsState()
     val error by viewModel.error.collectAsState()
     val addSuccess by viewModel.addSuccess.collectAsState()
 
+    // Lokalne stany formularza
     var latitude by remember { mutableStateOf("") }
     var longitude by remember { mutableStateOf("") }
     var description by remember { mutableStateOf("") }
     var verified by remember { mutableStateOf(false) }
 
+    // Dostęp do savedStateHandle poprzedniego ekranu (do odświeżenia listy AED)
     val savedStateHandle = navController.previousBackStackEntry?.savedStateHandle
 
+    // Reakcja na poprawne dodanie AED - cofnięcie ekranu i ustawienie flagi odświeżenia
     LaunchedEffect(addSuccess) {
         if (addSuccess) {
             viewModel.resetAddSuccess()
@@ -40,15 +44,19 @@ fun AddAedScreen(
         }
     }
 
+    // Główny kod ekranu z formularzem
     Column(
         modifier = Modifier
             .fillMaxSize()
             .padding(AppSizes.medium),
         horizontalAlignment = Alignment.CenterHorizontally
     ) {
+
+        // Nagłówek
         Text("Dodaj AED", style = MaterialTheme.typography.headlineMedium)
         Spacer(Modifier.height(AppSizes.large))
 
+        // Pole do wpisania szerokości geograficznej
         OutlinedTextField(
             value = latitude,
             onValueChange = { latitude = it.replace(',', '.') },
@@ -59,6 +67,7 @@ fun AddAedScreen(
         )
         Spacer(Modifier.height(AppSizes.small))
 
+        // Pole do wpisania długości geograficznej
         OutlinedTextField(
             value = longitude,
             onValueChange = { longitude = it.replace(',', '.') },
@@ -69,6 +78,7 @@ fun AddAedScreen(
         )
         Spacer(Modifier.height(AppSizes.small))
 
+        // Pole do wpisania opisu AED
         OutlinedTextField(
             value = description,
             onValueChange = { description = it },
@@ -77,6 +87,7 @@ fun AddAedScreen(
         )
         Spacer(Modifier.height(AppSizes.small))
 
+        // Checkbox do oznaczenia AED jako zweryfikowanego
         Row(
             verticalAlignment = Alignment.CenterVertically,
             modifier = Modifier.fillMaxWidth()
@@ -88,11 +99,13 @@ fun AddAedScreen(
 
         Spacer(Modifier.height(AppSizes.large))
 
+        // Wyświetlenie komunikatu błędu, jeśli wystąpił
         if (error != null) {
             Text(error!!, color = MaterialTheme.colorScheme.error)
             Spacer(Modifier.height(AppSizes.small))
         }
 
+        // Przycisk zapisu AED z walidacją danych i obsługą stanu ładowania
         LargeButton(
             modifier = Modifier.fillMaxWidth(),
             enabled = !isLoading

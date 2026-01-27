@@ -48,6 +48,7 @@ fun AedMapScreen(
     viewModel: AedViewModel = hiltViewModel(),
     sessionViewModel: SessionViewModel = hiltViewModel()
 ) {
+    // Kontekst aplikacji oraz stany z ViewModeli
     val context = LocalContext.current
     val aeds by viewModel.aeds.collectAsState()
     val userRole by sessionViewModel.role.collectAsState()
@@ -62,20 +63,24 @@ fun AedMapScreen(
         )
     }
 
+    // Launcher do pytania użytkownika o pozwolenie na lokalizację
     val permissionLauncher = rememberLauncherForActivityResult(
         contract = ActivityResultContracts.RequestPermission()
     ) { granted -> hasLocationPermission = granted }
 
+    // Stany pomocnicze do obsługi dialogu, okienka ze szczegółami AED i centrowania mapy
     var showEnableLocationDialog by remember { mutableStateOf(false) }
     var lastOpenInfoWindow: InfoWindow? by remember { mutableStateOf(null) }
     var isCenteredOnUser by remember { mutableStateOf(false) }
 
+    // Funkcja sprawdzająca, czy lokalizacja jest włączona w ustawieniach systemowych
     fun isLocationEnabled(context: Context): Boolean {
         val locationManager = context.getSystemService(Context.LOCATION_SERVICE) as LocationManager
         return locationManager.isProviderEnabled(LocationManager.GPS_PROVIDER) ||
                 locationManager.isProviderEnabled(LocationManager.NETWORK_PROVIDER)
     }
 
+    // Funkcja otwierająca ekran ustawień lokalizacji w systemie Android
     fun openLocationSettings() {
         val intent = Intent(Settings.ACTION_LOCATION_SOURCE_SETTINGS)
         intent.flags = Intent.FLAG_ACTIVITY_NEW_TASK
@@ -92,11 +97,12 @@ fun AedMapScreen(
         }
     }
 
+    // Obsługa przycisku cofania: zamyka InfoWindow albo wraca do poprzedniego ekranu
     BackHandler {
         lastOpenInfoWindow?.close() ?: navController.popBackStack()
     }
 
-    // Tworzymy mapę z domyślnym centrum Warszawa
+    // Tworzymy mapę z domyślnym centrum - Warszawa
     val mapView = remember {
         Configuration.getInstance().userAgentValue = context.packageName
         MapView(context).apply {
@@ -138,7 +144,7 @@ fun AedMapScreen(
 
                         Spacer(modifier = Modifier.height(AppSizes.small))
 
-                        // Edytuj zawsze dla każdego użytkownika
+                        // Przycisk edycji widoczny tylko dla AED z bazy danych
                         if (aed.type == AedType.Internal) {
                             SmallButton(
                                 onClick = {
@@ -167,6 +173,7 @@ fun AedMapScreen(
                     subDescription = if (aed.verified) "Zweryfikowany" else "Niezweryfikowany"
                     setAnchor(Marker.ANCHOR_CENTER, Marker.ANCHOR_BOTTOM)
 
+                    // Obsługa kliknięcia markera - otwieranie InfoWindow
                     setOnMarkerClickListener { m, _ ->
                         lastOpenInfoWindow?.close()
                         val info = object : InfoWindow(createInfoWindow(aed), map) {
@@ -183,14 +190,14 @@ fun AedMapScreen(
         }
     }
 
-    // Aktualizacja markerów po zmianie listy AED
+    // Reakcja na zmianę listy AED - odświeżenie markerów na mapie
     LaunchedEffect(aeds) {
         updateMarkers(mapView, aeds)
     }
 
     Box(modifier = Modifier.fillMaxSize()) {
 
-        // Dialog o włączenie lokalizacji
+        // Dialog proszący użytkownika o włączenie lokalizacji w ustawieniach systemowych
         if (showEnableLocationDialog) {
             AlertDialog(
                 onDismissRequest = {},
@@ -214,7 +221,7 @@ fun AedMapScreen(
             )
         }
 
-        // Render mapy
+        // Widok mapy
         AndroidView(
             factory = { mapView },
             modifier = Modifier.fillMaxSize(),
@@ -223,6 +230,8 @@ fun AedMapScreen(
                     val locationProvider = GpsMyLocationProvider(context)
                     val myLocationOverlay = MyLocationNewOverlay(locationProvider, map)
                     myLocationOverlay.enableMyLocation()
+
+                    // Centrowanie mapy na użytkowniku przy pierwszym fixie GPS
                     myLocationOverlay.runOnFirstFix {
                         val loc = myLocationOverlay.myLocation
                         if (loc != null && !isCenteredOnUser) {
@@ -239,7 +248,7 @@ fun AedMapScreen(
             }
         )
 
-        // Przycisk dodawania AED (tylko dla użytkowników nieanonimowych)
+        // Przycisk dodawania AED - widoczny tylko dla użytkowników zalogowanych
         if (userRole != UserRole.ANON) {
             CustomIconButton(
                 onClick = { navController.navigate("addAed") },

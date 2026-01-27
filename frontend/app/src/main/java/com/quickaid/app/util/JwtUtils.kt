@@ -5,6 +5,7 @@ import org.json.JSONObject
 import javax.inject.Inject
 import javax.inject.Singleton
 
+// Klasa do decodowania JWT i pobierania id, roli i nazwy użytkownika
 @Singleton
 class JwtUtils @Inject constructor() {
 

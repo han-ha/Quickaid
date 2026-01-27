@@ -1,5 +1,6 @@
 package com.quickaid.app.util
 
+// Walidator dla szerokości i długości geograficznej
 object AedFormValidator {
 
     fun validateLatitude(value: String): Boolean {

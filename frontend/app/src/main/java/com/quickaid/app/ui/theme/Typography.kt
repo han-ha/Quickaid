@@ -6,6 +6,7 @@ import androidx.compose.ui.text.font.FontFamily
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.sp
 
+// Czcionki aplikacji
 val AppTypography = Typography(
     headlineMedium = TextStyle(
         fontFamily = FontFamily.Default,

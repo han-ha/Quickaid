@@ -2,6 +2,7 @@ package com.quickaid.app.ui.theme
 
 import androidx.compose.ui.graphics.Color
 
+// Kolory aplikacji
 val BluePrimaryLight = Color(0xFF1976D2)
 val BluePrimaryDark = Color(0xFF004BA0)
 val GreenPrimary = Color(0xFF388E3C)

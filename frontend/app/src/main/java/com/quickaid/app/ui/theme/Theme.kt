@@ -5,6 +5,7 @@ import androidx.compose.material3.darkColorScheme
 import androidx.compose.material3.lightColorScheme
 import androidx.compose.runtime.Composable
 
+// Kolory trybu jasnego
 private val LightColors = lightColorScheme(
     primary = BluePrimaryLight,
     secondary = BluePrimaryDark,
@@ -17,6 +18,7 @@ private val LightColors = lightColorScheme(
     onBackground = Black
 )
 
+// Kolory trybu ciemnego
 private val DarkColors = darkColorScheme(
     primary = BluePrimaryLight,
     secondary = BluePrimaryDark,
@@ -29,6 +31,7 @@ private val DarkColors = darkColorScheme(
     onBackground = White
 )
 
+// Styl aplikacji
 @Composable
 fun AppTheme(
     darkTheme: Boolean = false,

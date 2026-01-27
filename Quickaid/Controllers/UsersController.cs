@@ -13,26 +13,58 @@ namespace Quickaid.Controllers
     {
         private readonly IUserService _userService = userService;
 
-        // GET api/users
+        /// <summary>
+        /// Pobiera wszystkich u¿ytkowników
+        /// </summary>
+        /// <returns>Lista u¿ytkowników</returns>
+        /// <response code="200">Zwrócono listê u¿ytkowników</response>
+        /// <response code="401">Nieprawid³owy token u¿ytkownika</response>
         [HttpGet]
         [Authorize(Roles = "admin")]
         public async Task<IActionResult> GetAll()
         {
-            var users = await _userService.GetAllAsync();
-            return Ok(users);
+            try
+            {
+                var users = await _userService.GetAllAsync();
+                return Ok(users);
+            }
+            catch (Exception ex)
+            {
+                return StatusCode(500, "Wyst¹pi³ b³¹d podczas pobierania u¿ytkowników: " + ex.Message);
+            }
         }
 
-        // GET api/users/{id}
+        /// <summary>
+        /// Pobiera u¿ytkownika po ID
+        /// </summary>
+        /// <param name="id">ID u¿ytkownika</param>
+        /// <returns>Pojedynczy u¿ytkownik</returns>
+        /// <response code="200">Zwrócono u¿ytkownika</response>
+        /// <response code="401">Nieprawid³owy token u¿ytkownika</response>
+        /// <response code="404">Nie znaleziono u¿ytkownika o podanym ID</response>
         [HttpGet("{id}")]
         [Authorize(Roles = "admin")]
         public async Task<IActionResult> GetById(int id)
         {
-            var user = await _userService.GetByIdAsync(id);
-            if (user == null) return NotFound("Nie znaleziono u¿ytkownika.");
-            return Ok(user);
+            try
+            {
+                var user = await _userService.GetByIdAsync(id);
+                if (user == null) return NotFound("Nie znaleziono u¿ytkownika.");
+                return Ok(user);
+            }
+            catch (Exception ex)
+            {
+                return StatusCode(500, "Wyst¹pi³ b³¹d podczas pobierania u¿ytkownika: " + ex.Message);
+            }
         }
 
-        // GET api/users/me
+        /// <summary>
+        /// Pobiera dane zalogowanego u¿ytkownika
+        /// </summary>
+        /// <returns>Dane u¿ytkownika</returns>
+        /// <response code="200">Zwrócono dane u¿ytkownika</response>
+        /// <response code="401">Nieprawid³owy token lub brak uprawnieñ</response>
+        /// <response code="404">Nie znaleziono u¿ytkownika</response>
         [HttpGet("me")]
         public async Task<IActionResult> GetMe()
         {
@@ -51,7 +83,14 @@ namespace Quickaid.Controllers
             return Ok(user);
         }
 
-        // PUT api/users/me
+        /// <summary>
+        /// Aktualizuje dane zalogowanego u¿ytkownika
+        /// </summary>
+        /// <param name="dto">Dane do aktualizacji</param>
+        /// <returns>Zaktualizowany u¿ytkownik</returns>
+        /// <response code="200">U¿ytkownik zosta³ zaktualizowany</response>
+        /// <response code="401">Nieprawid³owy token lub brak uprawnieñ</response>
+        /// <response code="404">Nie znaleziono u¿ytkownika</response>
         [HttpPut("me")]
         public async Task<IActionResult> UpdateMe([FromBody] UserDto dto)
         {
@@ -70,7 +109,14 @@ namespace Quickaid.Controllers
             return Ok(updated);
         }
 
-        // PUT api/users/{id}
+        /// <summary>
+        /// Aktualizuje dane wybranego u¿ytkownika
+        /// </summary>
+        /// <param name="id">ID u¿ytkownika</param>
+        /// <param name="dto">Dane do aktualizacji</param>
+        /// <returns>Zaktualizowany u¿ytkownik</returns>
+        /// <response code="200">U¿ytkownik zosta³ zaktualizowany</response>
+        /// <response code="404">Nie znaleziono u¿ytkownika</response>
         [HttpPut("{id}")]
         [Authorize(Roles = "admin")]
         public async Task<IActionResult> UpdateUser(int id, [FromBody] UserDto dto)
@@ -80,7 +126,14 @@ namespace Quickaid.Controllers
             return Ok(updated);
         }
 
-        // DELETE api/users/me
+        /// <summary>
+        /// Usuwa konto zalogowanego u¿ytkownika
+        /// </summary>
+        /// <returns>Brak treœci</returns>
+        /// <response code="204">Konto zosta³o usuniête</response>
+        /// <response code="400">Nie mo¿na usun¹æ konta administratora</response>
+        /// <response code="401">Nieprawid³owy token lub brak uprawnieñ</response>
+        /// <response code="404">Nie znaleziono u¿ytkownika</response>
         [HttpDelete("me")]
         public async Task<IActionResult> DeleteMe()
         {
@@ -107,7 +160,15 @@ namespace Quickaid.Controllers
             return NoContent();
         }
 
-        // DELETE api/users/{id}
+        /// <summary>
+        /// Usuwa wybranego u¿ytkownika
+        /// </summary>
+        /// <param name="id">ID u¿ytkownika</param>
+        /// <returns>Brak treœci</returns>
+        /// <response code="204">Konto zosta³o usuniête</response>
+        /// <response code="400">Nie mo¿na usun¹æ konta administratora</response>
+        /// <response code="401">Nieprawid³owy token lub brak uprawnieñ</response>
+        /// <response code="404">Nie znaleziono u¿ytkownika</response>
         [HttpDelete("{id}")]
         [Authorize(Roles = "admin")]
         public async Task<IActionResult> Delete(int id)
@@ -140,7 +201,15 @@ namespace Quickaid.Controllers
             return NoContent();
         }
 
-        // PUT api/users/{id}/role
+        /// <summary>
+        /// Zmienia rolê u¿ytkownika
+        /// </summary>
+        /// <param name="id">ID u¿ytkownika</param>
+        /// <param name="role">Nowa rola (user lub admin)</param>
+        /// <returns>Brak treœci</returns>
+        /// <response code="204">Rola zosta³a zmieniona</response>
+        /// <response code="400">Nieprawid³owa rola</response>
+        /// <response code="404">Nie znaleziono u¿ytkownika</response>
         [HttpPut("{id}/role")]
         [Authorize(Roles = "admin")]
         public async Task<IActionResult> ChangeUserRole(int id, [FromQuery] string role)

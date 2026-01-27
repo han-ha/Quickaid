@@ -4,7 +4,6 @@ using Quickaid.Models.DTO;
 using Microsoft.AspNetCore.Authorization;
 using Quickaid.Utils;
 
-
 namespace Quickaid.Controllers
 {
     [ApiController]
@@ -14,16 +13,36 @@ namespace Quickaid.Controllers
     {
         private readonly IResultService _resultService = resultService;
 
-        // GET api/results
+        /// <summary>
+        /// Pobiera wszystkie wyniki
+        /// </summary>
+        /// <returns>Lista wyników</returns>
+        /// <response code="200">Zwrócono listê wyników</response>
+        /// <response code="500">Wyst¹pi³ b³¹d podczas pobierania danych</response>
         [Authorize(Roles = "admin")]
         [HttpGet]
         public async Task<IActionResult> GetAll()
         {
-            var results = await _resultService.GetAllAsync();
-            return Ok(results);
+            try
+            {
+                var results = await _resultService.GetAllAsync();
+                return Ok(results);
+            }
+            catch (Exception ex)
+            {
+                return StatusCode(500, "Wyst¹pi³ b³¹d podczas pobierania wyników: " + ex.Message);
+            }
         }
 
-        // GET api/results/{id}
+        /// <summary>
+        /// Pobiera pojedynczy wynik po ID
+        /// </summary>
+        /// <param name="id">ID wyniku</param>
+        /// <returns>Pojedynczy wynik</returns>
+        /// <response code="200">Zwrócono wynik</response>
+        /// <response code="401">Nieprawid³owy token u¿ytkownika</response>
+        /// <response code="403">Brak dostêpu do danego wyniku</response>
+        /// <response code="404">Nie znaleziono wyniku o podanym ID</response>
         [HttpGet("{id}")]
         public async Task<IActionResult> GetById(int id)
         {
@@ -46,7 +65,14 @@ namespace Quickaid.Controllers
             return Ok(result);
         }
 
-        // GET api/results/user/{userId}
+        /// <summary>
+        /// Pobiera wyniki konkretnego u¿ytkownika
+        /// </summary>
+        /// <param name="userId">ID u¿ytkownika</param>
+        /// <returns>Lista wyników u¿ytkownika</returns>
+        /// <response code="200">Zwrócono listê wyników</response>
+        /// <response code="401">Nieprawid³owy token u¿ytkownika</response>
+        /// <response code="403">Brak dostêpu do wyników danego u¿ytkownika</response>
         [HttpGet("user/{userId}")]
         public async Task<IActionResult> GetUserResults(int userId)
         {
@@ -67,7 +93,15 @@ namespace Quickaid.Controllers
             return Ok(results);
         }
 
-        // POST api/results
+        /// <summary>
+        /// Dodaje nowy wynik
+        /// </summary>
+        /// <param name="dto">Dane wyniku</param>
+        /// <returns>Utworzony wynik</returns>
+        /// <response code="200">Wynik zosta³ dodany</response>
+        /// <response code="400">Niepoprawne dane wejœciowe</response>
+        /// <response code="401">Nieprawid³owy token u¿ytkownika</response>
+        /// <response code="500">Wyst¹pi³ b³¹d podczas dodawania wyniku</response>
         [HttpPost]
         public async Task<IActionResult> Add([FromBody] ResultDto dto)
         {
@@ -95,11 +129,22 @@ namespace Quickaid.Controllers
             }
             catch (Exception ex)
             {
-                return StatusCode(500, ex.ToString());
+                return StatusCode(500, "Wyst¹pi³ b³¹d podczas dodawania wyniku: " + ex.Message);
             }
         }
 
-        // PUT api/results/{id}
+        /// <summary>
+        /// Aktualizuje wynik po ID
+        /// </summary>
+        /// <param name="id">ID wyniku</param>
+        /// <param name="dto">Nowe dane wyniku</param>
+        /// <returns>Aktualizowany wynik</returns>
+        /// <response code="200">Wynik zosta³ zaktualizowany</response>
+        /// <response code="400">Niepoprawne dane wejœciowe</response>
+        /// <response code="401">Nieprawid³owy token u¿ytkownika</response>
+        /// <response code="403">Brak dostêpu do wyniku danego u¿ytkownika</response>
+        /// <response code="404">Nie znaleziono wyniku o podanym ID</response>
+        /// <response code="500">Wyst¹pi³ b³¹d podczas aktualizacji wyniku</response>
         [HttpPut("{id}")]
         public async Task<IActionResult> Update(int id, [FromBody] ResultDto dto)
         {
@@ -129,11 +174,20 @@ namespace Quickaid.Controllers
             }
             catch (Exception ex)
             {
-                return StatusCode(500, ex.ToString());
+                return StatusCode(500, "Wyst¹pi³ b³¹d podczas aktualizacji wyniku: " + ex.Message);
             }
         }
 
-        // DELETE api/results/{id}
+        /// <summary>
+        /// Usuwa wynik po ID
+        /// </summary>
+        /// <param name="id">ID wyniku</param>
+        /// <returns>Brak treœci</returns>
+        /// <response code="204">Wynik zosta³ usuniêty</response>
+        /// <response code="401">Nieprawid³owy token u¿ytkownika</response>
+        /// <response code="403">Brak dostêpu do wyniku danego u¿ytkownika</response>
+        /// <response code="404">Nie znaleziono wyniku o podanym ID</response>
+        /// <response code="500">Wyst¹pi³ b³¹d podczas usuwania wyniku</response>
         [HttpDelete("{id}")]
         public async Task<IActionResult> Delete(int id)
         {
@@ -161,11 +215,18 @@ namespace Quickaid.Controllers
             }
             catch (Exception ex)
             {
-                return StatusCode(500, ex.ToString());
+                return StatusCode(500, "Wyst¹pi³ b³¹d podczas usuwania wyniku: " + ex.Message);
             }
         }
 
-        // GET api/results/best/{quizId}
+        /// <summary>
+        /// Pobiera najlepszy wynik u¿ytkownika dla konkretnego quizu
+        /// </summary>
+        /// <param name="quizId">ID quizu</param>
+        /// <returns>Najlepszy wynik u¿ytkownika</returns>
+        /// <response code="200">Zwrócono wynik</response>
+        /// <response code="401">Nieprawid³owy token u¿ytkownika</response>
+        /// <response code="404">Nie znaleziono wyniku</response>
         [HttpGet("best/{quizId}")]
         public async Task<IActionResult> GetBestForQuiz(int quizId)
         {
@@ -184,6 +245,5 @@ namespace Quickaid.Controllers
 
             return Ok(bestResult);
         }
-
     }
 }

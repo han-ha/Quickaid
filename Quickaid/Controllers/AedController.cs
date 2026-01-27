@@ -3,7 +3,6 @@ using Quickaid.Models.DTO;
 using Quickaid.Services.Interfaces;
 using Microsoft.AspNetCore.Authorization;
 using Quickaid.Utils;
-using Quickaid.Models.Entities;
 using Quickaid.Enums;
 
 namespace Quickaid.Controllers
@@ -15,26 +14,60 @@ namespace Quickaid.Controllers
         private readonly IAedService _aedService = aedService;
         private readonly AedGeoJsonUtils _geoJsonUtils = geoJsonUtils;
 
-        // GET api/aed
+        /// <summary>
+        /// Pobiera wszystkie punkty AED
+        /// </summary>
+        /// <returns>Lista punktów AED</returns>
+        /// <response code="200">Zwrócono listê AED</response>
+        /// <response code="500">Wyst¹pi³ b³¹d podczas pobierania danych</response>
         [AllowAnonymous]
         [HttpGet]
         public async Task<IActionResult> GetAllAedPoints()
         {
-            var result = await _aedService.GetMergedAedsAsync();
-            return Ok(result);
+            try
+            {
+                var result = await _aedService.GetMergedAedsAsync();
+                return Ok(result);
+            }
+            catch (Exception ex)
+            {
+                return StatusCode(500, "Wyst¹pi³ b³¹d podczas pobierania AED: " + ex.Message);
+            }
         }
 
-        // GET api/aed/{id}
+
+        /// <summary>
+        /// Pobiera pojedynczy punkt AED po ID
+        /// </summary>
+        /// <param name="id">ID punktu AED</param>
+        /// <returns>Punkt AED</returns>
+        /// <response code="200">Zwrócono AED</response>
+        /// <response code="404">Nie znaleziono AED o podanym ID</response>
+        /// <response code="500">Wyst¹pi³ b³¹d podczas pobierania danych</response>
         [AllowAnonymous]
         [HttpGet("{id}")]
         public async Task<IActionResult> GetAedById(int id)
         {
-            var point = await _aedService.GetByIdAsync(id);
-            if (point == null) return NotFound();
-            return Ok(point);
+            try
+            {
+                var point = await _aedService.GetByIdAsync(id);
+                if (point == null) return NotFound();
+                return Ok(point);
+            }
+            catch (Exception ex)
+            {
+                return StatusCode(500, "Wyst¹pi³ b³¹d podczas pobierania AED: " + ex.Message);
+            }
         }
 
-        // POST api/aed
+
+        /// <summary>
+        /// Dodaje nowe AED do bazy danych
+        /// </summary>
+        /// <param name="dto">Dane AED do dodania</param>
+        /// <returns>Utworzony punkt AED</returns>
+        /// <response code="201">AED zosta³ utworzony</response>
+        /// <response code="400">Niepoprawne dane lub próba dodania AED zewnêtrznego</response>
         [Authorize]
         [HttpPost]
         public async Task<IActionResult> AddAed([FromBody] InternalAedDto dto)
@@ -48,7 +81,15 @@ namespace Quickaid.Controllers
             return CreatedAtAction(nameof(GetAedById), new { id = created.Id }, created);
         }
 
-        // PUT api/aed/{id}
+        /// <summary>
+        /// Aktualizuje AED z bazy danych
+        /// </summary>
+        /// <param name="id">ID punktu AED</param>
+        /// <param name="dto">Nowe dane AED</param>
+        /// <returns>Aktualizowany punkt AED</returns>
+        /// <response code="200">AED zosta³ zaktualizowany</response>
+        /// <response code="400">Niepoprawne dane lub próba edycji AED zewnêtrznego</response>
+        /// <response code="404">Nie znaleziono AED o podanym ID</response>
         [Authorize]
         [HttpPut("{id}")]
         public async Task<IActionResult> UpdateAed(int id, [FromBody] InternalAedDto dto)
@@ -63,7 +104,13 @@ namespace Quickaid.Controllers
             return Ok(updated);
         }
 
-        // DELETE api/aed/{id}
+        /// <summary>
+        /// Usuwa AED po ID
+        /// </summary>
+        /// <param name="id">ID punktu AED</param>
+        /// <returns>Brak treœci</returns>
+        /// <response code="204">AED zosta³ usuniêty</response>
+        /// <response code="404">Nie znaleziono AED o podanym ID</response>
         [Authorize]
         [HttpDelete("{id}")]
         public async Task<IActionResult> DeleteAed(int id)
@@ -73,7 +120,12 @@ namespace Quickaid.Controllers
             return NoContent();
         }
 
-        // GET api/aed/external
+        /// <summary>
+        /// Pobiera listê AED zewnêtrznych (OpenAEDMap)
+        /// </summary>
+        /// <returns>Lista AED zewnêtrznych</returns>
+        /// <response code="200">Zwrócono listê AED</response>
+        /// <response code="503">B³¹d pobrania danych z OpenAEDMap</response>
         [HttpGet("external")]
         [AllowAnonymous]
         public async Task<IActionResult> GetExternalAeds()
@@ -89,7 +141,12 @@ namespace Quickaid.Controllers
             }
         }
 
-        // GET api/aed/internal
+        /// <summary>
+        /// Pobiera listê AED z bazy danych
+        /// </summary>
+        /// <returns>Lista AED z bazy danych</returns>
+        /// <response code="200">Zwrócono listê AED</response>
+        /// <response code="500">B³¹d pobrania danych z bazy</response>
         [HttpGet("internal")]
         [AllowAnonymous]
         public async Task<IActionResult> GetInternalAeds()

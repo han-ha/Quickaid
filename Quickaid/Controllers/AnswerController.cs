@@ -7,30 +7,63 @@ namespace Quickaid.Controllers
 {
     [ApiController]
     [Route("api/[controller]")]
-    [Authorize]    
+    [Authorize]
     public class AnswersController(IAnswerService answerService) : ControllerBase
     {
         private readonly IAnswerService _answerService = answerService;
 
-        // GET api/answers
+        /// <summary>
+        /// Pobiera wszystkie odpowiedzi do pytań quizowych
+        /// </summary>
+        /// <returns>Lista odpowiedzi</returns>
+        /// <response code="200">Zwrócono listę odpowiedzi</response>
+        /// <response code="500">Wystąpił błąd podczas pobierania danych</response>
         [HttpGet]
         [Authorize(Roles = "admin")]
         public async Task<IActionResult> GetAll()
         {
-            var answers = await _answerService.GetAllAsync();
-            return Ok(answers);
+            try
+            {
+                var answers = await _answerService.GetAllAsync();
+                return Ok(answers);
+            }
+            catch (Exception ex)
+            {
+                return StatusCode(500, "Wystąpił błąd podczas pobierania odpowiedzi: " + ex.Message);
+            }
         }
 
-        // GET api/answers/{id}
+        /// <summary>
+        /// Pobiera pojedynczą odpowiedź po ID
+        /// </summary>
+        /// <param name="id">ID odpowiedzi</param>
+        /// <returns>Pojedyncza odpowiedź</returns>
+        /// <response code="200">Zwrócono odpowiedź</response>
+        /// <response code="404">Nie znaleziono odpowiedzi o podanym ID</response>
+        /// <response code="500">Wystąpił błąd podczas pobierania danych</response>
         [HttpGet("{id}")]
         public async Task<IActionResult> GetById(int id)
         {
-            var answer = await _answerService.GetByIdAsync(id);
-            if (answer == null) return NotFound();
-            return Ok(answer);
+            try
+            {
+                var answer = await _answerService.GetByIdAsync(id);
+                if (answer == null) return NotFound();
+                return Ok(answer);
+            }
+            catch (Exception ex)
+            {
+                return StatusCode(500, "Wystąpił błąd podczas pobierania odpowiedzi: " + ex.Message);
+            }
         }
 
-        // POST api/answers?questionId={questionId}
+        /// <summary>
+        /// Dodaje nową odpowiedź do pytania
+        /// </summary>
+        /// <param name="dto">Dane odpowiedzi</param>
+        /// <param name="questionId">ID pytania, do którego dodawana jest odpowiedź</param>
+        /// <returns>Utworzona odpowiedź</returns>
+        /// <response code="201">Odpowiedź została utworzona</response>
+        /// <response code="400">Niepoprawne dane wejściowe</response>
         [HttpPost]
         [Authorize(Roles = "admin")]
         public async Task<IActionResult> Add([FromBody] AnswerDto dto, [FromQuery] int questionId)
@@ -41,7 +74,15 @@ namespace Quickaid.Controllers
             return CreatedAtAction(nameof(GetById), new { id = created.Id }, created);
         }
 
-        // PUT api/answers/{id}
+        /// <summary>
+        /// Aktualizuje istniejącą odpowiedź
+        /// </summary>
+        /// <param name="id">ID odpowiedzi</param>
+        /// <param name="dto">Nowe dane odpowiedzi</param>
+        /// <returns>Aktualizowana odpowiedź</returns>
+        /// <response code="200">Odpowiedź została zaktualizowana</response>
+        /// <response code="400">Niepoprawne dane wejściowe</response>
+        /// <response code="404">Nie znaleziono odpowiedzi o podanym ID</response>
         [HttpPut("{id}")]
         [Authorize(Roles = "admin")]
         public async Task<IActionResult> Update(int id, [FromBody] AnswerDto dto)
@@ -53,7 +94,13 @@ namespace Quickaid.Controllers
             return Ok(updated);
         }
 
-        // DELETE api/answers/{id}
+        /// <summary>
+        /// Usuwa odpowiedź po ID
+        /// </summary>
+        /// <param name="id">ID odpowiedzi</param>
+        /// <returns>Brak treści</returns>
+        /// <response code="204">Odpowiedź została usunięta</response>
+        /// <response code="404">Nie znaleziono odpowiedzi o podanym ID</response>
         [HttpDelete("{id}")]
         [Authorize(Roles = "admin")]
         public async Task<IActionResult> Delete(int id)

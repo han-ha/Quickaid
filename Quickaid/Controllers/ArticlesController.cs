@@ -12,26 +12,59 @@ namespace Quickaid.Controllers
     {
         private readonly IArticleService _articleService = articleService;
 
-        // GET api/articles
+        /// <summary>
+        /// Pobiera wszystkie artyku³y
+        /// </summary>
+        /// <returns>Lista artyku³ów</returns>
+        /// <response code="200">Zwrócono listê artyku³ów</response>
+        /// <response code="500">Wyst¹pi³ b³¹d podczas pobierania danych</response>
         [AllowAnonymous]
         [HttpGet]
         public async Task<IActionResult> GetAll()
         {
-            var articles = await _articleService.GetAllAsync();
-            return Ok(articles);
+            try
+            {
+                var articles = await _articleService.GetAllAsync();
+                return Ok(articles);
+            }
+            catch (Exception ex)
+            {
+                return StatusCode(500, "Wyst¹pi³ b³¹d podczas pobierania artyku³ów: " + ex.Message);
+            }
         }
 
-        // GET api/articles/{id}
+        /// <summary>
+        /// Pobiera pojedynczy artyku³ po ID
+        /// </summary>
+        /// <param name="id">ID artyku³u</param>
+        /// <returns>Pojedynczy artyku³</returns>
+        /// <response code="200">Zwrócono artyku³</response>
+        /// <response code="404">Nie znaleziono artyku³u o podanym ID</response>
+        /// <response code="500">Wyst¹pi³ b³¹d podczas pobierania danych</response>
         [AllowAnonymous]
         [HttpGet("{id}")]
         public async Task<IActionResult> GetById(int id)
         {
-            var article = await _articleService.GetByIdAsync(id);
-            if (article == null) return NotFound();
-            return Ok(article);
+            try
+            {
+                var article = await _articleService.GetByIdAsync(id);
+                if (article == null) return NotFound();
+                return Ok(article);
+            }
+            catch (Exception ex)
+            {
+                return StatusCode(500, "Wyst¹pi³ b³¹d podczas pobierania artyku³u: " + ex.Message);
+            }
         }
 
-        // POST api/articles
+        /// <summary>
+        /// Dodaje nowy artyku³
+        /// </summary>
+        /// <param name="dto">Dane artyku³u</param>
+        /// <returns>Utworzony artyku³</returns>
+        /// <response code="201">Artyku³ zosta³ utworzony</response>
+        /// <response code="400">Niepoprawne dane wejœciowe</response>
+        /// <response code="401">Brak uwierzytelnienia</response>
         [Authorize(Roles = "admin")]
         [HttpPost]
         public async Task<IActionResult> Add([FromBody] ArticleDto dto)
@@ -47,7 +80,15 @@ namespace Quickaid.Controllers
             return CreatedAtAction(nameof(GetById), new { id = created.Id }, created);
         }
 
-        // PUT api/articles/{id}
+        /// <summary>
+        /// Aktualizuje artyku³ o podanym ID
+        /// </summary>
+        /// <param name="id">ID artyku³u</param>
+        /// <param name="dto">Nowe dane artyku³u</param>
+        /// <returns>Aktualizowany artyku³</returns>
+        /// <response code="200">Artyku³ zosta³ zaktualizowany</response>
+        /// <response code="400">Niepoprawne dane wejœciowe</response>
+        /// <response code="404">Nie znaleziono artyku³u o podanym ID</response>
         [Authorize(Roles = "admin")]
         [HttpPut("{id}")]
         public async Task<IActionResult> Update(int id, [FromBody] ArticleDto dto)
@@ -59,7 +100,12 @@ namespace Quickaid.Controllers
             return Ok(updated);
         }
 
-        // DELETE api/articles/{id}
+        /// <summary>
+        /// Usuwa artyku³ po ID
+        /// </summary>
+        /// <param name="id">ID artyku³u</param>
+        /// <response code="204">Artyku³ zosta³ usuniêty</response>
+        /// <response code="404">Nie znaleziono artyku³u o podanym ID</response>
         [Authorize(Roles = "admin")]
         [HttpDelete("{id}")]
         public async Task<IActionResult> Delete(int id)

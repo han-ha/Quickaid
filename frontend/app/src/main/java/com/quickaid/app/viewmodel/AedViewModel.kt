@@ -81,6 +81,7 @@ class AedViewModel @Inject constructor(
                 val saved = repository.addAed(aed)
                 _selectedAed.value = saved
                 _addSuccess.value = true
+                fetchAeds()
             } catch (e: Exception) {
                 _error.value = e.message ?: "Nie udało się dodać AED"
             } finally { _isLoading.value = false }
@@ -104,6 +105,7 @@ class AedViewModel @Inject constructor(
                 )
                 _selectedAed.value = result
                 _updateSuccess.value = true
+                fetchAeds()
             } catch (e: Exception) {
                 _error.value = e.message ?: "Nie udało się zapisać AED"
             } finally { _isLoading.value = false }
@@ -119,6 +121,7 @@ class AedViewModel @Inject constructor(
             try {
                 repository.deleteAed(id)
                 _deleteSuccess.value = true
+                fetchAeds()
             } catch (e: Exception) {
                 _error.value = e.message ?: "Nie udało się usunąć AED"
             } finally { _isLoading.value = false }

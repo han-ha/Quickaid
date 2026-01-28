@@ -1,94 +1,113 @@
-USE QuickAid;
+ï»¿IF DB_ID('QuickAid') IS NULL
+BEGIN
+    PRINT 'Baza QuickAid nie istnieje. Najpierw uruchomiÄ‡ quickaid.sql!';
+    RETURN;
+END
+
+USE [QuickAid];
 GO
 
+-- Wstawienie uÅ¼ytkownika admin
+INSERT INTO [users] ([username], [email], [role])
+VALUES (N'admin', N'admin@example.com', N'admin');
+
+DECLARE @AdminId INT = SCOPE_IDENTITY();
+
+-- Wstawienie hasÅ‚a dla admina
+INSERT INTO [passwords] ([user_id], [hashed_password], [salt])
+VALUES (@AdminId, N'hmGYc4KiTBHKyCoXFRPzPmHY3wmxhnmjzYlGylbFALI=', N'Bs0TKfVUG2HnAq2OBbRxZQ==');
+
+-- AED Points
 INSERT INTO [aed_points] ([latitude], [longitude], [description], [added_by], [verified])
 VALUES
-(52.229676, 21.012229, 'Przy wejœciu do apteki', 1, 1),
-(50.061947, 19.936856, 'Przy centrum handlowym', 2, 0),
-(51.107885, 17.038538, 'Na dworcu kolejowym', 1, 1);
-GO
+(52.229676, 21.012229, N'Przy wejÅ›ciu do apteki', @AdminId, 1),
+(50.061947, 19.936856, N'Przy centrum handlowym', @AdminId, 0),
+(51.107885, 17.038538, N'Na dworcu kolejowym', @AdminId, 1);
 
+-- Quizy
 INSERT INTO [quizzes] ([title], [description], [number_of_questions], [max_score])
 VALUES
-('Pierwsza pomoc podstawy', 'Quiz o podstawowych zasadach pierwszej pomocy', 3, 3),
-('AED i defibrylatory', 'Quiz o AED', 2, 2);
-GO
+(N'Pierwsza pomoc podstawy', N'Quiz o podstawowych zasadach pierwszej pomocy', 3, 3),
+(N'AED i defibrylatory', N'Quiz o AED', 2, 2);
 
+DECLARE @Quiz1Id INT = SCOPE_IDENTITY() - 1;
+DECLARE @Quiz2Id INT = @Quiz1Id + 1;
+
+-- Pytania
 INSERT INTO [questions] ([question_text], [number_of_answers])
 VALUES
-('Jaki jest numer alarmowy w Polsce?', 4),
-('Co nale¿y zrobiæ w przypadku zatrzymania kr¹¿enia?', 4),
-('Gdzie najlepiej umieœciæ AED?', 3),
-('Jak d³ugo nale¿y uciskaæ klatkê piersiow¹?', 4),
-('Czy AED mo¿na u¿ywaæ u dzieci?', 2);
-GO
+(N'Jaki jest numer alarmowy w Polsce?', 4),
+(N'Co naleÅ¼y zrobiÄ‡ w przypadku zatrzymania krÄ…Å¼enia?', 4),
+(N'Gdzie najlepiej umieÅ›ciÄ‡ AED?', 3),
+(N'Jak dÅ‚ugo naleÅ¼y uciskaÄ‡ klatkÄ™ piersiowÄ…?', 4),
+(N'Czy AED moÅ¼na uÅ¼ywaÄ‡ u dzieci?', 2);
 
+DECLARE @Q1Id INT = SCOPE_IDENTITY() - 4;
+DECLARE @Q2Id INT = @Q1Id + 1;
+DECLARE @Q3Id INT = @Q1Id + 2;
+DECLARE @Q4Id INT = @Q1Id + 3;
+DECLARE @Q5Id INT = @Q1Id + 4;
+
+-- PowiÄ…zanie quizÃ³w z pytaniami
 INSERT INTO [quiz_questions] ([quiz_id], [question_id])
 VALUES
-(1, 1),
-(1, 2),
-(1, 4),
-(2, 3),
-(2, 5);
-GO
+(@Quiz1Id, @Q1Id),
+(@Quiz1Id, @Q2Id),
+(@Quiz1Id, @Q4Id),
+(@Quiz2Id, @Q3Id),
+(@Quiz2Id, @Q5Id);
 
+-- Odpowiedzi
 INSERT INTO [answers] ([question_id], [answer_text], [is_correct])
 VALUES
-(1, '112', 1),
-(1, '911', 0),
-(1, '184', 0),
-(1, '0800', 0),
-(2, 'Rozpocz¹æ resuscytacjê kr¹¿eniowo-oddechow¹', 1),
-(2, 'Podawaæ wodê', 0),
-(2, 'Wezwaæ pomoc', 1),
-(2, 'Nic nie robiæ', 0),
-(3, 'Przy wejœciu do budynku', 1),
-(3, 'W piwnicy', 0),
-(3, 'Na dachu', 0),
-(4, '30 uciœniêæ', 1),
-(4, '15 uciœniêæ', 0),
-(4, 'Do przyjazdu karetki', 1),
-(4, '5 uciœniêæ', 0),
-(5, 'Tak', 1),
-(5, 'Nie', 0);
-GO
+(@Q1Id, N'112', 1),
+(@Q1Id, N'911', 0),
+(@Q1Id, N'184', 0),
+(@Q1Id, N'0800', 0),
+(@Q2Id, N'RozpoczÄ…Ä‡ resuscytacjÄ™ krÄ…Å¼eniowo-oddechowÄ…', 1),
+(@Q2Id, N'PodawaÄ‡ wodÄ™', 0),
+(@Q2Id, N'WezwaÄ‡ pomoc', 1),
+(@Q2Id, N'Nic nie robiÄ‡', 0),
+(@Q3Id, N'Przy wejÅ›ciu do budynku', 1),
+(@Q3Id, N'W piwnicy', 0),
+(@Q3Id, N'Na dachu', 0),
+(@Q4Id, N'30 uciÅ›niÄ™Ä‡', 1),
+(@Q4Id, N'15 uciÅ›niÄ™Ä‡', 0),
+(@Q4Id, N'Do przyjazdu karetki', 1),
+(@Q4Id, N'5 uciÅ›niÄ™Ä‡', 0),
+(@Q5Id, N'Tak', 1),
+(@Q5Id, N'Nie', 0);
 
+-- ArtykuÅ‚y
 INSERT INTO [articles] ([title], [content], [created_by])
 VALUES
-('Podstawy pierwszej pomocy – co musisz wiedzieæ',
-'Pierwsza pomoc to czynnoœci wykonywane natychmiast przez osoby bêd¹ce œwiadkami zdarzenia, które maj¹ na celu podtrzymanie ¿ycia lub zapobie¿enie pogorszeniu stanu zdrowia osoby poszkodowanej, zanim przyjedzie Zespó³ Ratownictwa Medycznego.
+(N'Podstawy pierwszej pomocy â€“ co musisz wiedzieÄ‡',
+N'Pierwsza pomoc to czynnoÅ›ci wykonywane natychmiast przez osoby bÄ™dÄ…ce Å›wiadkami zdarzenia, ktÃ³re majÄ… na celu podtrzymanie Å¼ycia lub zapobieÅ¼enie pogorszeniu stanu zdrowia osoby poszkodowanej, zanim przyjedzie ZespÃ³Å‚ Ratownictwa Medycznego.
 
-Przede wszystkim – oceñ bezpieczeñstwo: upewnij siê, ¿e ani Ty, ani poszkodowany nie jesteœcie nara¿eni na dodatkowe zagro¿enie. Jeœli otoczenie jest niebezpieczne – nie podejmuj interwencji, wezwanie pomocy jest priorytetem.
+Przede wszystkim â€“ oceÅ„ bezpieczeÅ„stwo: upewnij siÄ™, Å¼e ani Ty, ani poszkodowany nie jesteÅ›cie naraÅ¼eni na dodatkowe zagroÅ¼enie. JeÅ›li otoczenie jest niebezpieczne â€“ nie podejmuj interwencji, wezwanie pomocy jest priorytetem.
 
-SprawdŸ, czy poszkodowany jest przytomny – g³oœno go zawo³aj, potrz¹œnij za ramiona, zapytaj, czy Ciê s³yszy. Jeœli reaguje, zapytaj co siê sta³o i postaraj siê ustaliæ, czy wymagane jest wezwanie pomocy.
+SprawdÅº, czy poszkodowany jest przytomny â€“ gÅ‚oÅ›no go zawoÅ‚aj, potrzÄ…Å›nij za ramiona, zapytaj, czy CiÄ™ sÅ‚yszy. JeÅ›li reaguje, zapytaj co siÄ™ staÅ‚o i postaraj siÄ™ ustaliÄ‡, czy wymagane jest wezwanie pomocy.
 
-Jeœli poszkodowany nie reaguje lub jest nieprzytomny – sprawdŸ, czy oddycha. Jeœli drogi oddechowe s¹ dro¿ne i oddech nie wystêpuje – przygotuj siê do resuscytacji kr¹¿eniowo-oddechowej (RKO). Jeœli jest dostêpny defibrylator AED, poproœ kogoœ o jego przyniesienie i uruchom zgodnie z instrukcj¹.
+JeÅ›li poszkodowany nie reaguje lub jest nieprzytomny â€“ sprawdÅº, czy oddycha. JeÅ›li drogi oddechowe sÄ… droÅ¼ne i oddech nie wystÄ™puje â€“ przygotuj siÄ™ do resuscytacji krÄ…Å¼eniowo-oddechowej (RKO). JeÅ›li jest dostÄ™pny defibrylator AED, poproÅ› kogoÅ› o jego przyniesienie i uruchom zgodnie z instrukcjÄ….
 
-Pamiêtaj – ka¿da minuta siê liczy: szybka reakcja i prawid³owe dzia³anie czêsto decyduj¹ o prze¿yciu poszkodowanego.', 2),
+PamiÄ™taj â€“ kaÅ¼da minuta siÄ™ liczy: szybka reakcja i prawidÅ‚owe dziaÅ‚anie czÄ™sto decyduje o przeÅ¼yciu poszkodowanego.', @AdminId),
+(N'Resuscytacja i AED â€“ krok po kroku',
+N'JeÅ›li osoba straciÅ‚a przytomnoÅ›Ä‡ i nie oddycha, postÄ™puj wedÅ‚ug poniÅ¼szych krokÃ³w:
 
-('Resuscytacja i AED – krok po kroku',
-'Jeœli osoba straci³a przytomnoœæ i nie oddycha, postêpuj wed³ug poni¿szych kroków:
+1. UÅ‚Ã³Å¼ poszkodowanego na plecach, na twardym i pÅ‚askim podÅ‚oÅ¼u.
+2. UklÄ™knij obok klatki piersiowej. JednÄ… rÄ™kÄ™ poÅ‚Ã³Å¼ na czole, drugÄ… na podbrÃ³dku â€“ odchyl gÅ‚owÄ™ do tyÅ‚u, aby udroÅ¼niÄ‡ drogi oddechowe.
+3. SprawdÅº oddech: obserwuj ruch klatki piersiowej, przyÅ‚Ã³Å¼ policzek do ust i nosa poszkodowanego, nasÅ‚uchaj oddechu. Czekaj ok. 10 sekund.
+4. JeÅ›li nie ma oddechu â€“ rozpocznij RKO: 30 uciÅ›niÄ™Ä‡ klatki piersiowej (okoÅ‚o 5-6 cm gÅ‚Ä™bokoÅ›ci, tempo ~100-120 uciÅ›niÄ™Ä‡/min), nastÄ™pnie 2 oddechy ratownicze. Powtarzaj cykl 30:2 aÅ¼ do przyjazdu pomocy lub pojawienia siÄ™ oddechu.
+5. JeÅ›li dostÄ™pny jest AED â€“ poproÅ› towarzyszÄ…cÄ… osobÄ™ o jego przyniesienie; po podÅ‚Ä…czeniu podÄ…Å¼aj za komunikatami urzÄ…dzenia, a jednoczeÅ›nie kontynuuj uciski klatki piersiowej.
 
-1. U³ó¿ poszkodowanego na plecach, na twardym i p³askim pod³o¿u.
-2. Uklêknij obok klatki piersiowej. Jedn¹ rêkê po³ó¿ na czole, drug¹ na podbródku – odchyl g³owê do ty³u, aby udro¿niæ drogi oddechowe.
-3. SprawdŸ oddech: obserwuj ruch klatki piersiowej, przy³ó¿ policzek do ust i nosa poszkodowanego, nas³uchaj oddechu. Czekaj ok. 10 sekund.
-4. Jeœli nie ma oddechu – rozpocznij RKO: 30 uciœniêæ klatki piersiowej (oko³o 5-6 cm g³êbokoœci, tempo ~100-120 uciœniêæ/min), nastêpnie 2 oddechy ratownicze. Powtarzaj cykl 30:2 a¿ do przyjazdu pomocy lub pojawienia siê oddechu.
-5. Jeœli dostêpny jest AED – poproœ towarzysz¹c¹ osobê o jego przyniesienie; po pod³¹czeniu pod¹¿aj za komunikatami urz¹dzenia, a jednoczeœnie kontynuuj uciski klatki piersiowej.
+Wielokrotne i szybkie rozpoczÄ™cie RKO oraz uÅ¼ycie AED zwiÄ™ksza szanse na przeÅ¼ycie poszkodowanego.', @AdminId),
+(N'Kiedy i jak wezwaÄ‡ pomoc â€“ bezpieczeÅ„stwo i numer alarmowy',
+N'JeÅ›li jesteÅ› Å›wiadkiem wypadku, upadku, utraty przytomnoÅ›ci, silnego krwotoku lub innego nagÅ‚ego zagroÅ¼enia zdrowia â€“ niezwÅ‚ocznie zadzwoÅ„ pod numer alarmowy 112 (lub 999/998 jeÅ›li znasz wÅ‚aÅ›ciwy numer sÅ‚uÅ¼b).
 
-Wielokrotne i szybkie rozpoczêcie RKO oraz u¿ycie AED zwiêksza szanse na prze¿ycie poszkodowanego.', 2),
+ObowiÄ…zkiem kaÅ¼dego z nas jest udzielenie pierwszej pomocy â€” zwlekanie moÅ¼e kosztowaÄ‡ Å¼ycie. Przed podjÄ™ciem dziaÅ‚aÅ„ upewnij siÄ™, Å¼e miejsce zdarzenia jest bezpieczne, oceÅ„ liczbÄ™ poszkodowanych, okreÅ›l, kto potrzebuje pilnej pomocy. MoÅ¼esz poprosiÄ‡ Å›wiadkÃ³w o pomoc â€” np. by wezwali pogotowie, przynieÅ›li AED, opatrunki lub telefon.
 
-('Kiedy i jak wezwaæ pomoc – bezpieczeñstwo i numer alarmowy',
-'Jeœli jesteœ œwiadkiem wypadku, upadku, utraty przytomnoœci, silnego krwotoku lub innego nag³ego zagro¿enia zdrowia – niezw³ocznie zadzwoñ pod numer alarmowy 112 (lub 999/998 jeœli znasz w³aœciwy numer s³u¿b).
+JeÅ›li poszkodowany oddycha, ale jest nieprzytomny â€” uÅ‚Ã³Å¼ go w pozycji bocznej ustalonej i stale monitoruj oddech i przytomnoÅ›Ä‡ aÅ¼ do przyjazdu pomocy. JeÅ›li widzisz krwawienie, zranienia, oparzenia, zÅ‚amania â€” zaÅ‚Ã³Å¼ jaÅ‚owy opatrunek, unieruchom koÅ„czynÄ™ lub zastosuj inne dostÄ™pne Å›rodki, jeÅ›li masz odpowiedniÄ… wiedzÄ™.
 
-Obowi¹zkiem ka¿dego z nas jest udzielenie pierwszej pomocy — zwlekanie mo¿e kosztowaæ ¿ycie. Przed podjêciem dzia³añ upewnij siê, ¿e miejsce zdarzenia jest bezpieczne, oceñ liczbê poszkodowanych, okreœl, kto potrzebuje pilnej pomocy. Mo¿esz poprosiæ œwiadków o pomoc — np. by wezwali pogotowie, przynieœli AED, opatrunki lub telefon.
+Nie musisz byÄ‡ ratownikiem â€” waÅ¼na jest szybka, rozsÄ…dna i przemyÅ›lana reakcja. Twoje dziaÅ‚ania mogÄ… ocaliÄ‡ komuÅ› Å¼ycie.', @AdminId);
 
-Jeœli poszkodowany oddycha, ale jest nieprzytomny — u³ó¿ go w pozycji bocznej ustalonej i stale monitoruj oddech i przytomnoœæ a¿ do przyjazdu pomocy. Jeœli widzisz krwawienie, zranienia, oparzenia, z³amania — za³ó¿ ja³owy opatrunek, unieruchom koñczynê lub zastosuj inne dostêpne œrodki, jeœli masz odpowiedni¹ wiedzê.
-
-Nie musisz byæ ratownikiem — wa¿na jest szybka, rozs¹dna i przemyœlana reakcja. Twoje dzia³ania mog¹ ocaliæ komuœ ¿ycie.', 2);
 GO
-
-INSERT INTO users (username, email, role)
-VALUES ('admin', 'admin@example.com', 'admin');
-
-INSERT INTO passwords (user_id, hashed_password, salt)
-VALUES (15, 'hmGYc4KiTBHKyCoXFRPzPmHY3wmxhnmjzYlGylbFALI=', 'Bs0TKfVUG2HnAq2OBbRxZQ==');

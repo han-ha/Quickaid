@@ -1,5 +1,6 @@
 package com.quickaid.app.di
 
+import android.util.Log
 import com.google.gson.Gson
 import com.google.gson.GsonBuilder
 import com.quickaid.app.Constants
@@ -62,6 +63,7 @@ object NetworkModule {
                 chain.proceed(requestBuilder.build())
             }
             .addInterceptor(logging)
+            .addInterceptor(RetryInterceptor(maxRetries = 3))
             .build()
     }
 
@@ -168,4 +170,25 @@ object NetworkModule {
     @Singleton
     fun provideAedRepository(api: AedApi): AedRepository =
         AedRepository(api)
+}
+
+// Interceptor retry dla błędów 5xx
+class RetryInterceptor(private val maxRetries: Int = 3) : okhttp3.Interceptor {
+    override fun intercept(chain: okhttp3.Interceptor.Chain): okhttp3.Response {
+        var request = chain.request()
+        var response: okhttp3.Response
+        var tryCount = 0
+
+        while (true) {
+            response = chain.proceed(request)
+            if (!response.code.let { it in 500..599 } || tryCount >= maxRetries) {
+                break
+            }
+            tryCount++
+            response.close()
+            Log.d("RetryInterceptor", "Request failed with code ${response.code}, retrying...")
+        }
+
+        return response
+    }
 }

@@ -89,17 +89,16 @@ fun QuestionForm(
             }
             Spacer(Modifier.height(AppSizes.small))
         }
-        Button(
+        LargeButton(
             onClick = { localAnswers.add(AnswerDto(id = 0, answerText = "", isCorrect = false)) },
-            modifier = Modifier.fillMaxWidth()
-        ) {
-            Text("Dodaj odpowiedź")
-        }
+            modifier = Modifier.fillMaxWidth(),
+            content = "Dodaj odpowiedź"
+        )
         Spacer(Modifier.height(AppSizes.medium))
         if (!error.isNullOrBlank()) {
             Text(text = "Błąd: $error", color = MaterialTheme.colorScheme.error)
         }
-        Button(
+        LargeButton(
             onClick = {
                 val q = QuestionDto(
                     id = questionId ?: 0,
@@ -114,10 +113,9 @@ fun QuestionForm(
                     && localAnswers.size >= 2
                     && localAnswers.all { it.answerText.isNotBlank() }
                     && localCorrectAnswerIndex != null,
-            modifier = Modifier.fillMaxWidth()
-        ) {
-            Text("Zapisz")
-        }
+            modifier = Modifier.fillMaxWidth(),
+            content = "Zapisz"
+        )
     }
 
     if (answerToDeleteIndex != null) {
@@ -126,7 +124,7 @@ fun QuestionForm(
             title = { Text("Usuń odpowiedź") },
             text = { Text("Czy na pewno chcesz usunąć tę odpowiedź?") },
             confirmButton = {
-                Button(
+                SmallButton(
                     onClick = {
                         localAnswers.removeAt(answerToDeleteIndex!!)
                         if (localCorrectAnswerIndex == answerToDeleteIndex) localCorrectAnswerIndex = null
@@ -134,15 +132,15 @@ fun QuestionForm(
                             localCorrectAnswerIndex = localCorrectAnswerIndex!! - 1
                         answerToDeleteIndex = null
                     },
-                    colors = ButtonDefaults.buttonColors(containerColor = MaterialTheme.colorScheme.error)
-                ) {
-                    Text("Usuń")
-                }
+                    content = "Usuń",
+                    buttonColor = MaterialTheme.colorScheme.error
+                )
             },
             dismissButton = {
-                Button(onClick = { answerToDeleteIndex = null }) {
-                    Text("Anuluj")
-                }
+                SmallButton(
+                    onClick = { answerToDeleteIndex = null },
+                    content = "Anuluj"
+                )
             }
         )
     }

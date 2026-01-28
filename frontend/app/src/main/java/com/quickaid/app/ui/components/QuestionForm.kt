@@ -121,7 +121,7 @@ fun QuestionForm(
     if (answerToDeleteIndex != null) {
         AlertDialog(
             onDismissRequest = { answerToDeleteIndex = null },
-            title = { Text("Usuń odpowiedź") },
+            title = { Text("Potwierdzenie usunięcia") },
             text = { Text("Czy na pewno chcesz usunąć tę odpowiedź?") },
             confirmButton = {
                 SmallButton(

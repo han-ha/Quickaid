@@ -41,6 +41,9 @@ import org.osmdroid.views.overlay.Marker
 import org.osmdroid.views.overlay.infowindow.InfoWindow
 import org.osmdroid.views.overlay.mylocation.GpsMyLocationProvider
 import org.osmdroid.views.overlay.mylocation.MyLocationNewOverlay
+import org.osmdroid.events.MapListener
+import org.osmdroid.events.ScrollEvent
+import org.osmdroid.events.ZoomEvent
 
 @Composable
 fun AedMapScreen(
@@ -102,20 +105,6 @@ fun AedMapScreen(
         lastOpenInfoWindow?.close() ?: navController.popBackStack()
     }
 
-    // Tworzymy mapę z domyślnym centrum - Warszawa
-    val mapView = remember {
-        Configuration.getInstance().userAgentValue = context.packageName
-        MapView(context).apply {
-            setMultiTouchControls(true)
-            controller.setZoom(15.0)
-            controller.setCenter(GeoPoint(52.2297, 21.0122)) // Warszawa domyślnie
-            setOnTouchListener { _, _ ->
-                lastOpenInfoWindow?.close()
-                false
-            }
-        }
-    }
-
     // InfoWindow dla markerów AED
     fun createInfoWindow(aed: AedDto): ComposeView {
         return ComposeView(context).apply {
@@ -166,27 +155,59 @@ fun AedMapScreen(
             map.overlays.removeAll { it is Marker }
             lastOpenInfoWindow?.close()
 
-            aeds.forEach { aed ->
-                val marker = Marker(map).apply {
-                    position = GeoPoint(aed.latitude, aed.longitude)
-                    title = aed.description ?: "AED"
-                    subDescription = if (aed.verified) "Zweryfikowany" else "Niezweryfikowany"
-                    setAnchor(Marker.ANCHOR_CENTER, Marker.ANCHOR_BOTTOM)
+            // Pobranie widocznego obszaru mapy
+            val boundingBox = map.boundingBox
 
-                    // Obsługa kliknięcia markera - otwieranie InfoWindow
-                    setOnMarkerClickListener { m, _ ->
-                        lastOpenInfoWindow?.close()
-                        val info = object : InfoWindow(createInfoWindow(aed), map) {
-                            override fun onOpen(item: Any?) { lastOpenInfoWindow = this }
-                            override fun onClose() { if (lastOpenInfoWindow == this) lastOpenInfoWindow = null }
+            aeds.forEach { aed ->
+                if (boundingBox.contains(aed.latitude, aed.longitude)) {
+                    val marker = Marker(map).apply {
+                        position = GeoPoint(aed.latitude, aed.longitude)
+                        title = aed.description ?: "AED"
+                        subDescription = if (aed.verified) "Zweryfikowany" else "Niezweryfikowany"
+                        setAnchor(Marker.ANCHOR_CENTER, Marker.ANCHOR_BOTTOM)
+
+                        // Obsługa kliknięcia markera - otwieranie InfoWindow
+                        setOnMarkerClickListener { m, _ ->
+                            lastOpenInfoWindow?.close()
+                            val info = object : InfoWindow(createInfoWindow(aed), map) {
+                                override fun onOpen(item: Any?) { lastOpenInfoWindow = this }
+                                override fun onClose() { if (lastOpenInfoWindow == this) lastOpenInfoWindow = null }
+                            }
+                            info.open(m, m.position, 0, -m.icon.intrinsicHeight)
+                            true
                         }
-                        info.open(m, m.position, 0, -m.icon.intrinsicHeight)
-                        true
                     }
+                    map.overlays.add(marker)
                 }
-                map.overlays.add(marker)
             }
             map.invalidate()
+        }
+    }
+
+    // Tworzymy mapę z domyślnym centrum - Warszawa
+    val mapView = remember {
+        Configuration.getInstance().userAgentValue = context.packageName
+        MapView(context).apply {
+            setMultiTouchControls(true)
+            controller.setZoom(15.0)
+            controller.setCenter(GeoPoint(52.2297, 21.0122)) // Warszawa domyślnie
+            setOnTouchListener { _, _ ->
+                lastOpenInfoWindow?.close()
+                false
+            }
+
+            // Listener do przesuwania i zoomu mapy
+            addMapListener(object : MapListener {
+                override fun onScroll(event: ScrollEvent?): Boolean {
+                    updateMarkers(this@apply, aeds)
+                    return true
+                }
+
+                override fun onZoom(event: ZoomEvent?): Boolean {
+                    updateMarkers(this@apply, aeds)
+                    return true
+                }
+            })
         }
     }
 

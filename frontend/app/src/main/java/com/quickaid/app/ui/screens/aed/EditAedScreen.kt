@@ -13,16 +13,19 @@ import androidx.hilt.navigation.compose.hiltViewModel
 import androidx.navigation.NavController
 import androidx.navigation.compose.currentBackStackEntryAsState
 import com.quickaid.app.enums.AedType
+import com.quickaid.app.enums.UserRole
 import com.quickaid.app.ui.components.CustomIconButton
 import com.quickaid.app.ui.components.LargeButton
 import com.quickaid.app.ui.components.SmallButton
 import com.quickaid.app.ui.theme.AppSizes
 import com.quickaid.app.util.AedFormValidator
 import com.quickaid.app.viewmodel.AedViewModel
+import com.quickaid.app.viewmodel.SessionViewModel
 
 @Composable
 fun EditAedScreen(
-    navController: NavController
+    navController: NavController,
+    sessionViewModel: SessionViewModel = hiltViewModel()
 ) {
     // Współdzielenie ViewModelu z mapą AED
     val currentBackStackEntry by navController.currentBackStackEntryAsState()
@@ -38,6 +41,7 @@ fun EditAedScreen(
     val error by viewModel.error.collectAsState()
     val updateSuccess by viewModel.updateSuccess.collectAsState()
     val deleteSuccess by viewModel.deleteSuccess.collectAsState()
+    val userRole by sessionViewModel.role.collectAsState()
 
     // Lokalne stany formularza
     var latitude by remember { mutableStateOf("") }
@@ -177,17 +181,19 @@ fun EditAedScreen(
             )
         }
 
-        // Ikona kosza do usuwania AED
-        currentAed?.let {
-            CustomIconButton(
-                onClick = { showDeleteDialog = true },
-                modifier = Modifier
-                    .align(Alignment.TopEnd)
-                    .padding(top = AppSizes.medium, end = AppSizes.medium)
-                    .size(AppSizes.extraLarge),
-                icon = Icons.Filled.Delete,
-                contentDescription = "Usuń AED"
-            )
+        // Ikona kosza do usuwania
+        if (userRole == UserRole.ADMIN) {
+            currentAed?.let {
+                CustomIconButton(
+                    onClick = { showDeleteDialog = true },
+                    modifier = Modifier
+                        .align(Alignment.TopEnd)
+                        .padding(top = AppSizes.medium, end = AppSizes.medium)
+                        .size(AppSizes.extraLarge),
+                    icon = Icons.Filled.Delete,
+                    contentDescription = "Usuń AED"
+                )
+            }
         }
 
         // Dialog potwierdzający usunięcie punktu AED
